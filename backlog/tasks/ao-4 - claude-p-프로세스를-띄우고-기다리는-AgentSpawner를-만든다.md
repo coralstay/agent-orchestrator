@@ -1,11 +1,11 @@
 ---
 id: AO-4
 title: claude -p 프로세스를 띄우고 기다리는 AgentSpawner를 만든다
-status: To Do
+status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-03 03:18'
-updated_date: '2026-10-03 03:25'
+updated_date: '2026-10-03 03:37'
 labels:
   - skeleton
   - spawner
