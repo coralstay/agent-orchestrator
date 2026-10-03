@@ -2,14 +2,21 @@ package com.coralstay.orchestrator.backlog;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+import com.coralstay.orchestrator.backlog.BacklogClient.BacklogException;
 import com.coralstay.orchestrator.backlog.BacklogClient.Criterion;
+import com.coralstay.orchestrator.backlog.BacklogClient.ProcessResult;
 import com.coralstay.orchestrator.backlog.BacklogClient.Task;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -63,6 +70,71 @@ class BacklogClientTest {
 
         assertTrue(task.acceptanceCriteria().stream()
                 .noneMatch(c -> c.text().contains("통과 로그를 확인했다")));
+    }
+
+    // --- view: 실행기 주입 ---
+
+    @Test
+    void viewRunsBacklogTaskViewPlainAndParsesStdout() {
+        List<List<String>> calls = new ArrayList<>();
+        var client = new BacklogClient(command -> {
+            calls.add(command);
+            return new ProcessResult(0, fixture("ao-7-plain.txt"), "");
+        });
+
+        Task task = client.view("AO-7");
+
+        assertEquals(List.of(List.of("backlog", "task", "view", "AO-7", "--plain")), calls);
+        assertEquals("AO-7", task.id());
+    }
+
+    @Test
+    void viewThrowsWithStderrOnNonZeroExit() {
+        var client = new BacklogClient(command -> new ProcessResult(1, "", "Task AO-999 not found.\n"));
+
+        var e = assertThrows(BacklogException.class, () -> client.view("AO-999"));
+
+        assertEquals(1, e.exitCode());
+        assertEquals("Task AO-999 not found.\n", e.stderr());
+        assertTrue(e.getMessage().contains("Task AO-999 not found."));
+    }
+
+    // --- 실제 backlog CLI (이 저장소의 backlog/, PATH에 backlog가 없으면 건너뜀) ---
+
+    @Test
+    void realCliViewsDoneTask() {
+        var client = new BacklogClient(BacklogClient.processExecutor(Path.of("").toAbsolutePath()));
+        assumeTrue(backlogOnPath(), "backlog CLI not on PATH");
+
+        Task task = client.view("AO-1");
+
+        assertEquals("AO-1", task.id());
+        assertEquals("Done", task.status());
+        assertEquals(List.of(), task.dependencies());
+    }
+
+    @Test
+    void realCliMissingTaskExitsNonZeroWithStderr() {
+        var client = new BacklogClient(BacklogClient.processExecutor(Path.of("").toAbsolutePath()));
+        assumeTrue(backlogOnPath(), "backlog CLI not on PATH");
+
+        var e = assertThrows(BacklogException.class, () -> client.view("AO-999999"));
+
+        assertEquals(1, e.exitCode());
+        assertTrue(e.stderr().contains("not found"), e.stderr());
+    }
+
+    private static boolean backlogOnPath() {
+        String path = System.getenv("PATH");
+        if (path == null) {
+            return false;
+        }
+        for (String dir : path.split(java.io.File.pathSeparator)) {
+            if (Files.isExecutable(Path.of(dir, "backlog"))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     static String fixture(String name) {

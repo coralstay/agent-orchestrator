@@ -1,9 +1,19 @@
 package com.coralstay.orchestrator.backlog;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +39,73 @@ public final class BacklogClient {
             acceptanceCriteria = List.copyOf(acceptanceCriteria);
             dependencies = List.copyOf(dependencies);
         }
+    }
+
+    /** 외부 프로세스 실행 결과. */
+    public record ProcessResult(int exitCode, String stdout, String stderr) {}
+
+    /** {@code backlog}가 0이 아닌 종료코드로 끝났을 때. stderr를 그대로 담는다. */
+    public static final class BacklogException extends RuntimeException {
+        private final int exitCode;
+        private final String stderr;
+
+        public BacklogException(List<String> command, int exitCode, String stderr) {
+            super(String.join(" ", command) + " 실패(exit " + exitCode + "): " + stderr.strip());
+            this.exitCode = exitCode;
+            this.stderr = stderr;
+        }
+
+        public int exitCode() {
+            return exitCode;
+        }
+
+        public String stderr() {
+            return stderr;
+        }
+    }
+
+    private final Function<List<String>, ProcessResult> executor;
+
+    /** 명령 실행기를 주입받는다. 테스트는 가짜 실행기를, 운영은 {@link #processExecutor(Path)}를 넘긴다. */
+    public BacklogClient(Function<List<String>, ProcessResult> executor) {
+        this.executor = Objects.requireNonNull(executor);
+    }
+
+    /** {@code backlog task view <id> --plain}을 실행해 Task로 해석한다. 종료코드≠0이면 {@link BacklogException}. */
+    public Task view(String id) {
+        List<String> command = List.of("backlog", "task", "view", id, "--plain");
+        ProcessResult result = executor.apply(command);
+        if (result.exitCode() != 0) {
+            throw new BacklogException(command, result.exitCode(), result.stderr());
+        }
+        return parse(result.stdout());
+    }
+
+    /** workingDir에서 ProcessBuilder로 명령을 실행하는 실행기. stdout·stderr를 동시에 읽어 파이프 교착을 피한다. */
+    public static Function<List<String>, ProcessResult> processExecutor(Path workingDir) {
+        return command -> {
+            try {
+                Process process = new ProcessBuilder(command).directory(workingDir.toFile()).start();
+                process.getOutputStream().close();
+                try (var pool = Executors.newVirtualThreadPerTaskExecutor()) {
+                    Future<String> stderr = pool.submit(() -> read(process.getErrorStream()));
+                    String stdout = read(process.getInputStream());
+                    int exitCode = process.waitFor();
+                    return new ProcessResult(exitCode, stdout, stderr.get());
+                }
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException("interrupted: " + command, e);
+            } catch (ExecutionException e) {
+                throw new IllegalStateException("stderr read failed: " + command, e.getCause());
+            }
+        };
+    }
+
+    private static String read(InputStream in) throws IOException {
+        return new String(in.readAllBytes(), StandardCharsets.UTF_8);
     }
 
     private static final Pattern TITLE = Pattern.compile("^Task (\\S+) - (.+)$");
