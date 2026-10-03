@@ -1,11 +1,11 @@
 ---
 id: AO-3
 title: 태스크별 git worktree를 만들고 지우는 WorktreeManager를 만든다
-status: To Do
+status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-03 03:18'
-updated_date: '2026-10-03 03:25'
+updated_date: '2026-10-03 03:33'
 labels:
   - skeleton
   - worktree
