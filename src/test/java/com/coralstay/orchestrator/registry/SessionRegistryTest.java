@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.coralstay.orchestrator.registry.SessionRegistry.LiveSession;
 import com.coralstay.orchestrator.registry.SessionRegistry.Session;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -240,5 +242,46 @@ class SessionRegistryTest {
 
     static String firstLineOf(Process p) throws IOException {
         return new BufferedReader(new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8)).readLine();
+    }
+
+    // --- live ---
+
+    @Test
+    void liveReturnsSnapshotOfRegisteredSessions() throws Exception {
+        var registry = new SessionRegistry(2);
+        Session spawned = registry.admit("AO-1", "implementer");
+        Process p = sh("sleep 30");
+        registry.attach(spawned, p.toHandle());
+        Session pending = registry.admit("AO-2", "verifier");
+
+        List<LiveSession> live = registry.live();
+
+        assertEquals(List.of(
+                new LiveSession("AO-1", "implementer", OptionalLong.of(p.pid()), spawned.startedAt()),
+                new LiveSession("AO-2", "verifier", OptionalLong.empty(), pending.startedAt())), live);
+    }
+
+    @Test
+    void liveSnapshotIsImmutableAndUnaffectedByLaterChanges() throws Exception {
+        var registry = new SessionRegistry(2);
+        Session first = registry.admit("AO-1", "implementer");
+        List<LiveSession> before = registry.live();
+
+        registry.admit("AO-2", "implementer");
+        registry.retire(first);
+
+        assertEquals(1, before.size());
+        assertEquals("AO-1", before.getFirst().taskId());
+        assertThrows(UnsupportedOperationException.class, () -> before.add(before.getFirst()));
+        assertThrows(UnsupportedOperationException.class, before::clear);
+        assertEquals(List.of("AO-2"), registry.live().stream().map(LiveSession::taskId).toList());
+    }
+
+    @Test
+    void liveIsEmptyAfterAllRetired() throws Exception {
+        var registry = new SessionRegistry();
+        registry.retire(registry.admit("AO-1", "implementer"));
+
+        assertTrue(registry.live().isEmpty());
     }
 }

@@ -2,9 +2,12 @@ package com.coralstay.orchestrator.registry;
 
 import com.coralstay.orchestrator.spawn.AgentSpawner;
 import java.time.Instant;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
@@ -68,6 +71,14 @@ public final class SessionRegistry {
             return Optional.ofNullable(process.get());
         }
     }
+
+    /**
+     * {@link #live()}가 돌려주는 세션 한 건의 불변 스냅샷.
+     *
+     * @param pid attach된 프로세스 PID (스폰 전이면 비어 있다)
+     * @param startedAt admit(허가 획득) 시각
+     */
+    public record LiveSession(String taskId, String role, OptionalLong pid, Instant startedAt) {}
 
     private final Semaphore permits;
     private final Map<String, Session> sessions = new ConcurrentHashMap<>();
@@ -149,6 +160,23 @@ public final class SessionRegistry {
             }
         }
         return removed;
+    }
+
+    /**
+     * 현재 등록된(admit 후 아직 retire되지 않은) 세션의 불변 스냅샷. admit 시각 순으로 정렬한다.
+     *
+     * <p>스냅샷이라 이후의 admit·retire는 반영되지 않는다. "살아 있음"은 허가를 쥐고 있다는 뜻이다 — 프로세스가 이미
+     * 끝났어도 retire 전까지는 목록에 남는다.
+     */
+    public List<LiveSession> live() {
+        return sessions.values().stream()
+                .map(s -> new LiveSession(
+                        s.taskId,
+                        s.role,
+                        s.process().map(p -> OptionalLong.of(p.pid())).orElse(OptionalLong.empty()),
+                        s.startedAt))
+                .sorted(Comparator.comparing(LiveSession::startedAt).thenComparing(LiveSession::taskId))
+                .toList();
     }
 
     /** 지금 얻을 수 있는 허가 수 (테스트·진단용). */
