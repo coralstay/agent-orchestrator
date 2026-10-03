@@ -1,11 +1,11 @@
 ---
 id: AO-3
 title: 태스크별 git worktree를 만들고 지우는 WorktreeManager를 만든다
-status: In Progress
+status: Done
 assignee:
   - '@claude'
 created_date: '2026-10-03 03:18'
-updated_date: '2026-10-03 03:33'
+updated_date: '2026-10-03 03:37'
 labels:
   - skeleton
   - worktree
@@ -45,18 +45,18 @@ decision-3: 스켈레톤 범위에 worktree 격리를 포함한다. 계층 대�
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 `create(taskId)`: `git worktree add -b task/<id> ../<repo>-wt/<id>`를 실행하고 생성된 경로를 돌려준다
-- [ ] #2 `create(taskId)`: 같은 경로나 브랜치가 이미 있으면 덮어쓰지 않고 원인을 담은 예외를 던진다
-- [ ] #3 `remove(taskId)`: worktree를 제거하고 `git worktree prune`까지 실행한다 (브랜치는 남긴다)
-- [ ] #4 팩토리 문서 D3 반영: 아키텍처.md 6절·README 6절 디렉토리 구조를 실제 패키지(backlog/workspace/spawn/registry/ledger)로 갱신했다
+- [x] #1 `create(taskId)`: `git worktree add -b task/<id> ../<repo>-wt/<id>`를 실행하고 생성된 경로를 돌려준다
+- [x] #2 `create(taskId)`: 같은 경로나 브랜치가 이미 있으면 덮어쓰지 않고 원인을 담은 예외를 던진다
+- [x] #3 `remove(taskId)`: worktree를 제거하고 `git worktree prune`까지 실행한다 (브랜치는 남긴다)
+- [x] #4 팩토리 문서 D3 반영: 아키텍처.md 6절·README 6절 디렉토리 구조를 실제 패키지(backlog/workspace/spawn/registry/ledger)로 갱신했다
 <!-- AC:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 `./gradlew test` 통과 로그를 확인했다
-- [ ] #2 AC마다 커밋 1개 이상이며 git-logbook 형식 검사를 통과했다
-- [ ] #3 팩토리 `docs/orchestrator-skeleton` 브랜치에 문서 반영 커밋이 있다
-- [ ] #4 doc-1 해당 행을 ✅(팩토리 커밋 해시) 또는 ❌로 갱신했다
+- [x] #1 `./gradlew test` 통과 로그를 확인했다
+- [x] #2 AC마다 커밋 1개 이상이며 git-logbook 형식 검사를 통과했다
+- [x] #3 팩토리 `docs/orchestrator-skeleton` 브랜치에 문서 반영 커밋이 있다
+- [x] #4 doc-1 해당 행을 ✅(팩토리 커밋 해시) 또는 ❌로 갱신했다
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -75,4 +75,18 @@ decision-3: 스켈레톤 범위에 worktree 격리를 포함한다. 계층 대�
 
 <!-- SECTION:NOTES:BEGIN -->
 브랜치는 지우지 않는다 — Done 시 커밋을 읽어 카드에 기록하는 RFC 06절 흐름과 스쿼시/머지 미결 문제 때문에 브랜치 처리는 사람 몫으로 남긴다.
+
+구현 결과(AO-3):
+- WorktreeManager는 BacklogClient.ProcessResult/processExecutor를 재사용(실행기 주입). git 실패는 WorktreeException(명령+exit+stderr).
+- create: git은 빈 디렉토리가 이미 있으면 worktree add를 그대로 진행한다(실측, git 2.54) → 경로 존재를 직접 검사. 브랜치는 rev-parse --verify로 검사. 둘 다 아무것도 바꾸지 않고 예외.
+- 태스크 ID는 [A-Za-z0-9][A-Za-z0-9_-]*만 허용 — ../ 경로 이탈 차단.
+- remove: --force 없이 worktree remove → prune. 미커밋 변경 시 실패하고 worktree 유지. 디렉토리가 이미 없으면 prune만(멱등). 브랜치 유지.
+- 테스트: @TempDir 실제 git 저장소, 로컬 core.hooksPath=빈 디렉토리, user.name/email·commit.gpgsign 로컬 설정. WorktreeManagerTest 7개 + 전체 34개 통과(./gradlew test --rerun-tasks).
+- 팩토리 6a20bc0(docs/orchestrator-skeleton): 아키텍처.md 6·7절, README 6절 + [impl] 링크. doc-1 D3 ✅.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+태스크별 git worktree를 만들고 지우는 WorktreeManager(workspace 패키지) 구현. create는 <parent>/<repo>-wt/<id>에 task/<id> 브랜치로 worktree를 만들고, 경로(빈 디렉토리 포함)·브랜치가 있으면 아무것도 바꾸지 않고 예외. remove는 --force 없이 worktree remove 후 prune, 브랜치 유지(미커밋 변경 시 실패). 실제 git 임시 저장소 테스트 7개 포함 34개 통과. 팩토리 문서 D3(디렉토리 구조 ↔ RFC 06절 컴포넌트명) 반영: 6a20bc0.
+<!-- SECTION:FINAL_SUMMARY:END -->
