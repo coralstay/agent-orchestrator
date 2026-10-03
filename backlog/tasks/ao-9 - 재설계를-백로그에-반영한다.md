@@ -1,11 +1,11 @@
 ---
 id: AO-9
 title: 재설계를 백로그에 반영한다
-status: To Do
+status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-03 13:05'
-updated_date: '2026-10-03 13:05'
+updated_date: '2026-10-03 13:07'
 labels:
   - backlog
   - redesign
