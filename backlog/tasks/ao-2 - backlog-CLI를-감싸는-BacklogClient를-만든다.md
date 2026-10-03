@@ -1,11 +1,11 @@
 ---
 id: AO-2
 title: backlog CLI를 감싸는 BacklogClient를 만든다
-status: To Do
+status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-03 03:18'
-updated_date: '2026-10-03 03:25'
+updated_date: '2026-10-03 03:28'
 labels:
   - skeleton
   - backlog
