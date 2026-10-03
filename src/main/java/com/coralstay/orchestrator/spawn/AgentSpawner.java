@@ -8,11 +8,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * {@code claude -p} 헤드리스 프로세스를 띄우고 기다리는 스포너 (RFC 06절 Agent Spawner).
@@ -28,8 +31,8 @@ public final class AgentSpawner {
     /**
      * 한 세션의 실행 결과.
      *
-     * @param exitCode 종료코드 (타임아웃으로 죽였으면 신호 종료 코드, 보통 137/143)
-     * @param timedOut 제한 시간 안에 끝나지 않아 스포너가 종료시켰는가
+     * @param exitCode 종료코드 (타임아웃으로 죽였으면 신호 종료 코드, 보통 143/137)
+     * @param timedOut 제한 시간 안에 끝나지 않아 스포너가 프로세스와 자손을 종료시켰는가
      * @param duration 시작부터 종료(또는 강제 종료)까지
      */
     public record AgentResult(
@@ -131,6 +134,8 @@ public final class AgentSpawner {
     /**
      * 프로세스를 띄우고 핸들을 바로 돌려준다. 대기·타임아웃 처리는 virtual thread에서 진행된다.
      *
+     * <p>timeout이 지나면 프로세스와 자손 전부를 종료하고 timedOut=true인 결과를 낸다({@link #terminate}).
+     *
      * <p>stdin은 즉시 닫는다 — {@code claude -p}는 파이프된 stdin을 프롬프트로 읽으려 기다릴 수 있다. stdout·stderr는
      * 각각 별도 virtual thread로 끝까지 읽어, 출력이 커도 파이프 버퍼가 차서 프로세스가 멈추지 않게 한다.
      */
@@ -160,7 +165,7 @@ public final class AgentSpawner {
             try {
                 boolean exited = process.waitFor(timeout.toMillis(), TimeUnit.MILLISECONDS);
                 if (!exited) {
-                    terminate(process);
+                    terminate(process.toHandle());
                 }
                 int exitCode = process.waitFor();
                 Duration duration = Duration.between(startedAt, Instant.now());
@@ -170,7 +175,7 @@ public final class AgentSpawner {
                         exitCode, text(stdout), text(stderr), process.pid(), !exited, duration));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                process.destroyForcibly();
+                terminate(process.toHandle());
                 result.completeExceptionally(new IllegalStateException("에이전트 대기 중 인터럽트", e));
             } catch (RuntimeException e) {
                 result.completeExceptionally(e);
@@ -190,8 +195,34 @@ public final class AgentSpawner {
      */
     private static final Duration DRAIN_GRACE = Duration.ofSeconds(2);
 
-    private static void terminate(Process process) {
-        process.destroyForcibly();
+    /** 정상 종료(SIGTERM) 후 강제 종료(SIGKILL)로 넘어가기 전 기다리는 시간. */
+    static final Duration TERMINATE_GRACE = Duration.ofMillis(500);
+
+    /**
+     * 프로세스와 그 자손 전부를 종료한다: destroy → {@link #TERMINATE_GRACE} 대기 → 남은 것은 destroyForcibly.
+     *
+     * <p>자손 목록은 부모를 죽이기 <em>전에</em> 떠 둔다 — 부모가 먼저 죽으면 자손이 init으로 재부모화되어
+     * {@code descendants()}로 더는 찾을 수 없다. 스냅샷 이후 새로 생긴 자손은 놓칠 수 있다(스켈레톤 범위 밖).
+     */
+    static void terminate(ProcessHandle root) {
+        List<ProcessHandle> all = new ArrayList<>(root.descendants().toList());
+        all.add(root);
+        all.forEach(ProcessHandle::destroy);
+        long deadline = System.nanoTime() + TERMINATE_GRACE.toNanos();
+        for (ProcessHandle handle : all) {
+            long remaining = deadline - System.nanoTime();
+            if (remaining > 0) {
+                try {
+                    handle.onExit().get(remaining, TimeUnit.NANOSECONDS);
+                } catch (TimeoutException | ExecutionException e) {
+                    // 아래에서 강제 종료
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        }
+        all.stream().filter(ProcessHandle::isAlive).forEach(ProcessHandle::destroyForcibly);
     }
 
     private static void drain(InputStream in, ByteArrayOutputStream sink) {

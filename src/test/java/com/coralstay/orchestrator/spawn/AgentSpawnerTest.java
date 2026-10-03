@@ -2,6 +2,7 @@ package com.coralstay.orchestrator.spawn;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -141,5 +142,43 @@ class AgentSpawnerTest {
 
         assertThrows(IllegalArgumentException.class,
                 () -> spawner(exe).start("implementer", tmp, "p", Duration.ZERO));
+    }
+
+    // --- timeout ---
+
+    @Test
+    void spawnTimeoutKillsProcessAndAllDescendants() throws IOException {
+        // 백그라운드 자식과 전경 자식을 하나씩 두고, 둘 다 30초 동안 버티게 한다
+        Path pids = tmp.resolve("pids");
+        Path exe = fake("""
+                sleep 30 &
+                echo $! > %s
+                echo started
+                sleep 30""".formatted(pids));
+
+        AgentResult result = spawner(exe).spawn("implementer", tmp, "p", Duration.ofMillis(300));
+
+        assertTrue(result.timedOut());
+        assertNotEquals(0, result.exitCode());
+        assertEquals("started\n", result.stdout(), "죽이기 전까지의 출력은 남는다");
+        assertTrue(result.duration().compareTo(Duration.ofSeconds(2)) < 0, result.duration().toString());
+        assertFalse(ProcessHandle.of(result.pid()).map(ProcessHandle::isAlive).orElse(false));
+        long child = Long.parseLong(Files.readString(pids).strip());
+        assertFalse(ProcessHandle.of(child).map(ProcessHandle::isAlive).orElse(false),
+                "백그라운드 자식 sleep(pid " + child + ")이 남으면 안 된다");
+    }
+
+    @Test
+    void terminateForcesProcessThatIgnoresSigterm() throws IOException {
+        Path exe = fake("""
+                trap '' TERM
+                echo ready
+                while :; do sleep 0.05; done""");
+
+        AgentResult result = spawner(exe).spawn("implementer", tmp, "p", Duration.ofMillis(300));
+
+        assertTrue(result.timedOut());
+        assertFalse(ProcessHandle.of(result.pid()).map(ProcessHandle::isAlive).orElse(false),
+                "SIGTERM을 무시해도 유예 후 SIGKILL로 끝나야 한다");
     }
 }
