@@ -79,6 +79,20 @@ public final class WorktreeManager {
         return path;
     }
 
+    /**
+     * {@code git worktree remove <path>} 후 {@code git worktree prune}. 브랜치는 남긴다.
+     *
+     * <p>{@code --force}를 쓰지 않으므로 미커밋 변경이 있으면 {@link WorktreeException}으로 실패하고 worktree는 그대로
+     * 남는다 — 부분 작업 상태는 사람이 판단한다(RFC 07절). 디렉토리가 이미 없으면 remove를 건너뛰고 prune만 한다.
+     */
+    public void remove(String taskId) {
+        Path path = worktreePath(taskId);
+        if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
+            git("worktree", "remove", path.toString());
+        }
+        git("worktree", "prune");
+    }
+
     private ProcessResult git(String... args) {
         List<String> command = new ArrayList<>(List.of("git"));
         command.addAll(List.of(args));

@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,7 +88,57 @@ class WorktreeManagerTest {
         assertThrows(IllegalArgumentException.class, () -> manager.create("../evil"));
     }
 
+    // --- remove ---
+
+    @Test
+    void removeDeletesWorktreeAndKeepsBranchWithCommits() throws IOException {
+        Path path = manager.create("AO-3");
+        Files.writeString(path.resolve("work.txt"), "done\n");
+        git(path, "add", "work.txt");
+        git(path, "commit", "-q", "-m", "work");
+        String head = git(path, "rev-parse", "HEAD");
+
+        manager.remove("AO-3");
+
+        assertFalse(Files.exists(path));
+        assertFalse(git(repo, "worktree", "list", "--porcelain").contains(path.toString()));
+        assertEquals(head, git(repo, "rev-parse", "task/AO-3"), "브랜치와 커밋은 남아야 한다");
+        // 같은 ID로 다시 만들 수 있는지는 브랜치가 남아 있으므로 거부되어야 한다
+        assertThrows(WorktreeException.class, () -> manager.create("AO-3"));
+    }
+
+    @Test
+    void removePrunesWorktreeWhoseDirectoryWasDeletedByHand() throws IOException {
+        Path path = manager.create("AO-3");
+        deleteRecursively(path);
+
+        // 디렉토리가 이미 없으면 remove는 건너뛰고 prune으로 남은 메타데이터만 정리한다
+        manager.remove("AO-3");
+
+        assertFalse(git(repo, "worktree", "list", "--porcelain").contains(path.toString()));
+    }
+
+    @Test
+    void removeRefusesWorktreeWithUncommittedChanges() throws IOException {
+        Path path = manager.create("AO-3");
+        Files.writeString(path.resolve("README"), "dirty\n");
+
+        var e = assertThrows(WorktreeException.class, () -> manager.remove("AO-3"));
+
+        assertTrue(e.getMessage().contains("worktree remove"), e.getMessage());
+        assertEquals("dirty\n", Files.readString(path.resolve("README")), "변경을 지우면 안 된다");
+        assertTrue(git(repo, "worktree", "list", "--porcelain").contains(path.toString()));
+    }
+
     // --- helpers ---
+
+    static void deleteRecursively(Path dir) throws IOException {
+        try (var paths = Files.walk(dir)) {
+            for (Path p : paths.sorted(Comparator.reverseOrder()).toList()) {
+                Files.delete(p);
+            }
+        }
+    }
 
     boolean branchExists(String branch) {
         try {
