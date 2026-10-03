@@ -47,7 +47,7 @@ type: docs
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 decision-6~10을 추가하고 decision-5를 도구 중립(커밋 트레일러 계약) 기준으로 다시 썼다
-- [ ] #2 doc-1에 스파이크 결과(D5 헤드리스 실측, D9 peak RSS)와 재설계 반영 행을 추가했다
+- [x] #2 doc-1에 스파이크 결과(D5 헤드리스 실측, D9 peak RSS)와 재설계 반영 행을 추가했다
 - [ ] #3 AO-7을 새 실행 순서(카드 검증 → 판정 → 정책 → claim → 워크트리 → 실행 → 실제치 → 브랜치 상태 판정)로 다시 썼다
 - [ ] #4 AO-8을 Token Budget 카드 픽스처와 실제치 병기 확인 기준으로 다시 썼다
 - [ ] #5 M1 draft 4개(TaskCardSource, BacklogCardSource, AgentRunner, ModelPolicy)를 모든 필드를 채워 만들었다
