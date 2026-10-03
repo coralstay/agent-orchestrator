@@ -2,6 +2,8 @@ package com.coralstay.orchestrator.workspace;
 
 import com.coralstay.orchestrator.backlog.BacklogClient;
 import com.coralstay.orchestrator.backlog.BacklogClient.ProcessResult;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,10 +59,23 @@ public final class WorktreeManager {
         return "task/" + taskId;
     }
 
-    /** {@code git worktree add -b task/<id> <path>}를 실행하고 만든 경로를 돌려준다. */
+    /**
+     * {@code git worktree add -b task/<id> <path>}를 실행하고 만든 경로를 돌려준다.
+     *
+     * <p>경로나 브랜치가 이미 있으면 아무것도 바꾸지 않고 {@link WorktreeException}을 던진다. git은 빈 디렉토리에는
+     * 그대로 worktree를 만들어 버리므로 경로는 직접 확인한다.
+     */
     public Path create(String taskId) {
         Path path = worktreePath(taskId);
-        git("worktree", "add", "-b", branchName(taskId), path.toString());
+        String branch = branchName(taskId);
+        if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
+            throw new WorktreeException("worktree 경로가 이미 있습니다: " + path);
+        }
+        if (executor.apply(List.of("git", "rev-parse", "--verify", "--quiet", "refs/heads/" + branch))
+                        .exitCode() == 0) {
+            throw new WorktreeException("브랜치가 이미 있습니다: " + branch);
+        }
+        git("worktree", "add", "-b", branch, path.toString());
         return path;
     }
 

@@ -1,8 +1,11 @@
 package com.coralstay.orchestrator.workspace;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.coralstay.orchestrator.workspace.WorktreeManager.WorktreeException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -55,7 +58,46 @@ class WorktreeManagerTest {
         assertTrue(git(repo, "worktree", "list", "--porcelain").contains("worktree " + path));
     }
 
+    @Test
+    void createRefusesExistingPathEvenIfEmpty() throws IOException {
+        // git은 빈 디렉토리면 그대로 worktree add를 해버리므로 직접 막아야 한다
+        Path path = Files.createDirectories(manager.worktreePath("AO-3"));
+
+        var e = assertThrows(WorktreeException.class, () -> manager.create("AO-3"));
+
+        assertTrue(e.getMessage().contains(path.toString()), e.getMessage());
+        assertFalse(branchExists("task/AO-3"), "브랜치를 만들면 안 된다");
+        assertFalse(Files.exists(path.resolve("README")));
+    }
+
+    @Test
+    void createRefusesExistingBranchAndKeepsIt() throws IOException {
+        git(repo, "branch", "task/AO-3");
+        String before = git(repo, "rev-parse", "task/AO-3");
+
+        var e = assertThrows(WorktreeException.class, () -> manager.create("AO-3"));
+
+        assertTrue(e.getMessage().contains("task/AO-3"), e.getMessage());
+        assertFalse(Files.exists(manager.worktreePath("AO-3")), "경로를 만들면 안 된다");
+        assertEquals(before, git(repo, "rev-parse", "task/AO-3"));
+    }
+
+    @Test
+    void rejectsTaskIdThatEscapesWorktreeDirectory() {
+        assertThrows(IllegalArgumentException.class, () -> manager.create("../evil"));
+    }
+
     // --- helpers ---
+
+    boolean branchExists(String branch) {
+        try {
+            git(repo, "rev-parse", "--verify", "--quiet", "refs/heads/" + branch);
+            return true;
+        } catch (IllegalStateException e) {
+            return false;
+        }
+    }
+
 
     static String git(Path dir, String... args) {
         List<String> command = new ArrayList<>(List.of("git"));
