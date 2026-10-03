@@ -108,6 +108,25 @@ public final class BacklogClient {
         return new String(in.readAllBytes(), StandardCharsets.UTF_8);
     }
 
+    public static final String TO_DO = "To Do";
+    public static final String IN_PROGRESS = "In Progress";
+    public static final String DONE = "Done";
+
+    /**
+     * 스폰해도 되는 태스크인가: 상태가 To Do이고 직접 의존 태스크가 전부 Done일 때만 true.
+     *
+     * <p>In Progress는 사람이 선점한 락이므로 false. backlog의 {@code isReady}/{@code task list --ready}는
+     * In Progress도 ready로 치므로(1.51.0 실측) 그대로 쓰지 않고 여기서 직접 판정한다.
+     *
+     * @param lookup 의존 태스크 ID → Task (보통 {@code this::view})
+     */
+    public static boolean isRunnable(Task task, Function<String, Task> lookup) {
+        if (!TO_DO.equals(task.status())) {
+            return false;
+        }
+        return task.dependencies().stream().allMatch(id -> DONE.equals(lookup.apply(id).status()));
+    }
+
     private static final Pattern TITLE = Pattern.compile("^Task (\\S+) - (.+)$");
     /** {@code Status: ○ To Do} — 앞의 상태 글리프(○ ◒ ✔ 등)는 버린다. */
     private static final Pattern STATUS =

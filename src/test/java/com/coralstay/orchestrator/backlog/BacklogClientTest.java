@@ -18,7 +18,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class BacklogClientTest {
 
@@ -97,6 +100,55 @@ class BacklogClientTest {
         assertEquals(1, e.exitCode());
         assertEquals("Task AO-999 not found.\n", e.stderr());
         assertTrue(e.getMessage().contains("Task AO-999 not found."));
+    }
+
+    // --- isRunnable: 상태 × 의존 완료 여부 ---
+
+    @ParameterizedTest(name = "{0}, deps={1},{2} -> {3}")
+    @CsvSource({
+        "To Do,       Done,        Done,        true",
+        "To Do,       Done,        To Do,       false",
+        "To Do,       Done,        In Progress, false",
+        "In Progress, Done,        Done,        false",
+        "In Progress, To Do,       Done,        false",
+        "Done,        Done,        Done,        false",
+        "Done,        To Do,       To Do,       false",
+    })
+    void runnableOnlyWhenToDoAndAllDependenciesDone(
+            String status, String dep1Status, String dep2Status, boolean expected) {
+        Task task = task("AO-9", status, List.of("AO-1", "AO-2"));
+        Map<String, Task> board = Map.of(
+                "AO-1", task("AO-1", dep1Status, List.of()),
+                "AO-2", task("AO-2", dep2Status, List.of()));
+
+        assertEquals(expected, BacklogClient.isRunnable(task, board::get));
+    }
+
+    @Test
+    void toDoWithoutDependenciesIsRunnableWithoutLookup() {
+        Task task = task("AO-9", "To Do", List.of());
+
+        assertTrue(BacklogClient.isRunnable(task, id -> {
+            throw new AssertionError("lookup should not be called");
+        }));
+    }
+
+    @Test
+    void realFixturesInProgressAndBlockedToDoAreNotRunnable() {
+        Map<String, Task> board = Map.of(
+                "AO-1", BacklogClient.parse(fixture("ao-1-plain.txt")),
+                "AO-2", BacklogClient.parse(fixture("ao-2-plain.txt")));
+
+        // AO-2: 의존 AO-1은 Done이지만 In Progress(사람 선점) → false
+        assertFalse(BacklogClient.isRunnable(board.get("AO-2"), board::get));
+        // AO-7: To Do지만 AO-2가 미완 → 첫 미완 의존에서 false
+        assertFalse(BacklogClient.isRunnable(
+                BacklogClient.parse(fixture("ao-7-plain.txt")),
+                id -> board.getOrDefault(id, task(id, "To Do", List.of()))));
+    }
+
+    private static Task task(String id, String status, List<String> dependencies) {
+        return new Task(id, id + " title", status, List.of(), dependencies);
     }
 
     // --- 실제 backlog CLI (이 저장소의 backlog/, PATH에 backlog가 없으면 건너뜀) ---
