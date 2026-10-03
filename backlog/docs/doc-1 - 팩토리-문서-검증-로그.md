@@ -14,7 +14,7 @@ coralstay-software-factory(`~/githubs/coralstay-software-factory`) 문서의 가
 
 | #  | 팩토리 위치 | 문제 | 확인·반영할 것 | 담당 태스크 | 상태 |
 |----|-------------|------|----------------|-------------|------|
-| D1 | 아키텍처.md 3절, README "한눈에 보는 실행 기반" 그림 | "Java 22+" ↔ RFC 06절 "Java 25" | Java 25로 통일 (decision-1) | Gradle 골격 + CLI 진입 | ⏳ |
+| D1 | 아키텍처.md 3절, README "한눈에 보는 실행 기반" 그림 | "Java 22+" ↔ RFC 06절 "Java 25" | Java 25로 통일 (decision-1) | Gradle 골격 + CLI 진입 | ✅ 8931057 |
 | D2 | 아키텍처.md 1·4절 계층 1 | `WatchService` 감시를 확정처럼 기술 ↔ RFC 09절 "CLI 폴링 vs WatchService 미정" | 미정으로 정정, 스켈레톤은 단발 CLI (decision-2) | run 배선 + 기록 | ⏳ |
 | D3 | 아키텍처.md 6절, README 6절 디렉토리 구조 | `allocator/interceptor/parser/web` ↔ RFC 06절 `Watcher/Queue/Policy/Spawner/Registry` | 실제 패키지 구조로 갱신 | worktree 관리 | ⏳ |
 | D4 | RFC 04절 "회수 시 컨텍스트 폐기", fig.5(`diagrams/07-task-sequence.mmd`), README 로드맵 1 | "`/clear` 후 회수" — `claude -p` 헤드리스는 프로세스 종료가 곧 컨텍스트 폐기라 `/clear` 단계가 성립하지 않을 수 있음 | 회수 = 프로세스(자손 포함) 종료 + Registry 제거로 실측 후 문구 정정 | 에이전트 스폰, 세션 레지스트리 | ⏳ |
