@@ -1,11 +1,11 @@
 ---
 id: AO-9
 title: 재설계를 백로그에 반영한다
-status: In Progress
+status: Done
 assignee:
   - '@claude'
 created_date: '2026-10-03 13:05'
-updated_date: '2026-10-03 13:10'
+updated_date: '2026-10-03 13:11'
 labels:
   - backlog
   - redesign
@@ -56,7 +56,7 @@ type: docs
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 `backlog draft list --plain`·`task view`로 새 항목의 공란을 점검했다
+- [x] #1 `backlog draft list --plain`·`task view`로 새 항목의 공란을 점검했다
 - [ ] #2 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(병합은 유저)
 <!-- DOD:END -->
 
@@ -75,4 +75,12 @@ type: docs
 
 <!-- SECTION:NOTES:BEGIN -->
 draft→promote 순서상 이 카드 자체는 main(예외 브랜치)에서 만들고 승격한다. 이후 작업은 task/AO-<n> 브랜치. 라이선스 PR(#1)이 먼저 병합되지 않으면 이 브랜치 PR에 라이선스 커밋이 함께 보인다.
+
+공란 점검: draft-1~8·AO-7·AO-8 필드 공란 없음. AO-9 의존은 선행 태스크가 없어 비어 있음. promote가 draft 간 의존을 갱신하지 않으므로 승격 후 AO ID로 재설정 필요.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+재설계를 backlog에 반영했다. decision-6(카드 Token Budget 소절)·7(Claude 전용 + AgentRunner 포트)·8(in/out 단위, 커밋 귀속분과 세션 총량 병기)·9(claim 후 태스크 브랜치에서만 카드 수정)·10(의존성 없는 모델 정책)을 추가하고 decision-5를 커밋 트레일러 계약 기준으로 다시 썼다. doc-1에 스파이크 결과(D5 헤드리스 실측, D9 240~290MB)와 D10~D13을 추가했다. AO-7은 새 실행 순서(검증→판정→정책→claim→워크트리→실행→실제치→브랜치 상태 판정)로, AO-8은 Token Budget 카드 픽스처 기준으로 다시 썼다. M1 draft 4개(TaskCardSource, BacklogCardSource, AgentRunner, ModelPolicy)와 M2 마일스톤·draft 4개를 만들었고 M1 마일스톤 설명을 갱신했다. 코드 변경 없음.
+<!-- SECTION:FINAL_SUMMARY:END -->
