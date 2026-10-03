@@ -6,7 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.coralstay.orchestrator.registry.SessionRegistry.Session;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -128,5 +131,114 @@ class SessionRegistryTest {
         assertEquals(p.pid(), session.process().orElseThrow().pid());
         assertThrows(IllegalStateException.class, () -> registry.attach(session, p.toHandle()));
         assertFalse(session.process().isEmpty());
+    }
+
+    // --- retire ---
+
+    /** sh가 띄운 백그라운드 자식의 PID — 스크립트가 첫 줄에 {@code $!}를 찍는다. */
+    static long firstLinePid(Process p) throws IOException {
+        return Long.parseLong(firstLineOf(p).strip());
+    }
+
+    static boolean alive(long pid) {
+        return ProcessHandle.of(pid).map(ProcessHandle::isAlive).orElse(false);
+    }
+
+    @Test
+    void retireReleasesPermitAndUnblocksWaitingAdmit() throws Exception {
+        var registry = new SessionRegistry(1);
+        Session first = registry.admit("AO-1", "implementer");
+        PendingAdmit second = admitAsync(registry, "AO-2");
+        assertThrows(TimeoutException.class, () -> second.result().get(BLOCK_MS, TimeUnit.MILLISECONDS));
+
+        assertTrue(registry.retire(first));
+
+        Session admitted = second.result().get(DONE_S, TimeUnit.SECONDS);
+        assertEquals("AO-2", admitted.taskId());
+        assertEquals(0, registry.availablePermits());
+    }
+
+    @Test
+    void retireTwiceReleasesPermitOnlyOnce() throws Exception {
+        var registry = new SessionRegistry(1);
+        Session session = registry.admit("AO-1", "implementer");
+
+        assertTrue(registry.retire(session));
+        assertFalse(registry.retire(session), "두 번째 retire는 아무것도 반납하지 않는다");
+
+        assertEquals(1, registry.availablePermits(), "이중 반납은 용량을 몰래 늘린다");
+    }
+
+    @Test
+    void retireOfStaleSessionDoesNotRemoveNewSessionOfSameTask() throws Exception {
+        var registry = new SessionRegistry(2);
+        Session old = registry.admit("AO-1", "implementer");
+        registry.retire(old);
+        Session current = registry.admit("AO-1", "implementer");
+
+        assertFalse(registry.retire(old));
+
+        assertEquals(1, registry.availablePermits());
+        assertThrows(IllegalStateException.class, () -> registry.admit("AO-1", "implementer"),
+                "새 세션은 여전히 등록돼 있어야 한다");
+        assertTrue(registry.retire(current));
+    }
+
+    @Test
+    void retireWithoutProcessReleasesPermitWhenSpawnFailed() throws Exception {
+        var registry = new SessionRegistry(1);
+        Session session = registry.admit("AO-1", "implementer");
+
+        assertTrue(registry.retire(session));
+
+        assertEquals(1, registry.availablePermits());
+        assertThrows(IllegalStateException.class, () -> registry.attach(session, ProcessHandle.current()),
+                "회수된 세션에는 프로세스를 붙일 수 없다");
+    }
+
+    @Test
+    void retireKillsRunningProcessAndLingeringChild() throws Exception {
+        var registry = new SessionRegistry(1);
+        Session session = registry.admit("AO-1", "implementer");
+        Process p = sh("sleep 30 & echo $!; wait");
+        long child = firstLinePid(p);
+        registry.attach(session, p.toHandle());
+        assertTrue(alive(child));
+
+        assertTrue(registry.retire(session));
+
+        assertFalse(p.isAlive(), "root가 남으면 안 된다");
+        assertFalse(alive(child), "백그라운드 자식 sleep(pid " + child + ")이 남으면 안 된다");
+        assertEquals(1, registry.availablePermits());
+    }
+
+    @Test
+    void retireForcesProcessThatIgnoresSigterm() throws Exception {
+        var registry = new SessionRegistry(1);
+        Session session = registry.admit("AO-1", "implementer");
+        Process p = sh("trap '' TERM; echo ready; while :; do sleep 0.05; done");
+        firstLineOf(p);
+        registry.attach(session, p.toHandle());
+
+        registry.retire(session);
+
+        assertFalse(p.isAlive(), "SIGTERM을 무시해도 유예 후 SIGKILL로 끝나야 한다");
+    }
+
+    @Test
+    void retireAfterNormalExitJustRemovesSession() throws Exception {
+        var registry = new SessionRegistry(1);
+        Session session = registry.admit("AO-1", "implementer");
+        Process p = sh("exit 0");
+        registry.attach(session, p.toHandle());
+        assertTrue(p.waitFor(DONE_S, TimeUnit.SECONDS));
+
+        assertTrue(registry.retire(session));
+
+        assertEquals(1, registry.availablePermits());
+    }
+
+    static String firstLineOf(Process p) throws IOException {
+        return new BufferedReader(new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8)).readLine();
     }
 }

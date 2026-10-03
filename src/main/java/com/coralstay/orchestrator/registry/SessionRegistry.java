@@ -1,5 +1,6 @@
 package com.coralstay.orchestrator.registry;
 
+import com.coralstay.orchestrator.spawn.AgentSpawner;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
@@ -118,6 +119,36 @@ public final class SessionRegistry {
         if (!session.process.compareAndSet(null, process)) {
             throw new IllegalStateException("이미 프로세스가 붙은 세션입니다: " + session.taskId);
         }
+    }
+
+    /**
+     * 세션을 회수한다: attach된 프로세스와 자손을 종료({@link AgentSpawner#terminate}) → 목록에서 제거 → 허가 반납.
+     *
+     * <p>회수의 정의는 "프로세스(자손 포함) 종료 + 레지스트리 제거 + 허가 반납"이다. {@code claude -p} 헤드리스 세션은
+     * 프로세스가 끝나면 컨텍스트도 함께 사라지므로 {@code /clear} 같은 별도 단계가 없다(doc-1 D4).
+     *
+     * <p>멱등이다 — 허가는 {@code ConcurrentHashMap.remove(key, value)}가 성공한 호출에서만 반납하므로 두 번 불러도
+     * Semaphore 용량이 몰래 늘지 않는다. 종료는 매번 시도한다(이미 끝났으면 아무 일도 없다). 종료 중 예외가 나도 제거와
+     * 반납은 수행한다.
+     *
+     * <p><b>한계</b>: 자손은 root가 살아 있을 때만 찾을 수 있다. root가 이미 정상 종료한 뒤라면 그 뒤에 남은 백그라운드
+     * 자손은 init으로 재부모화되어 {@link ProcessHandle#descendants()}로 보이지 않으므로 여기서 죽이지 못한다. 실행
+     * 중에 자손을 주기적으로 기록해 두는 방식은 스켈레톤 범위 밖이다.
+     *
+     * @return 이 호출이 세션을 제거하고 허가를 반납했는가 (이미 회수된 세션이면 false)
+     */
+    public boolean retire(Session session) {
+        Objects.requireNonNull(session, "session");
+        boolean removed;
+        try {
+            session.process().ifPresent(AgentSpawner::terminate);
+        } finally {
+            removed = sessions.remove(session.taskId, session);
+            if (removed) {
+                permits.release();
+            }
+        }
+        return removed;
     }
 
     /** 지금 얻을 수 있는 허가 수 (테스트·진단용). */
