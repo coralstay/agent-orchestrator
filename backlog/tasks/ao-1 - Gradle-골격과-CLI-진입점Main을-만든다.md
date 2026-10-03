@@ -1,7 +1,7 @@
 ---
-id: DRAFT-1
+id: AO-1
 title: Gradle 골격과 CLI 진입점(Main)을 만든다
-status: Draft
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-03 03:18'
@@ -72,7 +72,7 @@ decision-1(Java 25 + Gradle, 외부 런타임 의존성 없음), decision-2(`run
 4. `.claude-rails.json` 작성 후 `./gradlew test`로 게이트 확인.
 5. 팩토리 docs 브랜치에서 D1 정정 → doc-1 갱신.
 
-의존(계획 키 기준): 없음 — dependencies 필드에 draft ID로 설정됨. promote 후 AO ID로 바뀌었는지 확인하고 아니면 `--dep`로 재설정한다.
+의존: 없음 — promote가 draft ID 의존성을 갱신하지 않아(backlog 1.51.0 실측) promote 후 AO ID로 재설정함.
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes

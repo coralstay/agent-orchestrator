@@ -1,18 +1,18 @@
 ---
-id: DRAFT-4
+id: AO-4
 title: claude -p 프로세스를 띄우고 기다리는 AgentSpawner를 만든다
-status: Draft
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-03 03:18'
-updated_date: '2026-10-03 03:18'
+updated_date: '2026-10-03 03:25'
 labels:
   - skeleton
   - spawner
   - docs-sync
 milestone: m-0
 dependencies:
-  - DRAFT-1
+  - AO-1
 references:
   - decision-5
 documentation:
@@ -67,7 +67,7 @@ RFC 06절 Agent Spawner. RFC 11절①에 따라 `--bare`를 쓰지 않는다 —
 4. 타임아웃 테스트: `ProcessHandle.descendants()`까지 destroy 후 isAlive=false 확인.
 5. D4 정정은 T5(Registry)의 회수 실측과 함께 판단 — 이 태스크에서는 스폰 측 서술만.
 
-의존(계획 키 기준): T1 — dependencies 필드에 draft ID로 설정됨. promote 후 AO ID로 바뀌었는지 확인하고 아니면 `--dep`로 재설정한다.
+의존: AO-1 — promote가 draft ID 의존성을 갱신하지 않아(backlog 1.51.0 실측) promote 후 AO ID로 재설정함.
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes

@@ -1,11 +1,11 @@
 ---
-id: DRAFT-6
+id: AO-6
 title: 태스크 브랜치의 git-logbook 트레일러를 읽는 CommitLedger를 만든다
-status: Draft
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-03 03:18'
-updated_date: '2026-10-03 03:18'
+updated_date: '2026-10-03 03:25'
 labels:
   - skeleton
   - ledger
@@ -13,7 +13,7 @@ labels:
   - docs-sync
 milestone: m-0
 dependencies:
-  - DRAFT-1
+  - AO-1
 references:
   - decision-5
 documentation:
@@ -71,7 +71,7 @@ decision-5: 토큰 측정은 git-logbook(구 git-format)이 한다. 오케스트
 4. summarize 합계 테스트(사람 커밋은 트레일러 없음 → 합계 제외, 커밋 수에는 포함).
 5. 팩토리 D5 반영 — 다이어그램 수정 시 build-diagrams/build-pdf.
 
-의존(계획 키 기준): T1 — dependencies 필드에 draft ID로 설정됨. promote 후 AO ID로 바뀌었는지 확인하고 아니면 `--dep`로 재설정한다.
+의존: AO-1 — promote가 draft ID 의존성을 갱신하지 않아(backlog 1.51.0 실측) promote 후 AO ID로 재설정함.
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes

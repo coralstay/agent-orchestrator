@@ -1,22 +1,22 @@
 ---
-id: DRAFT-7
+id: AO-7
 title: run 흐름을 배선하고 실행 결과를 runs.jsonl에 기록한다
-status: Draft
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-03 03:18'
-updated_date: '2026-10-03 03:18'
+updated_date: '2026-10-03 03:25'
 labels:
   - skeleton
   - cli
   - docs-sync
 milestone: m-0
 dependencies:
-  - DRAFT-2
-  - DRAFT-3
-  - DRAFT-4
-  - DRAFT-5
-  - DRAFT-6
+  - AO-2
+  - AO-3
+  - AO-4
+  - AO-5
+  - AO-6
 references:
   - decision-2
   - decision-3
@@ -78,7 +78,7 @@ RFC 로드맵 1번 walking skeleton의 완성 지점. 기록 항목 중 **커밋
 5. Main 연결 후 `./gradlew run --args="run AO-x"`로 스모크(가짜 claude).
 6. 팩토리 D2·D6·D8 반영.
 
-의존(계획 키 기준): T2, T3, T4, T5, T6 — dependencies 필드에 draft ID로 설정됨. promote 후 AO ID로 바뀌었는지 확인하고 아니면 `--dep`로 재설정한다.
+의존: AO-2, T3, T4, T5, T6 — promote가 draft ID 의존성을 갱신하지 않아(backlog 1.51.0 실측) promote 후 AO ID로 재설정함.
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes

@@ -1,18 +1,18 @@
 ---
-id: DRAFT-3
+id: AO-3
 title: 태스크별 git worktree를 만들고 지우는 WorktreeManager를 만든다
-status: Draft
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-03 03:18'
-updated_date: '2026-10-03 03:18'
+updated_date: '2026-10-03 03:25'
 labels:
   - skeleton
   - worktree
   - docs-sync
 milestone: m-0
 dependencies:
-  - DRAFT-1
+  - AO-1
 references:
   - decision-3
 documentation:
@@ -68,7 +68,7 @@ decision-3: 스켈레톤 범위에 worktree 격리를 포함한다. 계층 대�
 4. remove는 `git worktree remove --force` 대신 기본 remove — 미커밋 변경이 있으면 실패하게 두어 사람 판단으로 넘긴다.
 5. 팩토리 D3 반영.
 
-의존(계획 키 기준): T1 — dependencies 필드에 draft ID로 설정됨. promote 후 AO ID로 바뀌었는지 확인하고 아니면 `--dep`로 재설정한다.
+의존: AO-1 — promote가 draft ID 의존성을 갱신하지 않아(backlog 1.51.0 실측) promote 후 AO ID로 재설정함.
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes

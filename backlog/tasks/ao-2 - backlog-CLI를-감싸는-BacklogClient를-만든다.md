@@ -1,18 +1,18 @@
 ---
-id: DRAFT-2
+id: AO-2
 title: backlog CLI를 감싸는 BacklogClient를 만든다
-status: Draft
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-03 03:18'
-updated_date: '2026-10-03 03:18'
+updated_date: '2026-10-03 03:25'
 labels:
   - skeleton
   - backlog
   - docs-sync
 milestone: m-0
 dependencies:
-  - DRAFT-1
+  - AO-1
 references:
   - decision-2
 documentation:
@@ -67,11 +67,13 @@ README 로드맵 "실측 3종" 중 backlog.md 필드 지원 범위(doc-1 D7)를 
 4. `isRunnable` 테스트(To Do/In Progress/Done × 의존 Done/미완).
 5. 팩토리 문서 D7 반영.
 
-의존(계획 키 기준): T1 — dependencies 필드에 draft ID로 설정됨. promote 후 AO ID로 바뀌었는지 확인하고 아니면 `--dep`로 재설정한다.
+의존: AO-1 — promote가 draft ID 의존성을 갱신하지 않아(backlog 1.51.0 실측) promote 후 AO ID로 재설정함.
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
 RFC는 isReady가 backlog.md 내부 계산이라고 하지만 CLI 출력에 노출되는지는 미확인 — 노출되지 않으면 의존 태스크를 각각 view해서 직접 판정한다. 출력 포맷이 바뀌면 깨지므로 파서는 섹션 헤더 기반으로 느슨하게.
+
+실측(2026-10-03): `backlog draft promote`는 다른 draft를 가리키는 dependencies(DRAFT-n)를 새 AO ID로 바꾸지 않는다 — D7 기록 대상.
 <!-- SECTION:NOTES:END -->

@@ -1,18 +1,18 @@
 ---
-id: DRAFT-5
+id: AO-5
 title: 생존 에이전트를 추적·회수하는 SessionRegistry를 만든다
-status: Draft
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-03 03:18'
-updated_date: '2026-10-03 03:18'
+updated_date: '2026-10-03 03:25'
 labels:
   - skeleton
   - registry
   - docs-sync
 milestone: m-0
 dependencies:
-  - DRAFT-1
+  - AO-1
 references:
   - decision-3
 documentation:
@@ -67,7 +67,7 @@ RFC 06절 Session Registry + "virtual thread + Semaphore". Semaphore 상한은 R
 4. `live()` 스냅샷 불변성 테스트.
 5. D4 회수 측 정정.
 
-의존(계획 키 기준): T1 — dependencies 필드에 draft ID로 설정됨. promote 후 AO ID로 바뀌었는지 확인하고 아니면 `--dep`로 재설정한다.
+의존: AO-1 — promote가 draft ID 의존성을 갱신하지 않아(backlog 1.51.0 실측) promote 후 AO ID로 재설정함.
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes

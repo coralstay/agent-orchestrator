@@ -1,11 +1,11 @@
 ---
-id: DRAFT-8
+id: AO-8
 title: E2E 픽스처를 만들고 실제 claude로 스모크 실행한다
-status: Draft
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-03 03:18'
-updated_date: '2026-10-03 03:18'
+updated_date: '2026-10-03 03:25'
 labels:
   - skeleton
   - e2e
@@ -13,7 +13,7 @@ labels:
   - docs-sync
 milestone: m-0
 dependencies:
-  - DRAFT-7
+  - AO-7
 references:
   - decision-3
   - decision-5
@@ -69,7 +69,7 @@ type: task
 4. 결과 4항목 PASS/FAIL 출력 + peak RSS 수집.
 5. 팩토리 문서 반영, doc-1 D4·D5·D9 마무리.
 
-의존(계획 키 기준): T7 — dependencies 필드에 draft ID로 설정됨. promote 후 AO ID로 바뀌었는지 확인하고 아니면 `--dep`로 재설정한다.
+의존: AO-7 — promote가 draft ID 의존성을 갱신하지 않아(backlog 1.51.0 실측) promote 후 AO ID로 재설정함.
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes
