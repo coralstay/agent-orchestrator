@@ -1,7 +1,7 @@
 ---
-id: DRAFT-1
+id: AO-9
 title: 재설계를 백로그에 반영한다
-status: Draft
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-03 13:05'
