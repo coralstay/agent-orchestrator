@@ -78,7 +78,7 @@ RFC 로드맵 1번 walking skeleton의 완성 지점. 기록 항목 중 **커밋
 5. Main 연결 후 `./gradlew run --args="run AO-x"`로 스모크(가짜 claude).
 6. 팩토리 D2·D6·D8 반영.
 
-의존: AO-2, T3, T4, T5, T6 — promote가 draft ID 의존성을 갱신하지 않아(backlog 1.51.0 실측) promote 후 AO ID로 재설정함.
+의존: AO-2, AO-3, AO-4, AO-5, AO-6 — promote가 draft ID 의존성을 갱신하지 않아(backlog 1.51.0 실측) promote 후 AO ID로 재설정함.
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes
