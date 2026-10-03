@@ -199,30 +199,43 @@ public final class AgentSpawner {
     static final Duration TERMINATE_GRACE = Duration.ofMillis(500);
 
     /**
-     * 프로세스와 그 자손 전부를 종료한다: destroy → {@link #TERMINATE_GRACE} 대기 → 남은 것은 destroyForcibly.
+     * 프로세스와 그 자손 전부를 종료한다: destroy → {@link #TERMINATE_GRACE} 대기 → 남은 것은 destroyForcibly → 다시
+     * {@link #TERMINATE_GRACE}까지 종료를 기다린다. 타임아웃 처리와 세션 레지스트리 회수(AO-5)가 함께 쓰는 단일 구현이다.
      *
      * <p>자손 목록은 부모를 죽이기 <em>전에</em> 떠 둔다 — 부모가 먼저 죽으면 자손이 init으로 재부모화되어
-     * {@code descendants()}로 더는 찾을 수 없다. 스냅샷 이후 새로 생긴 자손은 놓칠 수 있다(스켈레톤 범위 밖).
+     * {@code descendants()}로 더는 찾을 수 없다. 같은 이유로 root가 <em>이미 끝난</em> 뒤에 부르면 남은 자손을 찾지
+     * 못한다(정상 종료 후 백그라운드 자손). 스냅샷 이후 새로 생긴 자손도 놓칠 수 있다(스켈레톤 범위 밖).
+     *
+     * @return 대상(스냅샷한 자손 + root)이 모두 종료됐는가 — SIGKILL 후에도 유예 안에 안 끝난 것이 있으면 false
      */
-    static void terminate(ProcessHandle root) {
+    public static boolean terminate(ProcessHandle root) {
         List<ProcessHandle> all = new ArrayList<>(root.descendants().toList());
         all.add(root);
         all.forEach(ProcessHandle::destroy);
-        long deadline = System.nanoTime() + TERMINATE_GRACE.toNanos();
-        for (ProcessHandle handle : all) {
+        awaitExit(all, TERMINATE_GRACE);
+        List<ProcessHandle> survivors = all.stream().filter(ProcessHandle::isAlive).toList();
+        survivors.forEach(ProcessHandle::destroyForcibly);
+        return awaitExit(survivors, TERMINATE_GRACE);
+    }
+
+    /** 모두 끝나거나 grace가 지날 때까지 기다린 뒤, 모두 끝났는지 돌려준다. */
+    private static boolean awaitExit(List<ProcessHandle> handles, Duration grace) {
+        long deadline = System.nanoTime() + grace.toNanos();
+        for (ProcessHandle handle : handles) {
             long remaining = deadline - System.nanoTime();
-            if (remaining > 0) {
-                try {
-                    handle.onExit().get(remaining, TimeUnit.NANOSECONDS);
-                } catch (TimeoutException | ExecutionException e) {
-                    // 아래에서 강제 종료
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    break;
-                }
+            if (remaining <= 0) {
+                break;
+            }
+            try {
+                handle.onExit().get(remaining, TimeUnit.NANOSECONDS);
+            } catch (TimeoutException | ExecutionException e) {
+                break;
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
             }
         }
-        all.stream().filter(ProcessHandle::isAlive).forEach(ProcessHandle::destroyForcibly);
+        return handles.stream().noneMatch(ProcessHandle::isAlive);
     }
 
     private static void drain(InputStream in, ByteArrayOutputStream sink) {

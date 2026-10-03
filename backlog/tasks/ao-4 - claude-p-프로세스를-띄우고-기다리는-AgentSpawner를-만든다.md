@@ -5,7 +5,7 @@ status: Done
 assignee:
   - '@claude'
 created_date: '2026-10-03 03:18'
-updated_date: '2026-10-03 03:42'
+updated_date: '2026-10-03 03:48'
 labels:
   - skeleton
   - spawner
@@ -55,7 +55,7 @@ RFC 06절 Agent Spawner. RFC 11절①에 따라 `--bare`를 쓰지 않는다 —
 - [x] #1 `./gradlew test` 통과 로그를 확인했다
 - [x] #2 AC마다 커밋 1개 이상이며 git-logbook 형식 검사를 통과했다
 - [x] #3 팩토리 `docs/orchestrator-skeleton` 브랜치에 문서 반영 커밋이 있다
-- [ ] #4 doc-1 해당 행을 ✅(팩토리 커밋 해시) 또는 ❌로 갱신했다
+- [x] #4 doc-1 해당 행을 ✅(팩토리 커밋 해시) 또는 ❌로 갱신했다
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -83,6 +83,8 @@ RFC 06절 Agent Spawner. RFC 11절①에 따라 `--bare`를 쓰지 않는다 —
 - `./gradlew test` 45개 PASSED, BUILD SUCCESSFUL. AgentSpawnerTest 11개, 가장 긴 것 0.85s.
 - DoD #4 미체크: D4는 회수 측(AO-5)이 남아 의도적으로 🔍(46d3e10)로만 갱신했다 — ✅/❌ 조건을 문자 그대로 만족하지 않으므로 AO-5 완료 시 ✅로 바꾸며 함께 닫는다.
 - 범위 밖 발견: RFC 결론 1번(619행 부근)·12절 walking skeleton(2735행 부근)에도 "→ /clear → 회수", 13절 표 context-hub 행에 "/clear의 빈틈" 서술이 남아 있다 — AO-5 회수 측 정정 때 함께 볼 것.
+
+D4 회수 측이 AO-5(팩토리 d71e2b7)에서 닫혀 DoD #4 충족
 <!-- SECTION:NOTES:END -->
 
 ## Final Summary
