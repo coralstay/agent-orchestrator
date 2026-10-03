@@ -13,7 +13,7 @@ worktree는 언급하지 않는다. 그러나 계층 대응(태스크 = 파일, 
 ## Decision
 
 스켈레톤 범위에 **git worktree 생성·제거**를 포함한다. 태스크마다 `../<repo>-wt/<id>` 디렉토리와 `task/<id>` 브랜치를 만들고
-Implementer를 그 안에서 실행한다. 브랜치명은 git-logbook `Task-Id` 추출 규칙(`<prefix>-<번호>`)과 호환된다.
+Implementer를 그 안에서 실행한다. 브랜치명은 git-trail `Task-Id` 추출 규칙(`<prefix>-<번호>`)과 호환된다.
 
 ## Alternatives
 
