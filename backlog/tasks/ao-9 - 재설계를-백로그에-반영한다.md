@@ -57,7 +57,7 @@ type: docs
 ## Definition of Done
 <!-- DOD:BEGIN -->
 - [x] #1 `backlog draft list --plain`·`task view`로 새 항목의 공란을 점검했다
-- [ ] #2 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(병합은 유저)
+- [x] #2 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(병합은 유저)
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -77,6 +77,8 @@ type: docs
 draft→promote 순서상 이 카드 자체는 main(예외 브랜치)에서 만들고 승격한다. 이후 작업은 task/AO-<n> 브랜치. 라이선스 PR(#1)이 먼저 병합되지 않으면 이 브랜치 PR에 라이선스 커밋이 함께 보인다.
 
 공란 점검: draft-1~8·AO-7·AO-8 필드 공란 없음. AO-9 의존은 선행 태스크가 없어 비어 있음. promote가 draft 간 의존을 갱신하지 않으므로 승격 후 AO ID로 재설정 필요.
+
+PR: https://github.com/coralstay/agent-orchestartor/pull/2
 <!-- SECTION:NOTES:END -->
 
 ## Final Summary
