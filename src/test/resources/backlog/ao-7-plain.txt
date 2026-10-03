@@ -1,0 +1,81 @@
+File: /Users/flynn_macpro/githubs/agent-orchestartor/backlog/tasks/ao-7 - run-흐름을-배선하고-실행-결과를-runs.jsonl에-기록한다.md
+
+Task AO-7 - run 흐름을 배선하고 실행 결과를 runs.jsonl에 기록한다
+==================================================
+
+Status: ○ To Do
+Priority: High
+Type: feature
+Assignee: @claude
+Created: 2026-10-03 03:18 (UTC)
+Updated: 2026-10-03 03:25 (UTC)
+Labels: skeleton, cli, docs-sync
+Milestone: m-0
+References: decision-2, decision-3, decision-4
+Documentation: ../coralstay-software-factory/아키텍처.md, ../coralstay-software-factory/README.md, backlog/docs/doc-1 - 팩토리-문서-검증-로그.md, backlog/docs/doc-2 - 팩토리-문서-반영-구조.md
+
+Dependency Graph:
+--------------------------------------------------
+Depends on (5 direct, 6 total):
+├─ AO-2 - backlog CLI를 감싸는 BacklogClient를 만든다 [In Progress]
+│  └─ AO-1 - Gradle 골격과 CLI 진입점(Main)을 만든다 [completed]
+├─ AO-3 - 태스크별 git worktree를 만들고 지우는 WorktreeManager를 만든다 [To Do]
+│  └─ AO-1 - Gradle 골격과 CLI 진입점(Main)을 만든다 [completed] (shown above)
+├─ AO-4 - claude -p 프로세스를 띄우고 기다리는 AgentSpawner를 만든다 [To Do]
+│  └─ AO-1 - Gradle 골격과 CLI 진입점(Main)을 만든다 [completed] (shown above)
+├─ AO-5 - 생존 에이전트를 추적·회수하는 SessionRegistry를 만든다 [To Do]
+│  └─ AO-1 - Gradle 골격과 CLI 진입점(Main)을 만든다 [completed] (shown above)
+└─ AO-6 - 태스크 브랜치의 git-logbook 트레일러를 읽는 CommitLedger를 만든다 [To Do]
+   └─ AO-1 - Gradle 골격과 CLI 진입점(Main)을 만든다 [completed] (shown above)
+
+Dependents (1 direct, 1 total):
+└─ AO-8 - E2E 픽스처를 만들고 실제 claude로 스모크 실행한다 [To Do]
+
+Description:
+--------------------------------------------------
+## 결과
+`orchestrator run <taskId>`가 BacklogClient → WorktreeManager → SessionRegistry.admit → AgentSpawner → retire →
+CommitLedger 순으로 실행되고, 한 줄 JSON 결과를 `.orchestrator/runs.jsonl`에 추가하는 명령.
+
+## 맥락
+RFC 로드맵 1번 walking skeleton의 완성 지점. 기록 항목 중 **커밋 수 vs AC 수**는 아키텍처.md 5절 "자가 치유 재시도
+배수" 미결 질문의 첫 표본이다. Implementer 실패 시 재스폰하지 않고 worktree를 남겨 사람이 판단한다(RFC 07절).
+문서 측면에서는 아키텍처.md의 WatchService 확정 서술(D2), "Dev 모드가 스스로 done"(D6), README "코드 한 줄도 없음"(D8)을 정정한다.
+
+## 대상 파일
+- `src/main/java/com/coralstay/orchestrator/RunCommand.java`
+- `src/main/java/com/coralstay/orchestrator/Main.java` (RunCommand 호출 연결)
+- `src/test/java/com/coralstay/orchestrator/RunCommandTest.java` (각 컴포넌트를 가짜로 주입)
+
+Acceptance Criteria:
+--------------------------------------------------
+- [ ] #1 `execute(taskId)`: isRunnable이 false면 스폰하지 않고 사유와 함께 exit 3으로 끝난다
+- [ ] #2 `execute(taskId)`: worktree 생성 → admit → spawn → retire → ledger 판독 순서로 실행하고, 예외가 나도 retire는 반드시 실행된다
+- [ ] #3 `record(result)`: task, 종료코드, timedOut, duration, 커밋 수, AC 수, 토큰·도구 호출 합계, unavailable 개수를 한 줄 JSON으로 `.orchestrator/runs.jsonl`에 추가한다
+- [ ] #4 `cleanup(result)`: 성공(종료코드 0)이면 worktree를 제거하고, 실패·타임아웃이면 남겨 경로를 출력한다
+- [ ] #5 팩토리 문서 D2·D6·D8 반영: 아키텍처.md 1·4절(감시 방식 미정, Implementer 단독 범위)과 README 상단 경고문을 정정했다
+
+Definition of Done:
+--------------------------------------------------
+- [ ] #1 `./gradlew test` 통과 로그를 확인했다
+- [ ] #2 AC마다 커밋 1개 이상이며 git-logbook 형식 검사를 통과했다
+- [ ] #3 팩토리 `docs/orchestrator-skeleton` 브랜치에 문서 반영 커밋이 있다
+- [ ] #4 doc-1 해당 행을 ✅(팩토리 커밋 해시) 또는 ❌로 갱신했다
+
+Implementation Plan:
+--------------------------------------------------
+1. RunCommand 생성자에 5개 컴포넌트 주입(인터페이스 없이 구체 클래스 + 테스트용 서브클래스/람다 실행기).
+2. Implementer 프롬프트: 태스크 ID와 "backlog task view로 읽고 claude-rails 절차대로 AC마다 커밋" 지시 — 포인터만 싣는다(RFC 11절①).
+3. 순서·finally retire 테스트, isRunnable false 테스트.
+4. JSON 직렬화는 의존성 없이 직접(값이 단순).
+5. Main 연결 후 `./gradlew run --args="run AO-x"`로 스모크(가짜 claude).
+6. 팩토리 D2·D6·D8 반영.
+
+의존: AO-2, AO-3, AO-4, AO-5, AO-6 — promote가 draft ID 의존성을 갱신하지 않아(backlog 1.51.0 실측) promote 후 AO ID로 재설정함.
+
+Implementation Notes:
+--------------------------------------------------
+토큰 필드명은 tokensUsedApprox처럼 근사임을 드러낸다(decision-5). JVM shutdown hook에서 Registry.live()의 남은 세션을 retire.
+
+Modified files: src/main/java/com/coralstay/orchestrator/RunCommand.java, src/main/java/com/coralstay/orchestrator/Main.java
+
