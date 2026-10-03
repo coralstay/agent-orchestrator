@@ -24,4 +24,7 @@ status: accepted
 ## Consequences
 
 - claim 이후 main은 카드를 고치지 않으므로 병합 충돌이 없다.
+- main 반영은 PR로만 한다. claim 커밋은 로컬 main에 먼저 생기고 그 위에서 갈라진 태스크 브랜치 PR에 함께 실려 원격에 들어간다.
+  그래서 **PR은 merge commit으로 병합한다(squash·rebase 병합 금지)** — 그래야 원격 main이 claim 커밋을 그대로 품고 로컬 main이 fast-forward로 따라간다. squash하면 로컬 main과 원격이 영구히 갈라진다.
+- 동시 실행이 1개(SessionRegistry 기본 용량)라 claim 커밋이 여러 PR에 섞이는 일은 드물다. 용량을 늘릴 때 다시 검토한다.
 - 실패한 실행은 브랜치에 attempt 기록과 함께 남고, main 카드는 In Progress + `@claude`로 남아 사람이 판단한다.
