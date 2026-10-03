@@ -77,9 +77,9 @@ type: feature
 ## Definition of Done
 <!-- DOD:BEGIN -->
 - [ ] #1 `./gradlew test` 통과 로그를 확인했다
-- [ ] #2 AC마다 커밋 1개 이상이며 git-logbook 형식 검사를 통과했다
-- [ ] #3 팩토리 `docs/orchestrator-skeleton` 브랜치에 문서 반영 커밋이 있다
-- [ ] #4 doc-1 해당 행을 ✅(팩토리 커밋 해시) 또는 ❌로 갱신했다
+- [ ] #2 팩토리 `docs/orchestrator-skeleton` 브랜치에 문서 반영 커밋이 있다
+- [ ] #3 doc-1 해당 행을 ✅(팩토리 커밋 해시) 또는 ❌로 갱신했다
+- [ ] #4 AC마다 커밋 1개 이상이며 git-trail 형식 검사를 통과했다
 <!-- DOD:END -->
 
 ## Implementation Plan
