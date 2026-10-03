@@ -1,11 +1,11 @@
 ---
 id: AO-5
 title: 생존 에이전트를 추적·회수하는 SessionRegistry를 만든다
-status: To Do
+status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-03 03:18'
-updated_date: '2026-10-03 03:25'
+updated_date: '2026-10-03 03:43'
 labels:
   - skeleton
   - registry
