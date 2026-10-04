@@ -5,7 +5,7 @@ status: Done
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 01:49'
+updated_date: '2026-10-04 01:50'
 labels:
   - test-first
   - skeleton
@@ -54,7 +54,7 @@ type: task
 <!-- DOD:BEGIN -->
 - [x] #1 `./gradlew test`가 통과한다(pending 제외)
 - [x] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
-- [ ] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
+- [x] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -80,6 +80,8 @@ type: task
 - DoD2: 이 카드의 기대 실패 목록 = 비어 있음. 실제 `pendingTest` 실패 0건.
 
 커밋: da99f4f (build.gradle.kts), c308b79 (README.md)
+
+PR: https://github.com/coralstay/agent-orchestartor/pull/4 (merge commit으로 병합)
 <!-- SECTION:NOTES:END -->
 
 ## Final Summary
