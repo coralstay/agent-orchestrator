@@ -5,7 +5,7 @@ status: Done
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:38'
-updated_date: '2026-10-04 02:03'
+updated_date: '2026-10-04 02:04'
 labels:
   - test-first
   - skeleton
@@ -54,7 +54,7 @@ draft-3 (AgentRunner)을 구현하기 전에 테스트부터 쓴다. 공개 API 
 <!-- DOD:BEGIN -->
 - [x] #1 `./gradlew test`가 통과한다(pending 제외)
 - [x] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
-- [ ] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
+- [x] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -76,6 +76,8 @@ draft-3 (AgentRunner)을 구현하기 전에 테스트부터 쓴다. 공개 API 
 - pending 테스트(13건, 6메서드): DRAFT-3#2 프롬프트 단일 인자 / --model·--permission-mode auto·--output-format json / --disallowedTools git push가 마지막 인자(claude --help상 `<tools...>` 가변 인자라 뒤 인자를 삼킴) / --bare·skip-permissions 없음; DRAFT-3#3 스파이크 JSON → session_id, in=80943 out=782 / null·빈·공백·깨짐·배열·usage 없음·usage 타입 오류 → 예외 없이 unavailable(파라미터 8건).
 - DRAFT-3#1(AgentSpawner 이동 후 기존 테스트 초록)은 구현 시점 AC — AgentSpawnerTest를 옮겨 통과시키는 것이 검증이라 pending으로 쓰지 않음. AgentSpawner는 손대지 않음.
 - 증거: `./gradlew test --rerun` 61 passed 0 failed, BUILD SUCCESSFUL. `./gradlew pendingTest` 13 tests completed, 13 failed(전부 AgentRunnerTest, UnsupportedOperationException).
+
+PR: https://github.com/coralstay/agent-orchestartor/pull/8
 <!-- SECTION:NOTES:END -->
 
 ## Final Summary
