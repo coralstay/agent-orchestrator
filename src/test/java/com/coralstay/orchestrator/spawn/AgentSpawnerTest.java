@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
 import java.util.List;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -40,6 +41,7 @@ class AgentSpawnerTest {
     // --- command ---
 
     @Test
+    @DisplayName("AO-4#1 command는 claude -p와 권한 모드 인자를 조립한다")
     void commandBuildsHeadlessInvocationWithPermissionMode() {
         var spawner = new AgentSpawner("/opt/claude", "acceptEdits");
 
@@ -50,6 +52,7 @@ class AgentSpawnerTest {
     }
 
     @Test
+    @DisplayName("AO-4#1 기본값은 claude·auto이고 --bare를 넣지 않는다")
     void commandDefaultsToClaudeWithAutoModeAndNeverBare() {
         List<String> command = new AgentSpawner().command("implementer", "x");
 
@@ -60,6 +63,7 @@ class AgentSpawnerTest {
     }
 
     @Test
+    @DisplayName("AO-4#1 프롬프트는 argv 원소 하나로 그대로 넘긴다")
     void commandPassesPromptAsSingleArgumentVerbatim() {
         String prompt = "line1\n\"quoted\" $HOME `id`; rm -rf / && echo";
 
@@ -70,6 +74,7 @@ class AgentSpawnerTest {
     }
 
     @Test
+    @DisplayName("AO-4 보조: 빈 실행 파일·권한 모드를 거부한다")
     void constructorRejectsBlankValues() {
         assertThrows(IllegalArgumentException.class, () -> new AgentSpawner(" ", "auto"));
         assertThrows(IllegalArgumentException.class, () -> new AgentSpawner("claude", ""));
@@ -78,6 +83,7 @@ class AgentSpawnerTest {
     // --- spawn ---
 
     @Test
+    @DisplayName("AO-4#2 spawn은 종료코드·stdout·stderr·PID를 돌려준다")
     void spawnReturnsExitCodeOutputsAndPid() throws IOException {
         Path cwd = Files.createDirectory(tmp.resolve("work")).toRealPath();
         Path exe = fake("""
@@ -99,6 +105,7 @@ class AgentSpawnerTest {
     }
 
     @Test
+    @DisplayName("AO-4#2 start는 완료 전에 PID를 노출한다")
     void startExposesPidBeforeCompletion() throws IOException {
         Path exe = fake("sleep 0.3; echo done");
 
@@ -114,6 +121,7 @@ class AgentSpawnerTest {
     }
 
     @Test
+    @DisplayName("AO-4 보조: stdin을 닫아 EOF를 보게 한다")
     void spawnClosesStdinSoReadersSeeEof() throws IOException {
         Path exe = fake("cat; echo eof");
 
@@ -124,6 +132,7 @@ class AgentSpawnerTest {
     }
 
     @Test
+    @DisplayName("AO-4 보조: 큰 출력도 막히지 않고 양쪽 스트림을 비운다")
     void spawnDrainsLargeOutputOnBothStreamsWithoutBlocking() throws IOException {
         // 파이프 버퍼(64KiB 안팎)를 훨씬 넘는 양을 stdout·stderr 양쪽에 쓴다
         Path exe = fake("head -c 1048576 /dev/zero | tr '\\0' a; head -c 1048576 /dev/zero | tr '\\0' b >&2");
@@ -137,6 +146,7 @@ class AgentSpawnerTest {
     }
 
     @Test
+    @DisplayName("AO-4 보조: 0 이하 타임아웃을 거부한다")
     void startRejectsNonPositiveTimeout() throws IOException {
         Path exe = fake("exit 0");
 
@@ -147,6 +157,7 @@ class AgentSpawnerTest {
     // --- timeout ---
 
     @Test
+    @DisplayName("AO-4#3 타임아웃이면 프로세스와 자손을 모두 종료한다")
     void spawnTimeoutKillsProcessAndAllDescendants() throws IOException {
         // 백그라운드 자식과 전경 자식을 하나씩 두고, 둘 다 30초 동안 버티게 한다
         Path pids = tmp.resolve("pids");
@@ -169,6 +180,7 @@ class AgentSpawnerTest {
     }
 
     @Test
+    @DisplayName("AO-4#3 SIGTERM을 무시하면 SIGKILL로 강제 종료한다")
     void terminateForcesProcessThatIgnoresSigterm() throws IOException {
         Path exe = fake("""
                 trap '' TERM
