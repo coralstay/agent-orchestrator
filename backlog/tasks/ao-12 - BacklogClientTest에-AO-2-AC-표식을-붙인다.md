@@ -5,7 +5,7 @@ status: Done
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 02:03'
+updated_date: '2026-10-04 02:04'
 labels:
   - test-first
   - skeleton
@@ -54,7 +54,7 @@ BacklogClientTest의 모든 테스트에 `AO-2#<AC>` 표식(@DisplayName)을 붙
 <!-- DOD:BEGIN -->
 - [x] #1 `./gradlew test`가 통과한다(pending 제외)
 - [x] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
-- [ ] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
+- [x] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -78,6 +78,8 @@ BacklogClientTest의 모든 테스트에 `AO-2#<AC>` 표식(@DisplayName)을 붙
 - DoD2: ./gradlew pendingTest BUILD SUCCESSFUL, 실패 0 — 이 카드는 pending 테스트를 추가하지 않으므로 기대와 일치.
 - 건너뜀 확인: PATH=/usr/bin:/bin 으로 실행 시 실제 CLI 테스트 2개가 'SKIPPED'로 로그에 표시됨(tests=17 skipped=2).
 - 주의: realCliViewsDoneTask는 실행 저장소에서 AO-1이 Done이라고 가정한다.
+
+- DoD3: PR https://github.com/coralstay/agent-orchestartor/pull/10 (merge commit으로 병합)
 <!-- SECTION:NOTES:END -->
 
 ## Final Summary
