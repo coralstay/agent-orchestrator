@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -50,6 +51,7 @@ class WorktreeManagerTest {
     // --- create ---
 
     @Test
+    @DisplayName("AO-3#1 create는 형제 디렉토리에 task/<id> 브랜치 worktree를 만들고 경로를 돌려준다")
     void createAddsWorktreeOnTaskBranchNextToRepo() throws IOException {
         Path path = manager.create("AO-3");
 
@@ -60,6 +62,7 @@ class WorktreeManagerTest {
     }
 
     @Test
+    @DisplayName("AO-3#2 create는 경로가 이미 있으면(빈 디렉토리여도) 예외를 던진다")
     void createRefusesExistingPathEvenIfEmpty() throws IOException {
         // git은 빈 디렉토리면 그대로 worktree add를 해버리므로 직접 막아야 한다
         Path path = Files.createDirectories(manager.worktreePath("AO-3"));
@@ -72,6 +75,7 @@ class WorktreeManagerTest {
     }
 
     @Test
+    @DisplayName("AO-3#2 create는 브랜치가 이미 있으면 예외를 던지고 브랜치를 보존한다")
     void createRefusesExistingBranchAndKeepsIt() throws IOException {
         git(repo, "branch", "task/AO-3");
         String before = git(repo, "rev-parse", "task/AO-3");
@@ -84,6 +88,7 @@ class WorktreeManagerTest {
     }
 
     @Test
+    @DisplayName("AO-3 보조: worktree 디렉토리를 벗어나는 태스크 ID는 거부한다")
     void rejectsTaskIdThatEscapesWorktreeDirectory() {
         assertThrows(IllegalArgumentException.class, () -> manager.create("../evil"));
     }
@@ -91,6 +96,7 @@ class WorktreeManagerTest {
     // --- remove ---
 
     @Test
+    @DisplayName("AO-3#3 remove는 worktree를 지우고 커밋이 있는 브랜치는 남긴다")
     void removeDeletesWorktreeAndKeepsBranchWithCommits() throws IOException {
         Path path = manager.create("AO-3");
         Files.writeString(path.resolve("work.txt"), "done\n");
@@ -108,6 +114,7 @@ class WorktreeManagerTest {
     }
 
     @Test
+    @DisplayName("AO-3#3 remove는 손으로 지운 worktree의 메타데이터를 prune한다")
     void removePrunesWorktreeWhoseDirectoryWasDeletedByHand() throws IOException {
         Path path = manager.create("AO-3");
         deleteRecursively(path);
@@ -119,6 +126,7 @@ class WorktreeManagerTest {
     }
 
     @Test
+    @DisplayName("AO-3 보조: 커밋하지 않은 변경이 있는 worktree는 remove를 거부한다")
     void removeRefusesWorktreeWithUncommittedChanges() throws IOException {
         Path path = manager.create("AO-3");
         Files.writeString(path.resolve("README"), "dirty\n");
