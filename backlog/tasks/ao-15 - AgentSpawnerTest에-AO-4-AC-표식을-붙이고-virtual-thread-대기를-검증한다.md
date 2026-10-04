@@ -1,11 +1,11 @@
 ---
 id: AO-15
 title: AgentSpawnerTest에 AO-4 AC 표식을 붙이고 virtual thread 대기를 검증한다
-status: To Do
+status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 01:47'
+updated_date: '2026-10-04 01:59'
 labels:
   - test-first
   - skeleton
