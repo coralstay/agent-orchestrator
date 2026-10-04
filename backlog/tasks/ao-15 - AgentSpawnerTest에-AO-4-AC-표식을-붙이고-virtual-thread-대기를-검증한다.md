@@ -5,7 +5,7 @@ status: Done
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 02:03'
+updated_date: '2026-10-04 02:04'
 labels:
   - test-first
   - skeleton
@@ -54,7 +54,7 @@ AgentSpawnerTest의 모든 테스트에 `AO-4#<AC>` 표식을 붙이고, 빠져 
 <!-- DOD:BEGIN -->
 - [x] #1 `./gradlew test`가 통과한다(pending 제외)
 - [x] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
-- [ ] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
+- [x] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -72,6 +72,8 @@ virtual thread는 Thread.getAllStackTraces()에 안 나온다. 코드에 관찰 
 
 증거: ./gradlew test 통과(62 tests, 실패 0; AgentSpawnerTest 12개 모두 @DisplayName). ./gradlew pendingTest: pending 태그 테스트 0개, 실패 0 — 이 카드는 pending 테스트를 추가하지 않으므로 기대와 일치.
 virtual thread 단언: 프로덕션 변경 없이 com.sun.management.HotSpotDiagnosticMXBean.dumpThreads(JSON)를 사용(virtual thread 포함, 스레드마다 "virtual": true). 가짜 실행 파일 sleep 30 실행 중 덤프에서 agent-wait/stdout/stderr-<pid>를 찾고, 대조군으로 현재 플랫폼 스레드가 false로 읽히는지도 확인. 변이 확인: agent-wait를 Thread.ofPlatform()으로 바꾸면 실패함을 확인 후 원복. AgentSpawner.java 수정 없음.
+
+PR: https://github.com/coralstay/agent-orchestartor/pull/9
 <!-- SECTION:NOTES:END -->
 
 ## Final Summary
