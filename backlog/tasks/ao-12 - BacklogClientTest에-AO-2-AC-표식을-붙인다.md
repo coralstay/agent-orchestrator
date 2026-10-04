@@ -1,11 +1,11 @@
 ---
 id: AO-12
 title: BacklogClientTest에 AO-2 AC 표식을 붙인다
-status: In Progress
+status: Done
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 01:59'
+updated_date: '2026-10-04 02:03'
 labels:
   - test-first
   - skeleton
@@ -45,15 +45,15 @@ BacklogClientTest의 모든 테스트에 `AO-2#<AC>` 표식(@DisplayName)을 붙
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 AO-2의 코드 AC마다 최소 하나의 테스트가 `AO-2#<AC>` 표식을 가진다
-- [ ] #2 AC에 매핑되지 않는 테스트는 `AO-2 보조:` 표식을 가진다
-- [ ] #3 표식만 붙이고 테스트 동작은 바꾸지 않는다(테스트 수·결과 동일)
+- [x] #1 AO-2의 코드 AC마다 최소 하나의 테스트가 `AO-2#<AC>` 표식을 가진다
+- [x] #2 AC에 매핑되지 않는 테스트는 `AO-2 보조:` 표식을 가진다
+- [x] #3 표식만 붙이고 테스트 동작은 바꾸지 않는다(테스트 수·결과 동일)
 <!-- AC:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 `./gradlew test`가 통과한다(pending 제외)
-- [ ] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
+- [x] #1 `./gradlew test`가 통과한다(pending 제외)
+- [x] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
 - [ ] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
 <!-- DOD:END -->
 
@@ -69,4 +69,19 @@ BacklogClientTest의 모든 테스트에 `AO-2#<AC>` 표식(@DisplayName)을 붙
 
 <!-- SECTION:NOTES:BEGIN -->
 대조표: AO-1~6 AC↔테스트 매핑은 이 카드를 만들 때의 탐색 결과에 있다. 실제 CLI 테스트는 backlog가 PATH에 없으면 건너뛴다 — 건너뛴 사실이 로그에 보이는지 확인.
+
+증거(2026-10-04, 커밋 248c59a):
+- AC1: AO-2#1 view 4개(viewRuns…, viewThrows…, realCliViewsDoneTask, realCliMissingTask…), #2 parse 3개, #3 isRunnable 2개(파라미터 7건 포함). AC4는 문서 AC라 테스트 대상 아님.
+- AC2: definitionOfDoneIsNotParsedAsAcceptanceCriteria, toDoWithoutDependenciesIsRunnableWithoutLookup → 'AO-2 보조:'.
+- AC3: 전후 BacklogClientTest tests=17 skipped=0 failures=0, 전체 61개 동일.
+- DoD1: ./gradlew test --rerun-tasks BUILD SUCCESSFUL.
+- DoD2: ./gradlew pendingTest BUILD SUCCESSFUL, 실패 0 — 이 카드는 pending 테스트를 추가하지 않으므로 기대와 일치.
+- 건너뜀 확인: PATH=/usr/bin:/bin 으로 실행 시 실제 CLI 테스트 2개가 'SKIPPED'로 로그에 표시됨(tests=17 skipped=2).
+- 주의: realCliViewsDoneTask는 실행 저장소에서 AO-1이 Done이라고 가정한다.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+BacklogClientTest 11개 메서드(17개 실행) 전부에 @DisplayName 표식을 붙였다: AO-2#1 view 4, #2 parse 3, #3 isRunnable 2, 보조 2. 동작 변경 없음(17/0 skipped 전후 동일, 전체 61). backlog가 PATH에 없으면 실제 CLI 테스트 2개가 SKIPPED로 로그에 보인다. realCliViewsDoneTask는 AO-1이 Done인 저장소를 가정한다.
+<!-- SECTION:FINAL_SUMMARY:END -->
