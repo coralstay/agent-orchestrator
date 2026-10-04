@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -27,6 +28,7 @@ class BacklogClientTest {
 
     // --- parse: 실제 backlog 1.51.0 `task view <id> --plain` 출력 픽스처 ---
 
+    @DisplayName("AO-2#2 parse: 직접 의존 5개인 To Do 태스크를 파싱한다")
     @Test
     void parsesTaskWithFiveDirectDependencies() {
         Task task = BacklogClient.parse(fixture("ao-7-plain.txt"));
@@ -43,6 +45,7 @@ class BacklogClientTest {
                 task.acceptanceCriteria().getFirst());
     }
 
+    @DisplayName("AO-2#2 parse: 의존 없는 Done 태스크와 체크된 AC를 파싱한다")
     @Test
     void parsesDoneTaskWithoutDependencies() {
         Task task = BacklogClient.parse(fixture("ao-1-plain.txt"));
@@ -56,6 +59,7 @@ class BacklogClientTest {
         assertTrue(task.acceptanceCriteria().stream().allMatch(Criterion::checked));
     }
 
+    @DisplayName("AO-2#2 parse: 의존 1개인 In Progress 태스크를 파싱한다")
     @Test
     void parsesInProgressTaskWithOneDependency() {
         Task task = BacklogClient.parse(fixture("ao-2-plain.txt"));
@@ -67,6 +71,7 @@ class BacklogClientTest {
         assertFalse(task.acceptanceCriteria().get(3).checked());
     }
 
+    @DisplayName("AO-2 보조: DoD 항목은 AC로 파싱하지 않는다")
     @Test
     void definitionOfDoneIsNotParsedAsAcceptanceCriteria() {
         Task task = BacklogClient.parse(fixture("ao-1-plain.txt"));
@@ -77,6 +82,7 @@ class BacklogClientTest {
 
     // --- view: 실행기 주입 ---
 
+    @DisplayName("AO-2#1 view: backlog task view <id> --plain을 실행하고 stdout을 파싱한다")
     @Test
     void viewRunsBacklogTaskViewPlainAndParsesStdout() {
         List<List<String>> calls = new ArrayList<>();
@@ -91,6 +97,7 @@ class BacklogClientTest {
         assertEquals("AO-7", task.id());
     }
 
+    @DisplayName("AO-2#1 view: 종료코드≠0이면 stderr를 담은 예외를 던진다")
     @Test
     void viewThrowsWithStderrOnNonZeroExit() {
         var client = new BacklogClient(command -> new ProcessResult(1, "", "Task AO-999 not found.\n"));
@@ -104,6 +111,7 @@ class BacklogClientTest {
 
     // --- isRunnable: 상태 × 의존 완료 여부 ---
 
+    @DisplayName("AO-2#3 isRunnable: To Do이고 의존이 모두 Done일 때만 true")
     @ParameterizedTest(name = "{0}, deps={1},{2} -> {3}")
     @CsvSource({
         "To Do,       Done,        Done,        true",
@@ -124,6 +132,7 @@ class BacklogClientTest {
         assertEquals(expected, BacklogClient.isRunnable(task, board::get));
     }
 
+    @DisplayName("AO-2 보조: 의존 없는 To Do는 lookup 없이 runnable")
     @Test
     void toDoWithoutDependenciesIsRunnableWithoutLookup() {
         Task task = task("AO-9", "To Do", List.of());
@@ -133,6 +142,7 @@ class BacklogClientTest {
         }));
     }
 
+    @DisplayName("AO-2#3 isRunnable: 실출력 픽스처의 In Progress·미완 의존 To Do는 false")
     @Test
     void realFixturesInProgressAndBlockedToDoAreNotRunnable() {
         Map<String, Task> board = Map.of(
@@ -153,6 +163,7 @@ class BacklogClientTest {
 
     // --- 실제 backlog CLI (이 저장소의 backlog/, PATH에 backlog가 없으면 건너뜀) ---
 
+    @DisplayName("AO-2#1 view: 실제 backlog CLI로 Done 태스크(AO-1)를 조회한다")
     @Test
     void realCliViewsDoneTask() {
         var client = new BacklogClient(BacklogClient.processExecutor(Path.of("").toAbsolutePath()));
@@ -165,6 +176,7 @@ class BacklogClientTest {
         assertEquals(List.of(), task.dependencies());
     }
 
+    @DisplayName("AO-2#1 view: 실제 backlog CLI에서 없는 태스크는 비0 종료와 stderr")
     @Test
     void realCliMissingTaskExitsNonZeroWithStderr() {
         var client = new BacklogClient(BacklogClient.processExecutor(Path.of("").toAbsolutePath()));
