@@ -54,7 +54,7 @@ SessionRegistryTest의 모든 테스트에 `AO-5#<AC>` 표식(@DisplayName)을 �
 <!-- DOD:BEGIN -->
 - [x] #1 `./gradlew test`가 통과한다(pending 제외)
 - [x] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
-- [ ] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
+- [x] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -71,6 +71,8 @@ SessionRegistryTest의 모든 테스트에 `AO-5#<AC>` 표식(@DisplayName)을 �
 대조표: AO-1~6 AC↔테스트 매핑은 이 카드를 만들 때의 탐색 결과에 있다.
 
 증거: ./gradlew test 통과 — SessionRegistryTest tests=16 failures=0 (변경 전후 동일), 전체 61개 동일. AO-5#1 3개, #2 4개, #3 3개, 보조 6개. ./gradlew pendingTest BUILD SUCCESSFUL, 실패 0 — 이 카드는 pending 테스트를 추가하지 않으므로 기대와 일치. 커밋 ce386df.
+
+PR: https://github.com/coralstay/agent-orchestartor/pull/7
 <!-- SECTION:NOTES:END -->
 
 ## Final Summary
