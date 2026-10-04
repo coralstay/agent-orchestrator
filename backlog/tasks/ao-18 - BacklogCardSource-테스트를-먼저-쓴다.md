@@ -55,7 +55,7 @@ draft-2 (BacklogCardSource)을 구현하기 전에 테스트부터 쓴다. 공�
 <!-- DOD:BEGIN -->
 - [x] #1 `./gradlew test`가 통과한다(pending 제외)
 - [x] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
-- [ ] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
+- [x] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -77,6 +77,8 @@ draft-2 (BacklogCardSource)을 구현하기 전에 테스트부터 쓴다. 공�
 - 픽스처: src/test/resources/card/ao-90-plain.txt(estimated/attempt/actual), ao-91-plain.txt(소절 앞뒤 텍스트 보존 검증용).
 - ./gradlew test: BUILD SUCCESSFUL(pending 제외).
 - ./gradlew pendingTest: 76 tests completed, 76 failed = 기존 59 + BacklogCardSourceTest 17(#1 3, #2 3, #3 4, #4 7). 17개 모두 UnsupportedOperationException: pending: DRAFT-2.
+
+PR: https://github.com/coralstay/agent-orchestartor/pull/13
 <!-- SECTION:NOTES:END -->
 
 ## Final Summary
