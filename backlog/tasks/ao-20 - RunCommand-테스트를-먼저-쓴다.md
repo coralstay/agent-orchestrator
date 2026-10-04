@@ -5,16 +5,16 @@ status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:38'
-updated_date: '2026-10-04 01:38'
+updated_date: '2026-10-04 01:47'
 labels:
   - test-first
   - skeleton
 milestone: m-0
 dependencies:
-  - DRAFT-15
-  - DRAFT-16
-  - DRAFT-17
-  - DRAFT-18
+  - AO-16
+  - AO-17
+  - AO-18
+  - AO-19
   - AO-6
 references:
   - decision-6

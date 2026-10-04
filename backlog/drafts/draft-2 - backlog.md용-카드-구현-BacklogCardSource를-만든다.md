@@ -5,7 +5,7 @@ status: Draft
 assignee:
   - '@claude'
 created_date: '2026-10-03 13:09'
-updated_date: '2026-10-04 01:38'
+updated_date: '2026-10-04 01:47'
 labels:
   - skeleton
   - card
@@ -15,7 +15,7 @@ milestone: m-0
 dependencies:
   - DRAFT-1
   - AO-2
-  - DRAFT-17
+  - AO-18
 references:
   - decision-6
   - decision-9

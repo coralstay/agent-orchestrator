@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-03 03:18'
-updated_date: '2026-10-03 13:10'
+updated_date: '2026-10-04 01:47'
 labels:
   - skeleton
   - e2e
@@ -14,6 +14,7 @@ labels:
 milestone: m-0
 dependencies:
   - AO-7
+  - AO-21
 references:
   - decision-3
   - decision-5
