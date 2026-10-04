@@ -22,6 +22,7 @@ references:
   - decision-8
   - decision-9
   - decision-10
+  - decision-11
 documentation:
   - backlog/docs/doc-1 - 팩토리-문서-검증-로그.md
 modified_files:

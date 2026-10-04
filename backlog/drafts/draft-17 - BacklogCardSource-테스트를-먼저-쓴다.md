@@ -16,6 +16,7 @@ references:
   - decision-6
   - decision-9
   - decision-5
+  - decision-11
 documentation:
   - backlog/docs/doc-1 - 팩토리-문서-검증-로그.md
 modified_files:

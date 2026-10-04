@@ -13,6 +13,8 @@ milestone: m-0
 dependencies:
   - DRAFT-9
   - AO-5
+references:
+  - decision-11
 documentation:
   - backlog/docs/doc-1 - 팩토리-문서-검증-로그.md
 modified_files:
