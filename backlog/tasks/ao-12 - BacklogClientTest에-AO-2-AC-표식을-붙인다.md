@@ -1,17 +1,17 @@
 ---
-id: DRAFT-11
+id: AO-12
 title: BacklogClientTest에 AO-2 AC 표식을 붙인다
-status: Draft
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 01:38'
+updated_date: '2026-10-04 01:47'
 labels:
   - test-first
   - skeleton
 milestone: m-0
 dependencies:
-  - DRAFT-9
+  - AO-10
   - AO-2
 references:
   - decision-11

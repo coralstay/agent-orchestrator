@@ -1,17 +1,17 @@
 ---
-id: DRAFT-15
+id: AO-16
 title: ModelPolicy 테스트를 먼저 쓴다
-status: Draft
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:38'
-updated_date: '2026-10-04 01:38'
+updated_date: '2026-10-04 01:47'
 labels:
   - test-first
   - skeleton
 milestone: m-0
 dependencies:
-  - DRAFT-9
+  - AO-10
 references:
   - decision-10
   - decision-8

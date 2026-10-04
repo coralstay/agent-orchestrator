@@ -1,26 +1,34 @@
 ---
-id: DRAFT-20
-title: E2E 스모크 확인 항목 골격을 먼저 쓴다
-status: Draft
+id: AO-20
+title: RunCommand 테스트를 먼저 쓴다
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:38'
-updated_date: '2026-10-04 01:38'
+updated_date: '2026-10-04 01:47'
 labels:
   - test-first
   - skeleton
 milestone: m-0
 dependencies:
-  - DRAFT-19
+  - AO-16
+  - AO-17
+  - AO-18
+  - AO-19
+  - AO-6
 references:
   - decision-6
+  - decision-7
+  - decision-8
   - decision-9
+  - decision-10
   - decision-11
 documentation:
   - backlog/docs/doc-1 - 팩토리-문서-검증-로그.md
 modified_files:
-  - scripts/smoke.sh
-priority: medium
+  - src/test/java/com/coralstay/orchestrator/RunCommandTest.java
+  - src/main/java/com/coralstay/orchestrator/RunCommand.java
+priority: high
 type: task
 ---
 
@@ -28,10 +36,11 @@ type: task
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 ## 결과
-AO-8의 E2E 확인 항목 (a)~(f)를 `scripts/smoke.sh`의 함수로 먼저 만든다. 구현 전에는 각 항목이 `FAIL not implemented`를 출력한다.
+AO-7 (RunCommand)을 구현하기 전에 테스트부터 쓴다. 공개 API 시그니처 스텁을 만들어 컴파일되게 하고, 근거 카드의 AC를 pending 테스트로 옮긴다. 구현 카드가 pending 태그를 떼고 초록으로 만드는 것이 그 카드의 완료 조건이 된다.
 
 ## 대상 파일
-- `scripts/smoke.sh`
+- `src/test/java/com/coralstay/orchestrator/RunCommandTest.java`
+- `src/main/java/com/coralstay/orchestrator/RunCommand.java` (시그니처 스텁)
 
 ## 공통 규칙
 - 테스트마다 `@DisplayName("<카드>#<AC> …")`로 카드·AC 번호를 붙인다(draft는 `DRAFT-n#k`, 승격 때 교체).
@@ -43,9 +52,9 @@ AO-8의 E2E 확인 항목 (a)~(f)를 `scripts/smoke.sh`의 함수로 먼저 만�
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 (a) claim (b) 워크트리·브랜치 (c) 잔존 claude 프로세스 없음 (d) AC 커밋 트레일러 (e) 브랜치 카드 Done + Token Budget actual (f) runs.jsonl 일치를 각각 함수로 만든다
-- [ ] #2 각 함수는 지금은 `FAIL <항목> not implemented`를 출력하고, 전체 결과 요약과 종료코드(실패 있으면 1)를 낸다
-- [ ] #3 실제 claude를 실행하지 않는다(실행 부분은 AO-8에서 채움)
+- [ ] #1 `RunCommand` 시그니처 스텁(생성자 포트 주입, execute, judge, record)을 만들고 컴파일된다
+- [ ] #2 AO-7 #1~5(실행 불가 시 exit 3, 순서와 finally retire, 브랜치 상태 판정, actual/attempt 분기와 워크트리 정리, runs.jsonl 한 줄)를 모든 포트를 가짜로 주입한 pending 테스트로 쓴다
+- [ ] #3 WorktreeManager가 claim 커밋 기준으로 생성되는지(기준 커밋 인자 전달)를 검증하는 테스트를 포함한다
 <!-- AC:END -->
 
 ## Definition of Done
@@ -58,13 +67,14 @@ AO-8의 E2E 확인 항목 (a)~(f)를 `scripts/smoke.sh`의 함수로 먼저 만�
 ## Implementation Plan
 
 <!-- SECTION:PLAN:BEGIN -->
-1. 함수 골격과 요약 출력.
-2. shellcheck 통과.
-3. `./gradlew test`와 무관(게이트 영향 없음).
+1. 근거 카드 AC를 읽고 테스트 목록 작성.
+2. 시그니처 스텁 → 컴파일.
+3. pending 테스트 작성(표식 포함).
+4. `./gradlew test` 초록, `./gradlew pendingTest` 빨강 확인.
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-AO-8 #2의 확인 항목과 이름을 맞춘다.
+CommitLedger는 AO-6 브랜치에만 있다 — AO-6이 main에 병합된 뒤 시작한다.
 <!-- SECTION:NOTES:END -->

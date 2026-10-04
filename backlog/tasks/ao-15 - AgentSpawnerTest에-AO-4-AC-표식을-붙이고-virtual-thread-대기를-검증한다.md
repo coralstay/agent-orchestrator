@@ -1,17 +1,17 @@
 ---
-id: DRAFT-14
+id: AO-15
 title: AgentSpawnerTest에 AO-4 AC 표식을 붙이고 virtual thread 대기를 검증한다
-status: Draft
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 01:38'
+updated_date: '2026-10-04 01:47'
 labels:
   - test-first
   - skeleton
 milestone: m-0
 dependencies:
-  - DRAFT-9
+  - AO-10
   - AO-4
 references:
   - decision-11

@@ -1,17 +1,17 @@
 ---
-id: DRAFT-10
+id: AO-11
 title: MainTest에 AO-1 AC 표식을 붙인다
-status: Draft
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 01:38'
+updated_date: '2026-10-04 01:47'
 labels:
   - test-first
   - skeleton
 milestone: m-0
 dependencies:
-  - DRAFT-9
+  - AO-10
   - AO-1
 references:
   - decision-11

@@ -3,6 +3,7 @@
 [coralstay-software-factory](https://github.com/coralstay/coralstay-software-factory) 설계 중
 오케스트레이터만 구현한 JVM 오케스트레이터 워킹스켈레톤이다. CLI `orchestrator run <taskId>`로
 태스크 하나를 실행한다. 빌드·테스트는 Java 25에서 `./gradlew test`.
+아직 구현이 없는 `@Tag("pending")` 테스트는 `test`에서 빠지며 `./gradlew pendingTest`로 따로 돌린다.
 
 ## 라이선스
 

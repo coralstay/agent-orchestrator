@@ -1,26 +1,26 @@
 ---
-id: DRAFT-16
-title: TaskCardSource 테스트를 먼저 쓴다
-status: Draft
+id: AO-19
+title: AgentRunner 테스트를 먼저 쓴다
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:38'
-updated_date: '2026-10-04 01:38'
+updated_date: '2026-10-04 01:47'
 labels:
   - test-first
   - skeleton
 milestone: m-0
 dependencies:
-  - DRAFT-9
+  - AO-10
 references:
-  - decision-6
-  - decision-9
+  - decision-7
+  - decision-8
   - decision-11
 documentation:
   - backlog/docs/doc-1 - 팩토리-문서-검증-로그.md
 modified_files:
-  - src/test/java/com/coralstay/orchestrator/card/TaskCardSourceTest.java
-  - src/main/java/com/coralstay/orchestrator/card/TaskCardSource.java
+  - src/test/java/com/coralstay/orchestrator/agent/AgentRunnerTest.java
+  - src/main/java/com/coralstay/orchestrator/agent/AgentRunner.java
 priority: high
 type: task
 ---
@@ -29,11 +29,11 @@ type: task
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 ## 결과
-draft-1 (TaskCardSource)을 구현하기 전에 테스트부터 쓴다. 공개 API 시그니처 스텁을 만들어 컴파일되게 하고, 근거 카드의 AC를 pending 테스트로 옮긴다. 구현 카드가 pending 태그를 떼고 초록으로 만드는 것이 그 카드의 완료 조건이 된다.
+draft-3 (AgentRunner)을 구현하기 전에 테스트부터 쓴다. 공개 API 시그니처 스텁을 만들어 컴파일되게 하고, 근거 카드의 AC를 pending 테스트로 옮긴다. 구현 카드가 pending 태그를 떼고 초록으로 만드는 것이 그 카드의 완료 조건이 된다.
 
 ## 대상 파일
-- `src/test/java/com/coralstay/orchestrator/card/TaskCardSourceTest.java`
-- `src/main/java/com/coralstay/orchestrator/card/TaskCardSource.java` (시그니처 스텁)
+- `src/test/java/com/coralstay/orchestrator/agent/AgentRunnerTest.java`
+- `src/main/java/com/coralstay/orchestrator/agent/AgentRunner.java` (시그니처 스텁)
 
 ## 공통 규칙
 - 테스트마다 `@DisplayName("<카드>#<AC> …")`로 카드·AC 번호를 붙인다(draft는 `DRAFT-n#k`, 승격 때 교체).
@@ -45,9 +45,9 @@ draft-1 (TaskCardSource)을 구현하기 전에 테스트부터 쓴다. 공개 A
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 `TaskCardSource` 포트와 값 타입(Card, TokenBudget, Tokens, Attempt, CardCheck) 시그니처를 만들고 컴파일된다
-- [ ] #2 draft-1 #1~3(read 반환 필드, validate 사유, claim/attempt/actual 상태 전이)과 Tokens `in=N out=M` 파싱·출력을 pending 테스트로 쓴다
-- [ ] #3 메모리 구현은 테스트 안의 가짜로 두고, 포트 계약만 검증한다
+- [ ] #1 `AgentRunner` 포트와 ClaudeCodeRunner 시그니처 스텁을 만들고 컴파일된다(기존 AgentSpawner는 아직 그대로)
+- [ ] #2 draft-3 #2(명령에 --model·--output-format json·push 금지, --bare 없음)와 #3(헤드리스 JSON에서 session_id·usage → in/out, 실패 시 unavailable)을 pending 테스트로 쓴다
+- [ ] #3 세션 총량 파싱은 2026-10-03 스파이크의 실제 out.json을 테스트 리소스로 쓴다
 <!-- AC:END -->
 
 ## Definition of Done
@@ -69,5 +69,5 @@ draft-1 (TaskCardSource)을 구현하기 전에 테스트부터 쓴다. 공개 A
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-Tokens 파싱 규칙은 CommitLedger(AO-6 AC5)와 같아야 한다 — 같은 테스트 벡터를 쓴다.
+스파이크 원본: scratchpad/spike-headless/out.json — 개인 정보(session_id 외) 없는지 확인 후 리소스로.
 <!-- SECTION:NOTES:END -->

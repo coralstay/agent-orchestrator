@@ -27,7 +27,24 @@ application {
 }
 
 tasks.test {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags("pending")
+    }
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
+}
+
+// decision-11: 아직 구현이 없는 @Tag("pending") 테스트만 따로 돌린다.
+val pendingTest by tasks.registering(Test::class) {
+    description = "Runs only tests tagged 'pending' (not yet implemented)."
+    group = "verification"
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+    useJUnitPlatform {
+        includeTags("pending")
+    }
+    failOnNoDiscoveredTests = false
     testLogging {
         events("passed", "skipped", "failed")
     }

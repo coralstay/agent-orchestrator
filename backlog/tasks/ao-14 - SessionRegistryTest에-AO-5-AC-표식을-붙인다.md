@@ -1,24 +1,24 @@
 ---
-id: DRAFT-12
-title: WorktreeManagerTest에 AO-3 AC 표식을 붙인다
-status: Draft
+id: AO-14
+title: SessionRegistryTest에 AO-5 AC 표식을 붙인다
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 01:38'
+updated_date: '2026-10-04 01:47'
 labels:
   - test-first
   - skeleton
 milestone: m-0
 dependencies:
-  - DRAFT-9
-  - AO-3
+  - AO-10
+  - AO-5
 references:
   - decision-11
 documentation:
   - backlog/docs/doc-1 - 팩토리-문서-검증-로그.md
 modified_files:
-  - src/test/java/com/coralstay/orchestrator/workspace/WorktreeManagerTest.java
+  - src/test/java/com/coralstay/orchestrator/registry/SessionRegistryTest.java
 priority: medium
 type: task
 ---
@@ -27,13 +27,13 @@ type: task
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 ## 결과
-WorktreeManagerTest의 모든 테스트에 `AO-3#<AC>` 표식(@DisplayName)을 붙여, 카드 AC와 테스트를 1:1로 추적할 수 있게 한다. AC에 매핑되지 않는 보조 테스트는 `AO-3 보조:`로 표시한다.
+SessionRegistryTest의 모든 테스트에 `AO-5#<AC>` 표식(@DisplayName)을 붙여, 카드 AC와 테스트를 1:1로 추적할 수 있게 한다. AC에 매핑되지 않는 보조 테스트는 `AO-5 보조:`로 표시한다.
 
 ## 맥락
-2026-10-04 대조 결과: AO-3의 코드 AC는 모두 테스트가 있지만 어떤 테스트가 어떤 AC인지 표식이 없다. 
+2026-10-04 대조 결과: AO-5의 코드 AC는 모두 테스트가 있지만 어떤 테스트가 어떤 AC인지 표식이 없다. 
 
 ## 대상 파일
-- `src/test/java/com/coralstay/orchestrator/workspace/WorktreeManagerTest.java`
+- `src/test/java/com/coralstay/orchestrator/registry/SessionRegistryTest.java`
 
 ## 공통 규칙
 - 테스트마다 `@DisplayName("<카드>#<AC> …")`로 카드·AC 번호를 붙인다(draft는 `DRAFT-n#k`, 승격 때 교체).
@@ -45,8 +45,8 @@ WorktreeManagerTest의 모든 테스트에 `AO-3#<AC>` 표식(@DisplayName)을 �
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 AO-3의 코드 AC마다 최소 하나의 테스트가 `AO-3#<AC>` 표식을 가진다
-- [ ] #2 AC에 매핑되지 않는 테스트는 `AO-3 보조:` 표식을 가진다
+- [ ] #1 AO-5의 코드 AC마다 최소 하나의 테스트가 `AO-5#<AC>` 표식을 가진다
+- [ ] #2 AC에 매핑되지 않는 테스트는 `AO-5 보조:` 표식을 가진다
 - [ ] #3 표식만 붙이고 테스트 동작은 바꾸지 않는다(테스트 수·결과 동일)
 <!-- AC:END -->
 

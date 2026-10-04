@@ -1,26 +1,25 @@
 ---
-id: DRAFT-9
-title: 빌드에서 pending 테스트를 분리한다
-status: Draft
+id: AO-13
+title: WorktreeManagerTest에 AO-3 AC 표식을 붙인다
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 01:38'
+updated_date: '2026-10-04 01:47'
 labels:
   - test-first
   - skeleton
 milestone: m-0
 dependencies:
-  - AO-1
+  - AO-10
+  - AO-3
 references:
-  - decision-1
   - decision-11
 documentation:
   - backlog/docs/doc-1 - 팩토리-문서-검증-로그.md
 modified_files:
-  - build.gradle.kts
-  - README.md
-priority: high
+  - src/test/java/com/coralstay/orchestrator/workspace/WorktreeManagerTest.java
+priority: medium
 type: task
 ---
 
@@ -28,11 +27,13 @@ type: task
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 ## 결과
-아직 구현이 없는 테스트(`@Tag("pending")`)를 기본 `./gradlew test`에서 빼고 `./gradlew pendingTest`로 따로 돌린다. claude-rails 커밋 게이트(`testCommand: ./gradlew test`)를 깨지 않고 테스트를 먼저 커밋하기 위한 장치다.
+WorktreeManagerTest의 모든 테스트에 `AO-3#<AC>` 표식(@DisplayName)을 붙여, 카드 AC와 테스트를 1:1로 추적할 수 있게 한다. AC에 매핑되지 않는 보조 테스트는 `AO-3 보조:`로 표시한다.
+
+## 맥락
+2026-10-04 대조 결과: AO-3의 코드 AC는 모두 테스트가 있지만 어떤 테스트가 어떤 AC인지 표식이 없다. 
 
 ## 대상 파일
-- `build.gradle.kts`
-- `README.md` (사용법 한 줄)
+- `src/test/java/com/coralstay/orchestrator/workspace/WorktreeManagerTest.java`
 
 ## 공통 규칙
 - 테스트마다 `@DisplayName("<카드>#<AC> …")`로 카드·AC 번호를 붙인다(draft는 `DRAFT-n#k`, 승격 때 교체).
@@ -44,10 +45,9 @@ type: task
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 `test` 태스크가 `pending` 태그 테스트를 제외한다(태그 붙은 샘플 테스트가 `test`에서 실행되지 않음을 확인)
-- [ ] #2 `pendingTest` 태스크가 `pending` 태그 테스트만 실행한다
-- [ ] #3 pending 테스트가 0개여도 `pendingTest`가 실패하지 않는다
-- [ ] #4 README에 `./gradlew pendingTest` 사용법을 한 줄 적었다
+- [ ] #1 AO-3의 코드 AC마다 최소 하나의 테스트가 `AO-3#<AC>` 표식을 가진다
+- [ ] #2 AC에 매핑되지 않는 테스트는 `AO-3 보조:` 표식을 가진다
+- [ ] #3 표식만 붙이고 테스트 동작은 바꾸지 않는다(테스트 수·결과 동일)
 <!-- AC:END -->
 
 ## Definition of Done
@@ -60,13 +60,13 @@ type: task
 ## Implementation Plan
 
 <!-- SECTION:PLAN:BEGIN -->
-1. `tasks.test { useJUnitPlatform { excludeTags("pending") } }`.
-2. `tasks.register<Test>("pendingTest")` — 같은 classpath, `includeTags("pending")`, `failOnNoDiscoveredTests = false`(Gradle 9 옵션 확인).
-3. 임시 pending 샘플로 두 태스크 동작 확인 후 샘플은 지운다.
+1. 카드 AC 목록과 테스트 메서드를 대조(2026-10-04 대조표 참고).
+2. @DisplayName 추가.
+3. `./gradlew test`로 수·결과가 그대로인지 확인.
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-이 카드는 다른 테스트 선작성 카드 전부의 선행 조건이다. Gradle 9.4에서 테스트 0개일 때의 기본 동작을 확인할 것.
+대조표: AO-1~6 AC↔테스트 매핑은 이 카드를 만들 때의 탐색 결과에 있다.
 <!-- SECTION:NOTES:END -->

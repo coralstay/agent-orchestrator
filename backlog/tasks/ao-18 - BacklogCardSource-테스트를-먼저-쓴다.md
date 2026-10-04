@@ -1,17 +1,17 @@
 ---
-id: DRAFT-17
+id: AO-18
 title: BacklogCardSource 테스트를 먼저 쓴다
-status: Draft
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:38'
-updated_date: '2026-10-04 01:38'
+updated_date: '2026-10-04 01:47'
 labels:
   - test-first
   - skeleton
 milestone: m-0
 dependencies:
-  - DRAFT-16
+  - AO-17
 references:
   - decision-6
   - decision-9

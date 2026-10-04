@@ -1,25 +1,27 @@
 ---
-id: DRAFT-13
-title: SessionRegistryTest에 AO-5 AC 표식을 붙인다
-status: Draft
+id: AO-17
+title: TaskCardSource 테스트를 먼저 쓴다
+status: To Do
 assignee:
   - '@claude'
-created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 01:38'
+created_date: '2026-10-04 01:38'
+updated_date: '2026-10-04 01:47'
 labels:
   - test-first
   - skeleton
 milestone: m-0
 dependencies:
-  - DRAFT-9
-  - AO-5
+  - AO-10
 references:
+  - decision-6
+  - decision-9
   - decision-11
 documentation:
   - backlog/docs/doc-1 - 팩토리-문서-검증-로그.md
 modified_files:
-  - src/test/java/com/coralstay/orchestrator/registry/SessionRegistryTest.java
-priority: medium
+  - src/test/java/com/coralstay/orchestrator/card/TaskCardSourceTest.java
+  - src/main/java/com/coralstay/orchestrator/card/TaskCardSource.java
+priority: high
 type: task
 ---
 
@@ -27,13 +29,11 @@ type: task
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 ## 결과
-SessionRegistryTest의 모든 테스트에 `AO-5#<AC>` 표식(@DisplayName)을 붙여, 카드 AC와 테스트를 1:1로 추적할 수 있게 한다. AC에 매핑되지 않는 보조 테스트는 `AO-5 보조:`로 표시한다.
-
-## 맥락
-2026-10-04 대조 결과: AO-5의 코드 AC는 모두 테스트가 있지만 어떤 테스트가 어떤 AC인지 표식이 없다. 
+draft-1 (TaskCardSource)을 구현하기 전에 테스트부터 쓴다. 공개 API 시그니처 스텁을 만들어 컴파일되게 하고, 근거 카드의 AC를 pending 테스트로 옮긴다. 구현 카드가 pending 태그를 떼고 초록으로 만드는 것이 그 카드의 완료 조건이 된다.
 
 ## 대상 파일
-- `src/test/java/com/coralstay/orchestrator/registry/SessionRegistryTest.java`
+- `src/test/java/com/coralstay/orchestrator/card/TaskCardSourceTest.java`
+- `src/main/java/com/coralstay/orchestrator/card/TaskCardSource.java` (시그니처 스텁)
 
 ## 공통 규칙
 - 테스트마다 `@DisplayName("<카드>#<AC> …")`로 카드·AC 번호를 붙인다(draft는 `DRAFT-n#k`, 승격 때 교체).
@@ -45,9 +45,9 @@ SessionRegistryTest의 모든 테스트에 `AO-5#<AC>` 표식(@DisplayName)을 �
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 AO-5의 코드 AC마다 최소 하나의 테스트가 `AO-5#<AC>` 표식을 가진다
-- [ ] #2 AC에 매핑되지 않는 테스트는 `AO-5 보조:` 표식을 가진다
-- [ ] #3 표식만 붙이고 테스트 동작은 바꾸지 않는다(테스트 수·결과 동일)
+- [ ] #1 `TaskCardSource` 포트와 값 타입(Card, TokenBudget, Tokens, Attempt, CardCheck) 시그니처를 만들고 컴파일된다
+- [ ] #2 draft-1 #1~3(read 반환 필드, validate 사유, claim/attempt/actual 상태 전이)과 Tokens `in=N out=M` 파싱·출력을 pending 테스트로 쓴다
+- [ ] #3 메모리 구현은 테스트 안의 가짜로 두고, 포트 계약만 검증한다
 <!-- AC:END -->
 
 ## Definition of Done
@@ -60,13 +60,14 @@ SessionRegistryTest의 모든 테스트에 `AO-5#<AC>` 표식(@DisplayName)을 �
 ## Implementation Plan
 
 <!-- SECTION:PLAN:BEGIN -->
-1. 카드 AC 목록과 테스트 메서드를 대조(2026-10-04 대조표 참고).
-2. @DisplayName 추가.
-3. `./gradlew test`로 수·결과가 그대로인지 확인.
+1. 근거 카드 AC를 읽고 테스트 목록 작성.
+2. 시그니처 스텁 → 컴파일.
+3. pending 테스트 작성(표식 포함).
+4. `./gradlew test` 초록, `./gradlew pendingTest` 빨강 확인.
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-대조표: AO-1~6 AC↔테스트 매핑은 이 카드를 만들 때의 탐색 결과에 있다.
+Tokens 파싱 규칙은 CommitLedger(AO-6 AC5)와 같아야 한다 — 같은 테스트 벡터를 쓴다.
 <!-- SECTION:NOTES:END -->
