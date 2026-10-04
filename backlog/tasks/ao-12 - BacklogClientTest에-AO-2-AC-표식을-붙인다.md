@@ -1,11 +1,11 @@
 ---
 id: AO-12
 title: BacklogClientTest에 AO-2 AC 표식을 붙인다
-status: To Do
+status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 01:47'
+updated_date: '2026-10-04 01:59'
 labels:
   - test-first
   - skeleton
