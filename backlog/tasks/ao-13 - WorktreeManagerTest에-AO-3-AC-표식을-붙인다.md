@@ -1,10 +1,10 @@
 ---
-id: DRAFT-15
-title: ModelPolicy 테스트를 먼저 쓴다
-status: Draft
+id: AO-13
+title: WorktreeManagerTest에 AO-3 AC 표식을 붙인다
+status: To Do
 assignee:
   - '@claude'
-created_date: '2026-10-04 01:38'
+created_date: '2026-10-04 01:37'
 updated_date: '2026-10-04 01:38'
 labels:
   - test-first
@@ -12,16 +12,14 @@ labels:
 milestone: m-0
 dependencies:
   - DRAFT-9
+  - AO-3
 references:
-  - decision-10
-  - decision-8
   - decision-11
 documentation:
   - backlog/docs/doc-1 - 팩토리-문서-검증-로그.md
 modified_files:
-  - src/test/java/com/coralstay/orchestrator/policy/ModelPolicyTest.java
-  - src/main/java/com/coralstay/orchestrator/policy/ModelPolicy.java
-priority: high
+  - src/test/java/com/coralstay/orchestrator/workspace/WorktreeManagerTest.java
+priority: medium
 type: task
 ---
 
@@ -29,11 +27,13 @@ type: task
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 ## 결과
-draft-4 (ModelPolicy)을 구현하기 전에 테스트부터 쓴다. 공개 API 시그니처 스텁을 만들어 컴파일되게 하고, 근거 카드의 AC를 pending 테스트로 옮긴다. 구현 카드가 pending 태그를 떼고 초록으로 만드는 것이 그 카드의 완료 조건이 된다.
+WorktreeManagerTest의 모든 테스트에 `AO-3#<AC>` 표식(@DisplayName)을 붙여, 카드 AC와 테스트를 1:1로 추적할 수 있게 한다. AC에 매핑되지 않는 보조 테스트는 `AO-3 보조:`로 표시한다.
+
+## 맥락
+2026-10-04 대조 결과: AO-3의 코드 AC는 모두 테스트가 있지만 어떤 테스트가 어떤 AC인지 표식이 없다. 
 
 ## 대상 파일
-- `src/test/java/com/coralstay/orchestrator/policy/ModelPolicyTest.java`
-- `src/main/java/com/coralstay/orchestrator/policy/ModelPolicy.java` (시그니처 스텁)
+- `src/test/java/com/coralstay/orchestrator/workspace/WorktreeManagerTest.java`
 
 ## 공통 규칙
 - 테스트마다 `@DisplayName("<카드>#<AC> …")`로 카드·AC 번호를 붙인다(draft는 `DRAFT-n#k`, 승격 때 교체).
@@ -45,9 +45,9 @@ draft-4 (ModelPolicy)을 구현하기 전에 테스트부터 쓴다. 공개 API 
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 `ModelPolicy` 시그니처 스텁(load, choose, 결과 타입)을 만들고 컴파일된다
-- [ ] #2 draft-4 #1~3(설정 파싱·형식 오류 줄 번호, 구간 선택·경계값, 설정 파일 없을 때 내장 기본값 표시)을 pending 테스트로 쓴다
-- [ ] #3 `pendingTest`에서 이 테스트들이 UnsupportedOperationException으로 실패하는 것을 확인한다
+- [ ] #1 AO-3의 코드 AC마다 최소 하나의 테스트가 `AO-3#<AC>` 표식을 가진다
+- [ ] #2 AC에 매핑되지 않는 테스트는 `AO-3 보조:` 표식을 가진다
+- [ ] #3 표식만 붙이고 테스트 동작은 바꾸지 않는다(테스트 수·결과 동일)
 <!-- AC:END -->
 
 ## Definition of Done
@@ -60,14 +60,13 @@ draft-4 (ModelPolicy)을 구현하기 전에 테스트부터 쓴다. 공개 API 
 ## Implementation Plan
 
 <!-- SECTION:PLAN:BEGIN -->
-1. 근거 카드 AC를 읽고 테스트 목록 작성.
-2. 시그니처 스텁 → 컴파일.
-3. pending 테스트 작성(표식 포함).
-4. `./gradlew test` 초록, `./gradlew pendingTest` 빨강 확인.
+1. 카드 AC 목록과 테스트 메서드를 대조(2026-10-04 대조표 참고).
+2. @DisplayName 추가.
+3. `./gradlew test`로 수·결과가 그대로인지 확인.
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-구간 경계: '이하'인지 '미만'인지 테스트로 못박는다(draft-4는 '이하').
+대조표: AO-1~6 AC↔테스트 매핑은 이 카드를 만들 때의 탐색 결과에 있다.
 <!-- SECTION:NOTES:END -->

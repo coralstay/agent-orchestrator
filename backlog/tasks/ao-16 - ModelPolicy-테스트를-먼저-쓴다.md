@@ -1,7 +1,7 @@
 ---
-id: DRAFT-17
-title: BacklogCardSource 테스트를 먼저 쓴다
-status: Draft
+id: AO-16
+title: ModelPolicy 테스트를 먼저 쓴다
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:38'
@@ -11,17 +11,16 @@ labels:
   - skeleton
 milestone: m-0
 dependencies:
-  - DRAFT-16
+  - DRAFT-9
 references:
-  - decision-6
-  - decision-9
-  - decision-5
+  - decision-10
+  - decision-8
   - decision-11
 documentation:
   - backlog/docs/doc-1 - 팩토리-문서-검증-로그.md
 modified_files:
-  - src/test/java/com/coralstay/orchestrator/card/BacklogCardSourceTest.java
-  - src/main/java/com/coralstay/orchestrator/card/BacklogCardSource.java
+  - src/test/java/com/coralstay/orchestrator/policy/ModelPolicyTest.java
+  - src/main/java/com/coralstay/orchestrator/policy/ModelPolicy.java
 priority: high
 type: task
 ---
@@ -30,11 +29,11 @@ type: task
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 ## 결과
-draft-2 (BacklogCardSource)을 구현하기 전에 테스트부터 쓴다. 공개 API 시그니처 스텁을 만들어 컴파일되게 하고, 근거 카드의 AC를 pending 테스트로 옮긴다. 구현 카드가 pending 태그를 떼고 초록으로 만드는 것이 그 카드의 완료 조건이 된다.
+draft-4 (ModelPolicy)을 구현하기 전에 테스트부터 쓴다. 공개 API 시그니처 스텁을 만들어 컴파일되게 하고, 근거 카드의 AC를 pending 테스트로 옮긴다. 구현 카드가 pending 태그를 떼고 초록으로 만드는 것이 그 카드의 완료 조건이 된다.
 
 ## 대상 파일
-- `src/test/java/com/coralstay/orchestrator/card/BacklogCardSourceTest.java`
-- `src/main/java/com/coralstay/orchestrator/card/BacklogCardSource.java` (시그니처 스텁)
+- `src/test/java/com/coralstay/orchestrator/policy/ModelPolicyTest.java`
+- `src/main/java/com/coralstay/orchestrator/policy/ModelPolicy.java` (시그니처 스텁)
 
 ## 공통 규칙
 - 테스트마다 `@DisplayName("<카드>#<AC> …")`로 카드·AC 번호를 붙인다(draft는 `DRAFT-n#k`, 승격 때 교체).
@@ -46,9 +45,9 @@ draft-2 (BacklogCardSource)을 구현하기 전에 테스트부터 쓴다. 공�
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 `BacklogCardSource` 시그니처 스텁을 만들고 컴파일된다
-- [ ] #2 draft-2 #1~4(Token Budget 파싱, claim 명령과 환경변수 제거, Description 소절만 교체하는 `-d` 기록, 파일 단위 사람 락 판정)를 pending 테스트로 쓴다
-- [ ] #3 소절 교체가 나머지 Description을 바꾸지 않는지, claim 커밋 환경에 AI_AGENT·CLAUDE_CODE_SESSION_ID가 없는지 검증하는 테스트를 포함한다
+- [ ] #1 `ModelPolicy` 시그니처 스텁(load, choose, 결과 타입)을 만들고 컴파일된다
+- [ ] #2 draft-4 #1~3(설정 파싱·형식 오류 줄 번호, 구간 선택·경계값, 설정 파일 없을 때 내장 기본값 표시)을 pending 테스트로 쓴다
+- [ ] #3 `pendingTest`에서 이 테스트들이 UnsupportedOperationException으로 실패하는 것을 확인한다
 <!-- AC:END -->
 
 ## Definition of Done
@@ -70,5 +69,5 @@ draft-2 (BacklogCardSource)을 구현하기 전에 테스트부터 쓴다. 공�
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-실행기 주입으로 명령 인자와 환경을 캡처한다. 실제 backlog 출력 픽스처에 Token Budget 소절이 있는 카드를 추가.
+구간 경계: '이하'인지 '미만'인지 테스트로 못박는다(draft-4는 '이하').
 <!-- SECTION:NOTES:END -->

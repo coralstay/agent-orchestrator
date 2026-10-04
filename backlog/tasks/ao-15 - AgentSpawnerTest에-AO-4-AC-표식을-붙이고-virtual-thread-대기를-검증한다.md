@@ -1,26 +1,25 @@
 ---
-id: DRAFT-20
-title: E2E 스모크 확인 항목 골격을 먼저 쓴다
-status: Draft
+id: AO-15
+title: AgentSpawnerTest에 AO-4 AC 표식을 붙이고 virtual thread 대기를 검증한다
+status: To Do
 assignee:
   - '@claude'
-created_date: '2026-10-04 01:38'
+created_date: '2026-10-04 01:37'
 updated_date: '2026-10-04 01:38'
 labels:
   - test-first
   - skeleton
 milestone: m-0
 dependencies:
-  - DRAFT-19
+  - DRAFT-9
+  - AO-4
 references:
-  - decision-6
-  - decision-9
   - decision-11
 documentation:
   - backlog/docs/doc-1 - 팩토리-문서-검증-로그.md
 modified_files:
-  - scripts/smoke.sh
-priority: medium
+  - src/test/java/com/coralstay/orchestrator/spawn/AgentSpawnerTest.java
+priority: high
 type: task
 ---
 
@@ -28,10 +27,13 @@ type: task
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 ## 결과
-AO-8의 E2E 확인 항목 (a)~(f)를 `scripts/smoke.sh`의 함수로 먼저 만든다. 구현 전에는 각 항목이 `FAIL not implemented`를 출력한다.
+AgentSpawnerTest의 모든 테스트에 `AO-4#<AC>` 표식을 붙이고, 빠져 있던 AO-4#2의 "virtual thread에서 waitFor" 검증을 추가한다.
+
+## 맥락
+2026-10-04 대조 결과: AO-4#2는 결과 필드만 검증하고 대기 스레드가 virtual인지 단언하지 않는다.
 
 ## 대상 파일
-- `scripts/smoke.sh`
+- `src/test/java/com/coralstay/orchestrator/spawn/AgentSpawnerTest.java`
 
 ## 공통 규칙
 - 테스트마다 `@DisplayName("<카드>#<AC> …")`로 카드·AC 번호를 붙인다(draft는 `DRAFT-n#k`, 승격 때 교체).
@@ -43,9 +45,9 @@ AO-8의 E2E 확인 항목 (a)~(f)를 `scripts/smoke.sh`의 함수로 먼저 만�
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 (a) claim (b) 워크트리·브랜치 (c) 잔존 claude 프로세스 없음 (d) AC 커밋 트레일러 (e) 브랜치 카드 Done + Token Budget actual (f) runs.jsonl 일치를 각각 함수로 만든다
-- [ ] #2 각 함수는 지금은 `FAIL <항목> not implemented`를 출력하고, 전체 결과 요약과 종료코드(실패 있으면 1)를 낸다
-- [ ] #3 실제 claude를 실행하지 않는다(실행 부분은 AO-8에서 채움)
+- [ ] #1 AO-4의 코드 AC마다 최소 하나의 테스트가 `AO-4#<AC>` 표식을 가진다(보조 테스트는 `AO-4 보조:`)
+- [ ] #2 AO-4#2: 대기·출력 소비 스레드가 virtual thread임을 단언하는 테스트를 추가한다(예: 실행 중 스레드 덤프에서 `agent-wait-<pid>` 스레드의 isVirtual)
+- [ ] #3 기존 테스트의 동작은 바꾸지 않는다
 <!-- AC:END -->
 
 ## Definition of Done
@@ -58,13 +60,13 @@ AO-8의 E2E 확인 항목 (a)~(f)를 `scripts/smoke.sh`의 함수로 먼저 만�
 ## Implementation Plan
 
 <!-- SECTION:PLAN:BEGIN -->
-1. 함수 골격과 요약 출력.
-2. shellcheck 통과.
-3. `./gradlew test`와 무관(게이트 영향 없음).
+1. 표식 추가.
+2. virtual thread 단언 방법 결정 — Thread.getAllStackTraces()는 virtual thread를 포함하지 않으므로 다른 방법(스레드 이름으로 찾기 어려우면 테스트 가능한 훅 노출 여부 검토).
+3. 코드 변경이 필요하면 최소 범위로(테스트용 관찰 지점).
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-AO-8 #2의 확인 항목과 이름을 맞춘다.
+virtual thread는 Thread.getAllStackTraces()에 안 나온다. 코드에 관찰 지점을 추가해야 하면 AgentSpawner 수정이 이 카드 범위에 들어간다 — 그 경우 카드 메모에 기록.
 <!-- SECTION:NOTES:END -->

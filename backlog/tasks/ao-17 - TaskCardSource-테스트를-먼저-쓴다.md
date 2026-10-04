@@ -1,7 +1,7 @@
 ---
-id: DRAFT-19
-title: RunCommand 테스트를 먼저 쓴다
-status: Draft
+id: AO-17
+title: TaskCardSource 테스트를 먼저 쓴다
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:38'
@@ -11,23 +11,16 @@ labels:
   - skeleton
 milestone: m-0
 dependencies:
-  - DRAFT-15
-  - DRAFT-16
-  - DRAFT-17
-  - DRAFT-18
-  - AO-6
+  - DRAFT-9
 references:
   - decision-6
-  - decision-7
-  - decision-8
   - decision-9
-  - decision-10
   - decision-11
 documentation:
   - backlog/docs/doc-1 - 팩토리-문서-검증-로그.md
 modified_files:
-  - src/test/java/com/coralstay/orchestrator/RunCommandTest.java
-  - src/main/java/com/coralstay/orchestrator/RunCommand.java
+  - src/test/java/com/coralstay/orchestrator/card/TaskCardSourceTest.java
+  - src/main/java/com/coralstay/orchestrator/card/TaskCardSource.java
 priority: high
 type: task
 ---
@@ -36,11 +29,11 @@ type: task
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 ## 결과
-AO-7 (RunCommand)을 구현하기 전에 테스트부터 쓴다. 공개 API 시그니처 스텁을 만들어 컴파일되게 하고, 근거 카드의 AC를 pending 테스트로 옮긴다. 구현 카드가 pending 태그를 떼고 초록으로 만드는 것이 그 카드의 완료 조건이 된다.
+draft-1 (TaskCardSource)을 구현하기 전에 테스트부터 쓴다. 공개 API 시그니처 스텁을 만들어 컴파일되게 하고, 근거 카드의 AC를 pending 테스트로 옮긴다. 구현 카드가 pending 태그를 떼고 초록으로 만드는 것이 그 카드의 완료 조건이 된다.
 
 ## 대상 파일
-- `src/test/java/com/coralstay/orchestrator/RunCommandTest.java`
-- `src/main/java/com/coralstay/orchestrator/RunCommand.java` (시그니처 스텁)
+- `src/test/java/com/coralstay/orchestrator/card/TaskCardSourceTest.java`
+- `src/main/java/com/coralstay/orchestrator/card/TaskCardSource.java` (시그니처 스텁)
 
 ## 공통 규칙
 - 테스트마다 `@DisplayName("<카드>#<AC> …")`로 카드·AC 번호를 붙인다(draft는 `DRAFT-n#k`, 승격 때 교체).
@@ -52,9 +45,9 @@ AO-7 (RunCommand)을 구현하기 전에 테스트부터 쓴다. 공개 API 시�
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 `RunCommand` 시그니처 스텁(생성자 포트 주입, execute, judge, record)을 만들고 컴파일된다
-- [ ] #2 AO-7 #1~5(실행 불가 시 exit 3, 순서와 finally retire, 브랜치 상태 판정, actual/attempt 분기와 워크트리 정리, runs.jsonl 한 줄)를 모든 포트를 가짜로 주입한 pending 테스트로 쓴다
-- [ ] #3 WorktreeManager가 claim 커밋 기준으로 생성되는지(기준 커밋 인자 전달)를 검증하는 테스트를 포함한다
+- [ ] #1 `TaskCardSource` 포트와 값 타입(Card, TokenBudget, Tokens, Attempt, CardCheck) 시그니처를 만들고 컴파일된다
+- [ ] #2 draft-1 #1~3(read 반환 필드, validate 사유, claim/attempt/actual 상태 전이)과 Tokens `in=N out=M` 파싱·출력을 pending 테스트로 쓴다
+- [ ] #3 메모리 구현은 테스트 안의 가짜로 두고, 포트 계약만 검증한다
 <!-- AC:END -->
 
 ## Definition of Done
@@ -76,5 +69,5 @@ AO-7 (RunCommand)을 구현하기 전에 테스트부터 쓴다. 공개 API 시�
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-CommitLedger는 AO-6 브랜치에만 있다 — AO-6이 main에 병합된 뒤 시작한다.
+Tokens 파싱 규칙은 CommitLedger(AO-6 AC5)와 같아야 한다 — 같은 테스트 벡터를 쓴다.
 <!-- SECTION:NOTES:END -->

@@ -1,7 +1,7 @@
 ---
-id: DRAFT-14
-title: AgentSpawnerTest에 AO-4 AC 표식을 붙이고 virtual thread 대기를 검증한다
-status: Draft
+id: AO-11
+title: MainTest에 AO-1 AC 표식을 붙인다
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
@@ -12,14 +12,14 @@ labels:
 milestone: m-0
 dependencies:
   - DRAFT-9
-  - AO-4
+  - AO-1
 references:
   - decision-11
 documentation:
   - backlog/docs/doc-1 - 팩토리-문서-검증-로그.md
 modified_files:
-  - src/test/java/com/coralstay/orchestrator/spawn/AgentSpawnerTest.java
-priority: high
+  - src/test/java/com/coralstay/orchestrator/MainTest.java
+priority: medium
 type: task
 ---
 
@@ -27,13 +27,13 @@ type: task
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 ## 결과
-AgentSpawnerTest의 모든 테스트에 `AO-4#<AC>` 표식을 붙이고, 빠져 있던 AO-4#2의 "virtual thread에서 waitFor" 검증을 추가한다.
+MainTest의 모든 테스트에 `AO-1#<AC>` 표식(@DisplayName)을 붙여, 카드 AC와 테스트를 1:1로 추적할 수 있게 한다. AC에 매핑되지 않는 보조 테스트는 `AO-1 보조:`로 표시한다.
 
 ## 맥락
-2026-10-04 대조 결과: AO-4#2는 결과 필드만 검증하고 대기 스레드가 virtual인지 단언하지 않는다.
+2026-10-04 대조 결과: AO-1의 코드 AC는 모두 테스트가 있지만 어떤 테스트가 어떤 AC인지 표식이 없다. AO-1#3(Gradle·Java 25·JUnit 설정)은 빌드 자체가 검증하므로 테스트를 두지 않고 카드 메모에 적는다.
 
 ## 대상 파일
-- `src/test/java/com/coralstay/orchestrator/spawn/AgentSpawnerTest.java`
+- `src/test/java/com/coralstay/orchestrator/MainTest.java`
 
 ## 공통 규칙
 - 테스트마다 `@DisplayName("<카드>#<AC> …")`로 카드·AC 번호를 붙인다(draft는 `DRAFT-n#k`, 승격 때 교체).
@@ -45,9 +45,9 @@ AgentSpawnerTest의 모든 테스트에 `AO-4#<AC>` 표식을 붙이고, 빠져 
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 AO-4의 코드 AC마다 최소 하나의 테스트가 `AO-4#<AC>` 표식을 가진다(보조 테스트는 `AO-4 보조:`)
-- [ ] #2 AO-4#2: 대기·출력 소비 스레드가 virtual thread임을 단언하는 테스트를 추가한다(예: 실행 중 스레드 덤프에서 `agent-wait-<pid>` 스레드의 isVirtual)
-- [ ] #3 기존 테스트의 동작은 바꾸지 않는다
+- [ ] #1 AO-1의 코드 AC마다 최소 하나의 테스트가 `AO-1#<AC>` 표식을 가진다
+- [ ] #2 AC에 매핑되지 않는 테스트는 `AO-1 보조:` 표식을 가진다
+- [ ] #3 표식만 붙이고 테스트 동작은 바꾸지 않는다(테스트 수·결과 동일)
 <!-- AC:END -->
 
 ## Definition of Done
@@ -60,13 +60,13 @@ AgentSpawnerTest의 모든 테스트에 `AO-4#<AC>` 표식을 붙이고, 빠져 
 ## Implementation Plan
 
 <!-- SECTION:PLAN:BEGIN -->
-1. 표식 추가.
-2. virtual thread 단언 방법 결정 — Thread.getAllStackTraces()는 virtual thread를 포함하지 않으므로 다른 방법(스레드 이름으로 찾기 어려우면 테스트 가능한 훅 노출 여부 검토).
-3. 코드 변경이 필요하면 최소 범위로(테스트용 관찰 지점).
+1. 카드 AC 목록과 테스트 메서드를 대조(2026-10-04 대조표 참고).
+2. @DisplayName 추가.
+3. `./gradlew test`로 수·결과가 그대로인지 확인.
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-virtual thread는 Thread.getAllStackTraces()에 안 나온다. 코드에 관찰 지점을 추가해야 하면 AgentSpawner 수정이 이 카드 범위에 들어간다 — 그 경우 카드 메모에 기록.
+대조표: AO-1~6 AC↔테스트 매핑은 이 카드를 만들 때의 탐색 결과에 있다. AO-1#3(Gradle·Java 25·JUnit 설정)은 빌드 자체가 검증하므로 테스트를 두지 않고 카드 메모에 적는다.
 <!-- SECTION:NOTES:END -->

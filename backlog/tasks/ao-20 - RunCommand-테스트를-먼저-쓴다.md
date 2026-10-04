@@ -1,7 +1,7 @@
 ---
-id: DRAFT-18
-title: AgentRunner 테스트를 먼저 쓴다
-status: Draft
+id: AO-20
+title: RunCommand 테스트를 먼저 쓴다
+status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:38'
@@ -11,16 +11,23 @@ labels:
   - skeleton
 milestone: m-0
 dependencies:
-  - DRAFT-9
+  - DRAFT-15
+  - DRAFT-16
+  - DRAFT-17
+  - DRAFT-18
+  - AO-6
 references:
+  - decision-6
   - decision-7
   - decision-8
+  - decision-9
+  - decision-10
   - decision-11
 documentation:
   - backlog/docs/doc-1 - 팩토리-문서-검증-로그.md
 modified_files:
-  - src/test/java/com/coralstay/orchestrator/agent/AgentRunnerTest.java
-  - src/main/java/com/coralstay/orchestrator/agent/AgentRunner.java
+  - src/test/java/com/coralstay/orchestrator/RunCommandTest.java
+  - src/main/java/com/coralstay/orchestrator/RunCommand.java
 priority: high
 type: task
 ---
@@ -29,11 +36,11 @@ type: task
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 ## 결과
-draft-3 (AgentRunner)을 구현하기 전에 테스트부터 쓴다. 공개 API 시그니처 스텁을 만들어 컴파일되게 하고, 근거 카드의 AC를 pending 테스트로 옮긴다. 구현 카드가 pending 태그를 떼고 초록으로 만드는 것이 그 카드의 완료 조건이 된다.
+AO-7 (RunCommand)을 구현하기 전에 테스트부터 쓴다. 공개 API 시그니처 스텁을 만들어 컴파일되게 하고, 근거 카드의 AC를 pending 테스트로 옮긴다. 구현 카드가 pending 태그를 떼고 초록으로 만드는 것이 그 카드의 완료 조건이 된다.
 
 ## 대상 파일
-- `src/test/java/com/coralstay/orchestrator/agent/AgentRunnerTest.java`
-- `src/main/java/com/coralstay/orchestrator/agent/AgentRunner.java` (시그니처 스텁)
+- `src/test/java/com/coralstay/orchestrator/RunCommandTest.java`
+- `src/main/java/com/coralstay/orchestrator/RunCommand.java` (시그니처 스텁)
 
 ## 공통 규칙
 - 테스트마다 `@DisplayName("<카드>#<AC> …")`로 카드·AC 번호를 붙인다(draft는 `DRAFT-n#k`, 승격 때 교체).
@@ -45,9 +52,9 @@ draft-3 (AgentRunner)을 구현하기 전에 테스트부터 쓴다. 공개 API 
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 `AgentRunner` 포트와 ClaudeCodeRunner 시그니처 스텁을 만들고 컴파일된다(기존 AgentSpawner는 아직 그대로)
-- [ ] #2 draft-3 #2(명령에 --model·--output-format json·push 금지, --bare 없음)와 #3(헤드리스 JSON에서 session_id·usage → in/out, 실패 시 unavailable)을 pending 테스트로 쓴다
-- [ ] #3 세션 총량 파싱은 2026-10-03 스파이크의 실제 out.json을 테스트 리소스로 쓴다
+- [ ] #1 `RunCommand` 시그니처 스텁(생성자 포트 주입, execute, judge, record)을 만들고 컴파일된다
+- [ ] #2 AO-7 #1~5(실행 불가 시 exit 3, 순서와 finally retire, 브랜치 상태 판정, actual/attempt 분기와 워크트리 정리, runs.jsonl 한 줄)를 모든 포트를 가짜로 주입한 pending 테스트로 쓴다
+- [ ] #3 WorktreeManager가 claim 커밋 기준으로 생성되는지(기준 커밋 인자 전달)를 검증하는 테스트를 포함한다
 <!-- AC:END -->
 
 ## Definition of Done
@@ -69,5 +76,5 @@ draft-3 (AgentRunner)을 구현하기 전에 테스트부터 쓴다. 공개 API 
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-스파이크 원본: scratchpad/spike-headless/out.json — 개인 정보(session_id 외) 없는지 확인 후 리소스로.
+CommitLedger는 AO-6 브랜치에만 있다 — AO-6이 main에 병합된 뒤 시작한다.
 <!-- SECTION:NOTES:END -->

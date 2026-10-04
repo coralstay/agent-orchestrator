@@ -1,24 +1,25 @@
 ---
-id: DRAFT-10
-title: MainTest에 AO-1 AC 표식을 붙인다
-status: Draft
+id: AO-21
+title: E2E 스모크 확인 항목 골격을 먼저 쓴다
+status: To Do
 assignee:
   - '@claude'
-created_date: '2026-10-04 01:37'
+created_date: '2026-10-04 01:38'
 updated_date: '2026-10-04 01:38'
 labels:
   - test-first
   - skeleton
 milestone: m-0
 dependencies:
-  - DRAFT-9
-  - AO-1
+  - DRAFT-19
 references:
+  - decision-6
+  - decision-9
   - decision-11
 documentation:
   - backlog/docs/doc-1 - 팩토리-문서-검증-로그.md
 modified_files:
-  - src/test/java/com/coralstay/orchestrator/MainTest.java
+  - scripts/smoke.sh
 priority: medium
 type: task
 ---
@@ -27,13 +28,10 @@ type: task
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 ## 결과
-MainTest의 모든 테스트에 `AO-1#<AC>` 표식(@DisplayName)을 붙여, 카드 AC와 테스트를 1:1로 추적할 수 있게 한다. AC에 매핑되지 않는 보조 테스트는 `AO-1 보조:`로 표시한다.
-
-## 맥락
-2026-10-04 대조 결과: AO-1의 코드 AC는 모두 테스트가 있지만 어떤 테스트가 어떤 AC인지 표식이 없다. AO-1#3(Gradle·Java 25·JUnit 설정)은 빌드 자체가 검증하므로 테스트를 두지 않고 카드 메모에 적는다.
+AO-8의 E2E 확인 항목 (a)~(f)를 `scripts/smoke.sh`의 함수로 먼저 만든다. 구현 전에는 각 항목이 `FAIL not implemented`를 출력한다.
 
 ## 대상 파일
-- `src/test/java/com/coralstay/orchestrator/MainTest.java`
+- `scripts/smoke.sh`
 
 ## 공통 규칙
 - 테스트마다 `@DisplayName("<카드>#<AC> …")`로 카드·AC 번호를 붙인다(draft는 `DRAFT-n#k`, 승격 때 교체).
@@ -45,9 +43,9 @@ MainTest의 모든 테스트에 `AO-1#<AC>` 표식(@DisplayName)을 붙여, 카�
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 AO-1의 코드 AC마다 최소 하나의 테스트가 `AO-1#<AC>` 표식을 가진다
-- [ ] #2 AC에 매핑되지 않는 테스트는 `AO-1 보조:` 표식을 가진다
-- [ ] #3 표식만 붙이고 테스트 동작은 바꾸지 않는다(테스트 수·결과 동일)
+- [ ] #1 (a) claim (b) 워크트리·브랜치 (c) 잔존 claude 프로세스 없음 (d) AC 커밋 트레일러 (e) 브랜치 카드 Done + Token Budget actual (f) runs.jsonl 일치를 각각 함수로 만든다
+- [ ] #2 각 함수는 지금은 `FAIL <항목> not implemented`를 출력하고, 전체 결과 요약과 종료코드(실패 있으면 1)를 낸다
+- [ ] #3 실제 claude를 실행하지 않는다(실행 부분은 AO-8에서 채움)
 <!-- AC:END -->
 
 ## Definition of Done
@@ -60,13 +58,13 @@ MainTest의 모든 테스트에 `AO-1#<AC>` 표식(@DisplayName)을 붙여, 카�
 ## Implementation Plan
 
 <!-- SECTION:PLAN:BEGIN -->
-1. 카드 AC 목록과 테스트 메서드를 대조(2026-10-04 대조표 참고).
-2. @DisplayName 추가.
-3. `./gradlew test`로 수·결과가 그대로인지 확인.
+1. 함수 골격과 요약 출력.
+2. shellcheck 통과.
+3. `./gradlew test`와 무관(게이트 영향 없음).
 <!-- SECTION:PLAN:END -->
 
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-대조표: AO-1~6 AC↔테스트 매핑은 이 카드를 만들 때의 탐색 결과에 있다. AO-1#3(Gradle·Java 25·JUnit 설정)은 빌드 자체가 검증하므로 테스트를 두지 않고 카드 메모에 적는다.
+AO-8 #2의 확인 항목과 이름을 맞춘다.
 <!-- SECTION:NOTES:END -->
