@@ -1,11 +1,11 @@
 ---
 id: AO-11
 title: MainTest에 AO-1 AC 표식을 붙인다
-status: To Do
+status: Done
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 01:47'
+updated_date: '2026-10-04 02:02'
 labels:
   - test-first
   - skeleton
@@ -45,16 +45,16 @@ MainTest의 모든 테스트에 `AO-1#<AC>` 표식(@DisplayName)을 붙여, 카�
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 AO-1의 코드 AC마다 최소 하나의 테스트가 `AO-1#<AC>` 표식을 가진다
-- [ ] #2 AC에 매핑되지 않는 테스트는 `AO-1 보조:` 표식을 가진다
-- [ ] #3 표식만 붙이고 테스트 동작은 바꾸지 않는다(테스트 수·결과 동일)
+- [x] #1 AO-1의 코드 AC마다 최소 하나의 테스트가 `AO-1#<AC>` 표식을 가진다
+- [x] #2 AC에 매핑되지 않는 테스트는 `AO-1 보조:` 표식을 가진다
+- [x] #3 표식만 붙이고 테스트 동작은 바꾸지 않는다(테스트 수·결과 동일)
 <!-- AC:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 `./gradlew test`가 통과한다(pending 제외)
-- [ ] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
-- [ ] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
+- [x] #1 `./gradlew test`가 통과한다(pending 제외)
+- [x] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
+- [x] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -69,4 +69,19 @@ MainTest의 모든 테스트에 `AO-1#<AC>` 표식(@DisplayName)을 붙여, 카�
 
 <!-- SECTION:NOTES:BEGIN -->
 대조표: AO-1~6 AC↔테스트 매핑은 이 카드를 만들 때의 탐색 결과에 있다. AO-1#3(Gradle·Java 25·JUnit 설정)은 빌드 자체가 검증하므로 테스트를 두지 않고 카드 메모에 적는다.
+
+검증(2026-10-04, 커밋 bd21f24):
+- AC1: AO-1#1 → parsesRunWithTaskId, AO-1#2 → noArgsIsUsageError, unknownCommandIsUsageError, badArgsPrintUsageToStderrAndExit2(파라미터화 3건, 이름 패턴 "{displayName} [{index}] args=..."). AO-1#3(Gradle·Java 25·JUnit·testCommand)은 빌드 자체(./gradlew test 통과)가 검증하므로 테스트 없음. AO-1#4는 문서 AC라 테스트 대상 아님.
+- AC2: runWithoutTaskIdIsUsageError, runWithExtraArgsIsUsageError, blankTaskIdIsUsageError, runPrintsTaskIdAndExits0 → 'AO-1 보조:' 표식.
+- AC3: build/test-results 비교 — MainTest 전/후 tests=10 skipped=0 failures=0 errors=0, 전체 61건 동일. 변경은 @DisplayName/이름 패턴과 import뿐.
+- DoD1: ./gradlew test BUILD SUCCESSFUL(61건 통과).
+- DoD2: ./gradlew pendingTest BUILD SUCCESSFUL, pending 테스트 0건(이 카드는 pending 테스트를 추가하지 않으므로 기대한 실패 목록=없음과 일치).
+
+- DoD3: task/AO-11 푸시, PR https://github.com/coralstay/agent-orchestartor/pull/5 (merge commit으로 병합)
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+MainTest의 10개 테스트 케이스 전부에 AO-1 AC 표식(@DisplayName)을 붙였다. AO-1#1·#2는 매핑 테스트, 나머지 4개는 'AO-1 보조:'. AO-1#3은 빌드가 검증하므로 메모로 남겼다. 테스트 수·결과는 전후 동일(MainTest 10, 전체 61, 실패 0).
+<!-- SECTION:FINAL_SUMMARY:END -->
