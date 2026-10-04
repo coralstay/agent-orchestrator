@@ -1,0 +1,43 @@
+File: /Users/flynn_macpro/githubs/agent-orchestartor/backlog/tasks/ao-90 - 카드-소스-읽기-픽스처.md
+
+Task AO-90 - 카드 소스 읽기 픽스처
+==================================================
+
+Status: ✔ Done
+Priority: Medium
+Type: task
+Assignee: @claude
+Created: 2026-10-04 02:10 (UTC)
+Updated: 2026-10-04 03:40 (UTC)
+Labels: fixture
+Milestone: m-0
+References: decision-6
+
+Dependency Graph:
+--------------------------------------------------
+Depends on (1 direct, 2 total):
+└─ AO-17 - TaskCardSource 테스트를 먼저 쓴다 [completed]
+   └─ AO-10 - 빌드에서 pending 테스트를 분리한다 [completed]
+
+Description:
+--------------------------------------------------
+## 결과
+Token Budget 소절을 가진 카드를 읽는다.
+
+### Token Budget
+
+estimated: in=200000 out=8000
+attempt 1: commits in=120000 out=3000 · session in=150000 out=3500 · model=claude-sonnet-4-5 · timeout
+actual: commits in=300000 out=9000 · session in=380000 out=9800 · attempts 2
+
+## 대상 파일
+- `src/main/java/com/coralstay/orchestrator/card/BacklogCardSource.java`
+
+Acceptance Criteria:
+--------------------------------------------------
+- [x] #1 Token Budget 소절을 파싱한다
+- [x] #2 대상 파일을 읽는다
+
+Implementation Notes:
+--------------------------------------------------
+Modified files: src/main/java/com/coralstay/orchestrator/card/BacklogCardSource.java, src/main/java/com/coralstay/orchestrator/card/TaskCardSource.java
