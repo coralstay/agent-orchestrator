@@ -1,11 +1,11 @@
 ---
 id: AO-13
 title: WorktreeManagerTest에 AO-3 AC 표식을 붙인다
-status: In Progress
+status: Done
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 01:59'
+updated_date: '2026-10-04 02:02'
 labels:
   - test-first
   - skeleton
@@ -45,15 +45,15 @@ WorktreeManagerTest의 모든 테스트에 `AO-3#<AC>` 표식(@DisplayName)을 �
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 AO-3의 코드 AC마다 최소 하나의 테스트가 `AO-3#<AC>` 표식을 가진다
-- [ ] #2 AC에 매핑되지 않는 테스트는 `AO-3 보조:` 표식을 가진다
-- [ ] #3 표식만 붙이고 테스트 동작은 바꾸지 않는다(테스트 수·결과 동일)
+- [x] #1 AO-3의 코드 AC마다 최소 하나의 테스트가 `AO-3#<AC>` 표식을 가진다
+- [x] #2 AC에 매핑되지 않는 테스트는 `AO-3 보조:` 표식을 가진다
+- [x] #3 표식만 붙이고 테스트 동작은 바꾸지 않는다(테스트 수·결과 동일)
 <!-- AC:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 `./gradlew test`가 통과한다(pending 제외)
-- [ ] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
+- [x] #1 `./gradlew test`가 통과한다(pending 제외)
+- [x] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
 - [ ] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
 <!-- DOD:END -->
 
@@ -69,4 +69,12 @@ WorktreeManagerTest의 모든 테스트에 `AO-3#<AC>` 표식(@DisplayName)을 �
 
 <!-- SECTION:NOTES:BEGIN -->
 대조표: AO-1~6 AC↔테스트 매핑은 이 카드를 만들 때의 탐색 결과에 있다.
+
+검증: ./gradlew test 통과 — 전체 61개(Main 10, SessionRegistry 16, BacklogClient 17, AgentSpawner 11, WorktreeManager 7), 실패 0. 변경 전후 WorktreeManagerTest 7개 동일. 매핑: #1 createAddsWorktreeOnTaskBranchNextToRepo / #2 createRefusesExistingPathEvenIfEmpty, createRefusesExistingBranchAndKeepsIt / #3 removeDeletesWorktreeAndKeepsBranchWithCommits, removePrunesWorktreeWhoseDirectoryWasDeletedByHand / 보조 rejectsTaskIdThatEscapesWorktreeDirectory, removeRefusesWorktreeWithUncommittedChanges. ./gradlew pendingTest: BUILD SUCCESSFUL, 실패 목록 없음(이 카드는 pending 테스트를 추가하지 않음 — 기대와 일치).
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+WorktreeManagerTest 7개 테스트 전부에 @DisplayName 표식을 붙였다. AO-3 코드 AC #1(1개)·#2(2개)·#3(2개)에 매핑하고, AC 밖 테스트 2개는 'AO-3 보조:'로 표시했다. 테스트 로직은 변경 없음 — ./gradlew test 61개 통과, WorktreeManagerTest 변경 전후 7개 동일, pendingTest 실패 없음.
+<!-- SECTION:FINAL_SUMMARY:END -->
