@@ -8,12 +8,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.coralstay.orchestrator.spawn.AgentSpawner.AgentResult;
 import com.coralstay.orchestrator.spawn.AgentSpawner.SpawnedAgent;
+import com.sun.management.HotSpotDiagnosticMXBean;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -32,6 +36,18 @@ class AgentSpawnerTest {
         Files.writeString(script, "#!/bin/sh\n" + body + "\n");
         Files.setPosixFilePermissions(script, PosixFilePermissions.fromString("rwx------"));
         return script;
+    }
+
+    /**
+     * {@code dumpThreads(JSON)} 결과에서 이름이 name인 스레드의 virtual 여부. 스레드 객체마다 {@code "tid"}로 시작하고
+     * virtual thread에만 {@code "virtual": true}가 붙는다. 그 이름의 스레드가 없으면 empty.
+     */
+    static Optional<Boolean> isVirtual(String json, String name) {
+        String nameField = "\"name\": \"" + name + "\"";
+        return Arrays.stream(json.split("\"tid\":"))
+                .filter(chunk -> chunk.contains(nameField))
+                .findFirst()
+                .map(chunk -> chunk.contains("\"virtual\": true"));
     }
 
     AgentSpawner spawner(Path executable) {
@@ -118,6 +134,30 @@ class AgentSpawnerTest {
         assertEquals("done\n", result.stdout());
         assertFalse(agent.process().isAlive());
         assertEquals(result, agent.await());
+    }
+
+    @Test
+    @DisplayName("AO-4#2 대기·stdout·stderr 소비 스레드는 virtual thread다")
+    void startWaitsAndDrainsOnVirtualThreads() throws Exception {
+        // Thread.getAllStackTraces()는 virtual thread를 빼므로, virtual thread까지 담는 JSON 스레드 덤프로 확인한다
+        Path exe = fake("sleep 30");
+        SpawnedAgent agent = spawner(exe).start("implementer", tmp, "p", TIMEOUT);
+        try {
+            Path dump = tmp.resolve("threads.json");
+            ManagementFactory.getPlatformMXBean(HotSpotDiagnosticMXBean.class)
+                    .dumpThreads(dump.toString(), HotSpotDiagnosticMXBean.ThreadDumpFormat.JSON);
+            String json = Files.readString(dump);
+
+            for (String prefix : List.of("agent-wait-", "agent-stdout-", "agent-stderr-")) {
+                String name = prefix + agent.pid();
+                assertEquals(Optional.of(true), isVirtual(json, name), name + " 스레드가 virtual이어야 한다");
+            }
+            // 판별 로직 자체의 확인: 테스트를 돌리는 플랫폼 스레드는 virtual로 읽히면 안 된다
+            assertEquals(Optional.of(false), isVirtual(json, Thread.currentThread().getName()));
+        } finally {
+            AgentSpawner.terminate(agent.process());
+            agent.await();
+        }
     }
 
     @Test
