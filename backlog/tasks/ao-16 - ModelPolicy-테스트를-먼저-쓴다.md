@@ -5,7 +5,7 @@ status: Done
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:38'
-updated_date: '2026-10-04 02:05'
+updated_date: '2026-10-04 02:06'
 labels:
   - test-first
   - skeleton
@@ -54,7 +54,7 @@ draft-4 (ModelPolicy)을 구현하기 전에 테스트부터 쓴다. 공개 API 
 <!-- DOD:BEGIN -->
 - [x] #1 `./gradlew test`가 통과한다(pending 제외)
 - [x] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
-- [ ] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
+- [x] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -74,9 +74,11 @@ draft-4 (ModelPolicy)을 구현하기 전에 테스트부터 쓴다. 공개 API 
 ## 2026-10-04 검증 (f0618cd, 032818a)
 - API: `ModelPolicy.load(Path)`(파일 없으면 builtIn), `builtIn()`, `choose(long estimatedInOut)` → `Choice(model, source)`+`builtIn()`, `buckets()`(SortedMap 상한→모델), `defaultModel()`, `source()`(FILE/BUILT_IN), `PolicyFormatException(lineNumber)`(default 누락은 줄 0), 상수 `BUILT_IN_SMALL_UP_TO=200000`/haiku/sonnet.
 - `./gradlew test`: BUILD SUCCESSFUL (pending 제외).
-- `./gradlew pendingTest`: 24 tests completed, 24 failed — 전부 ModelPolicyTest(DRAFT-4#1 11건: 파싱 1, default만 1, 형식오류 8, default 누락 1 / #2 10건: 경계 9 + 음수 1 / #3 3건). 각 실패의 원인은 UnsupportedOperationException("pending: DRAFT-4") (assertThrows 감싼 3+8건은 AssertionFailedError caused by UOE). 다른 클래스 실패 없음.
+- `./gradlew pendingTest`: 24 tests completed, 24 failed — 전부 ModelPolicyTest(DRAFT-4#1 11건: 파싱 1, default만 1, 형식오류 8, default 누락 1 / #2 10건: 경계 9 + 음수 1 / #3 3건). 각 실패의 원인은 UnsupportedOperationException("pending: DRAFT-4") (assertThrows로 감싼 9건은 AssertionFailedError caused by UOE). 다른 클래스 실패 없음.
 - 경계: 상한과 같으면 그 구간("이하") — 200000→haiku, 200001→sonnet으로 못박음.
 - 메모: CsvSource textBlock은 `#`로 시작하는 행을 주석으로 버리므로 주석 줄 케이스는 행 중간에 둠.
+
+PR: https://github.com/coralstay/agent-orchestartor/pull/12 (merge commit으로 병합)
 <!-- SECTION:NOTES:END -->
 
 ## Final Summary
