@@ -1,11 +1,11 @@
 ---
 id: AO-10
 title: 빌드에서 pending 테스트를 분리한다
-status: To Do
+status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 01:38'
+updated_date: '2026-10-04 01:47'
 labels:
   - test-first
   - skeleton
