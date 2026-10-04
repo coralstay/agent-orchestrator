@@ -1,11 +1,11 @@
 ---
 id: AO-14
 title: SessionRegistryTest에 AO-5 AC 표식을 붙인다
-status: In Progress
+status: Done
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 01:59'
+updated_date: '2026-10-04 02:03'
 labels:
   - test-first
   - skeleton
@@ -45,15 +45,15 @@ SessionRegistryTest의 모든 테스트에 `AO-5#<AC>` 표식(@DisplayName)을 �
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 AO-5의 코드 AC마다 최소 하나의 테스트가 `AO-5#<AC>` 표식을 가진다
-- [ ] #2 AC에 매핑되지 않는 테스트는 `AO-5 보조:` 표식을 가진다
-- [ ] #3 표식만 붙이고 테스트 동작은 바꾸지 않는다(테스트 수·결과 동일)
+- [x] #1 AO-5의 코드 AC마다 최소 하나의 테스트가 `AO-5#<AC>` 표식을 가진다
+- [x] #2 AC에 매핑되지 않는 테스트는 `AO-5 보조:` 표식을 가진다
+- [x] #3 표식만 붙이고 테스트 동작은 바꾸지 않는다(테스트 수·결과 동일)
 <!-- AC:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 `./gradlew test`가 통과한다(pending 제외)
-- [ ] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
+- [x] #1 `./gradlew test`가 통과한다(pending 제외)
+- [x] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
 - [ ] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
 <!-- DOD:END -->
 
@@ -69,4 +69,12 @@ SessionRegistryTest의 모든 테스트에 `AO-5#<AC>` 표식(@DisplayName)을 �
 
 <!-- SECTION:NOTES:BEGIN -->
 대조표: AO-1~6 AC↔테스트 매핑은 이 카드를 만들 때의 탐색 결과에 있다.
+
+증거: ./gradlew test 통과 — SessionRegistryTest tests=16 failures=0 (변경 전후 동일), 전체 61개 동일. AO-5#1 3개, #2 4개, #3 3개, 보조 6개. ./gradlew pendingTest BUILD SUCCESSFUL, 실패 0 — 이 카드는 pending 테스트를 추가하지 않으므로 기대와 일치. 커밋 ce386df.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+SessionRegistryTest의 16개 테스트 전부에 @DisplayName 표식을 붙였다: AO-5#1(admit) 3개, #2(retire) 4개, #3(live) 3개, 'AO-5 보조:' 6개. 동작 변경 없음(16/16 통과, 전체 61개 동일). pendingTest 실패 0.
+<!-- SECTION:FINAL_SUMMARY:END -->
