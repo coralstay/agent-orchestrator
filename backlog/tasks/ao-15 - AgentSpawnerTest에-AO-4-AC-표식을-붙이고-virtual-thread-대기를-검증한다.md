@@ -1,11 +1,11 @@
 ---
 id: AO-15
 title: AgentSpawnerTest에 AO-4 AC 표식을 붙이고 virtual thread 대기를 검증한다
-status: In Progress
+status: Done
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 01:59'
+updated_date: '2026-10-04 02:03'
 labels:
   - test-first
   - skeleton
@@ -45,15 +45,15 @@ AgentSpawnerTest의 모든 테스트에 `AO-4#<AC>` 표식을 붙이고, 빠져 
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 AO-4의 코드 AC마다 최소 하나의 테스트가 `AO-4#<AC>` 표식을 가진다(보조 테스트는 `AO-4 보조:`)
-- [ ] #2 AO-4#2: 대기·출력 소비 스레드가 virtual thread임을 단언하는 테스트를 추가한다(예: 실행 중 스레드 덤프에서 `agent-wait-<pid>` 스레드의 isVirtual)
-- [ ] #3 기존 테스트의 동작은 바꾸지 않는다
+- [x] #1 AO-4의 코드 AC마다 최소 하나의 테스트가 `AO-4#<AC>` 표식을 가진다(보조 테스트는 `AO-4 보조:`)
+- [x] #2 AO-4#2: 대기·출력 소비 스레드가 virtual thread임을 단언하는 테스트를 추가한다(예: 실행 중 스레드 덤프에서 `agent-wait-<pid>` 스레드의 isVirtual)
+- [x] #3 기존 테스트의 동작은 바꾸지 않는다
 <!-- AC:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 `./gradlew test`가 통과한다(pending 제외)
-- [ ] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
+- [x] #1 `./gradlew test`가 통과한다(pending 제외)
+- [x] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
 - [ ] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
 <!-- DOD:END -->
 
@@ -69,4 +69,13 @@ AgentSpawnerTest의 모든 테스트에 `AO-4#<AC>` 표식을 붙이고, 빠져 
 
 <!-- SECTION:NOTES:BEGIN -->
 virtual thread는 Thread.getAllStackTraces()에 안 나온다. 코드에 관찰 지점을 추가해야 하면 AgentSpawner 수정이 이 카드 범위에 들어간다 — 그 경우 카드 메모에 기록.
+
+증거: ./gradlew test 통과(62 tests, 실패 0; AgentSpawnerTest 12개 모두 @DisplayName). ./gradlew pendingTest: pending 태그 테스트 0개, 실패 0 — 이 카드는 pending 테스트를 추가하지 않으므로 기대와 일치.
+virtual thread 단언: 프로덕션 변경 없이 com.sun.management.HotSpotDiagnosticMXBean.dumpThreads(JSON)를 사용(virtual thread 포함, 스레드마다 "virtual": true). 가짜 실행 파일 sleep 30 실행 중 덤프에서 agent-wait/stdout/stderr-<pid>를 찾고, 대조군으로 현재 플랫폼 스레드가 false로 읽히는지도 확인. 변이 확인: agent-wait를 Thread.ofPlatform()으로 바꾸면 실패함을 확인 후 원복. AgentSpawner.java 수정 없음.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+AgentSpawnerTest 11개 기존 테스트에 AO-4#1/#2/#3 또는 'AO-4 보조:' @DisplayName을 붙이고(동작 변경 없음), AO-4#2 누락 검증으로 대기·stdout·stderr 소비 스레드가 virtual thread임을 JSON 스레드 덤프(HotSpotDiagnosticMXBean.dumpThreads)로 단언하는 테스트를 추가했다. 프로덕션 코드 변경 없음. ./gradlew test 62개 통과.
+<!-- SECTION:FINAL_SUMMARY:END -->
