@@ -8,12 +8,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.coralstay.orchestrator.spawn.AgentSpawner.AgentResult;
 import com.coralstay.orchestrator.spawn.AgentSpawner.SpawnedAgent;
+import com.sun.management.HotSpotDiagnosticMXBean;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -33,6 +38,18 @@ class AgentSpawnerTest {
         return script;
     }
 
+    /**
+     * {@code dumpThreads(JSON)} 결과에서 이름이 name인 스레드의 virtual 여부. 스레드 객체마다 {@code "tid"}로 시작하고
+     * virtual thread에만 {@code "virtual": true}가 붙는다. 그 이름의 스레드가 없으면 empty.
+     */
+    static Optional<Boolean> isVirtual(String json, String name) {
+        String nameField = "\"name\": \"" + name + "\"";
+        return Arrays.stream(json.split("\"tid\":"))
+                .filter(chunk -> chunk.contains(nameField))
+                .findFirst()
+                .map(chunk -> chunk.contains("\"virtual\": true"));
+    }
+
     AgentSpawner spawner(Path executable) {
         return new AgentSpawner(executable.toString(), "acceptEdits");
     }
@@ -40,6 +57,7 @@ class AgentSpawnerTest {
     // --- command ---
 
     @Test
+    @DisplayName("AO-4#1 command는 claude -p와 권한 모드 인자를 조립한다")
     void commandBuildsHeadlessInvocationWithPermissionMode() {
         var spawner = new AgentSpawner("/opt/claude", "acceptEdits");
 
@@ -50,6 +68,7 @@ class AgentSpawnerTest {
     }
 
     @Test
+    @DisplayName("AO-4#1 기본값은 claude·auto이고 --bare를 넣지 않는다")
     void commandDefaultsToClaudeWithAutoModeAndNeverBare() {
         List<String> command = new AgentSpawner().command("implementer", "x");
 
@@ -60,6 +79,7 @@ class AgentSpawnerTest {
     }
 
     @Test
+    @DisplayName("AO-4#1 프롬프트는 argv 원소 하나로 그대로 넘긴다")
     void commandPassesPromptAsSingleArgumentVerbatim() {
         String prompt = "line1\n\"quoted\" $HOME `id`; rm -rf / && echo";
 
@@ -70,6 +90,7 @@ class AgentSpawnerTest {
     }
 
     @Test
+    @DisplayName("AO-4 보조: 빈 실행 파일·권한 모드를 거부한다")
     void constructorRejectsBlankValues() {
         assertThrows(IllegalArgumentException.class, () -> new AgentSpawner(" ", "auto"));
         assertThrows(IllegalArgumentException.class, () -> new AgentSpawner("claude", ""));
@@ -78,6 +99,7 @@ class AgentSpawnerTest {
     // --- spawn ---
 
     @Test
+    @DisplayName("AO-4#2 spawn은 종료코드·stdout·stderr·PID를 돌려준다")
     void spawnReturnsExitCodeOutputsAndPid() throws IOException {
         Path cwd = Files.createDirectory(tmp.resolve("work")).toRealPath();
         Path exe = fake("""
@@ -99,6 +121,7 @@ class AgentSpawnerTest {
     }
 
     @Test
+    @DisplayName("AO-4#2 start는 완료 전에 PID를 노출한다")
     void startExposesPidBeforeCompletion() throws IOException {
         Path exe = fake("sleep 0.3; echo done");
 
@@ -114,6 +137,31 @@ class AgentSpawnerTest {
     }
 
     @Test
+    @DisplayName("AO-4#2 대기·stdout·stderr 소비 스레드는 virtual thread다")
+    void startWaitsAndDrainsOnVirtualThreads() throws Exception {
+        // Thread.getAllStackTraces()는 virtual thread를 빼므로, virtual thread까지 담는 JSON 스레드 덤프로 확인한다
+        Path exe = fake("sleep 30");
+        SpawnedAgent agent = spawner(exe).start("implementer", tmp, "p", TIMEOUT);
+        try {
+            Path dump = tmp.resolve("threads.json");
+            ManagementFactory.getPlatformMXBean(HotSpotDiagnosticMXBean.class)
+                    .dumpThreads(dump.toString(), HotSpotDiagnosticMXBean.ThreadDumpFormat.JSON);
+            String json = Files.readString(dump);
+
+            for (String prefix : List.of("agent-wait-", "agent-stdout-", "agent-stderr-")) {
+                String name = prefix + agent.pid();
+                assertEquals(Optional.of(true), isVirtual(json, name), name + " 스레드가 virtual이어야 한다");
+            }
+            // 판별 로직 자체의 확인: 테스트를 돌리는 플랫폼 스레드는 virtual로 읽히면 안 된다
+            assertEquals(Optional.of(false), isVirtual(json, Thread.currentThread().getName()));
+        } finally {
+            AgentSpawner.terminate(agent.process());
+            agent.await();
+        }
+    }
+
+    @Test
+    @DisplayName("AO-4 보조: stdin을 닫아 EOF를 보게 한다")
     void spawnClosesStdinSoReadersSeeEof() throws IOException {
         Path exe = fake("cat; echo eof");
 
@@ -124,6 +172,7 @@ class AgentSpawnerTest {
     }
 
     @Test
+    @DisplayName("AO-4 보조: 큰 출력도 막히지 않고 양쪽 스트림을 비운다")
     void spawnDrainsLargeOutputOnBothStreamsWithoutBlocking() throws IOException {
         // 파이프 버퍼(64KiB 안팎)를 훨씬 넘는 양을 stdout·stderr 양쪽에 쓴다
         Path exe = fake("head -c 1048576 /dev/zero | tr '\\0' a; head -c 1048576 /dev/zero | tr '\\0' b >&2");
@@ -137,6 +186,7 @@ class AgentSpawnerTest {
     }
 
     @Test
+    @DisplayName("AO-4 보조: 0 이하 타임아웃을 거부한다")
     void startRejectsNonPositiveTimeout() throws IOException {
         Path exe = fake("exit 0");
 
@@ -147,6 +197,7 @@ class AgentSpawnerTest {
     // --- timeout ---
 
     @Test
+    @DisplayName("AO-4#3 타임아웃이면 프로세스와 자손을 모두 종료한다")
     void spawnTimeoutKillsProcessAndAllDescendants() throws IOException {
         // 백그라운드 자식과 전경 자식을 하나씩 두고, 둘 다 30초 동안 버티게 한다
         Path pids = tmp.resolve("pids");
@@ -169,6 +220,7 @@ class AgentSpawnerTest {
     }
 
     @Test
+    @DisplayName("AO-4#3 SIGTERM을 무시하면 SIGKILL로 강제 종료한다")
     void terminateForcesProcessThatIgnoresSigterm() throws IOException {
         Path exe = fake("""
                 trap '' TERM
