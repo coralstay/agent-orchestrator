@@ -1,11 +1,11 @@
 ---
 id: AO-17
 title: TaskCardSource 테스트를 먼저 쓴다
-status: To Do
+status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:38'
-updated_date: '2026-10-04 01:47'
+updated_date: '2026-10-04 01:59'
 labels:
   - test-first
   - skeleton
