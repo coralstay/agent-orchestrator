@@ -5,7 +5,7 @@ status: Done
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:38'
-updated_date: '2026-10-04 02:04'
+updated_date: '2026-10-04 02:06'
 labels:
   - test-first
   - skeleton
@@ -54,7 +54,7 @@ draft-1 (TaskCardSource)을 구현하기 전에 테스트부터 쓴다. 공개 A
 <!-- DOD:BEGIN -->
 - [x] #1 `./gradlew test`가 통과한다(pending 제외)
 - [x] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
-- [ ] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
+- [x] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -75,6 +75,8 @@ API(TaskCardSource.java, 시그니처 스텁): read(id) → Card, default valida
 설계: 파싱·출력·상태 전이는 값 타입에 두고 구현체(메모리 가짜, BacklogCardSource)는 저장·커밋만 한다 — 그래서 가짜가 있어도 테스트는 DRAFT-1 구현 전까지 빨강이다. actual 줄(commits·session·attempts k)을 담을 값 타입이 draft-1 목록에 없어 Actual을 추가했다.
 Tokens 벡터는 AO-6 AC5(CommitLedger in/out 파싱)와 같아야 한다: 유효 `in=59858 out=465`, `in=0 out=0`, `in=3000000000 out=1`(long); 무효 "", `in=59858`, `out=465`, `out=465 in=59858`, `in=abc out=465`, `in=-1 out=465`, `in=59,858 out=465`, `in=59858 out=465 extra`, `IN=59858 OUT=465`, `unavailable (no-session-id)`. 한쪽으로 모을 때 이 벡터를 그대로 옮긴다.
 검증: ./gradlew test BUILD SUCCESSFUL(61 tests, 실패 0, pending 제외). ./gradlew pendingTest: 22 tests completed, 22 failed — 전부 TaskCardSourceTest, 원인은 모두 `pending: DRAFT-1` UnsupportedOperationException(8 직접, 4 assertDoesNotThrow, 10 assertThrows 타입 불일치). 목록: DRAFT-1#1 ×3(read 필드·estimated / attempt·actual 파싱 / 형식 오류 unparsed), DRAFT-1#2 ×4(ok / 소절 없음 / estimated 없음 / 형식 오류 줄), DRAFT-1#3 ×3(claim / recordAttempt 순번 / recordActual), DRAFT-1 보조 Tokens ×12(파싱 1, 출력·왕복 1, 무효 10).
+
+PR: https://github.com/coralstay/agent-orchestartor/pull/11 (merge commit으로 병합)
 <!-- SECTION:NOTES:END -->
 
 ## Final Summary
