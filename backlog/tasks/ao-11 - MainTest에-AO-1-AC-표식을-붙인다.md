@@ -54,7 +54,7 @@ MainTest의 모든 테스트에 `AO-1#<AC>` 표식(@DisplayName)을 붙여, 카�
 <!-- DOD:BEGIN -->
 - [x] #1 `./gradlew test`가 통과한다(pending 제외)
 - [x] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
-- [ ] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
+- [x] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -76,6 +76,8 @@ MainTest의 모든 테스트에 `AO-1#<AC>` 표식(@DisplayName)을 붙여, 카�
 - AC3: build/test-results 비교 — MainTest 전/후 tests=10 skipped=0 failures=0 errors=0, 전체 61건 동일. 변경은 @DisplayName/이름 패턴과 import뿐.
 - DoD1: ./gradlew test BUILD SUCCESSFUL(61건 통과).
 - DoD2: ./gradlew pendingTest BUILD SUCCESSFUL, pending 테스트 0건(이 카드는 pending 테스트를 추가하지 않으므로 기대한 실패 목록=없음과 일치).
+
+- DoD3: task/AO-11 푸시, PR https://github.com/coralstay/agent-orchestartor/pull/5 (merge commit으로 병합)
 <!-- SECTION:NOTES:END -->
 
 ## Final Summary
