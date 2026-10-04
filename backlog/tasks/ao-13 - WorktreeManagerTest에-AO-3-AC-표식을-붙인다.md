@@ -5,7 +5,7 @@ status: Done
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:37'
-updated_date: '2026-10-04 02:02'
+updated_date: '2026-10-04 02:03'
 labels:
   - test-first
   - skeleton
@@ -54,7 +54,7 @@ WorktreeManagerTest의 모든 테스트에 `AO-3#<AC>` 표식(@DisplayName)을 �
 <!-- DOD:BEGIN -->
 - [x] #1 `./gradlew test`가 통과한다(pending 제외)
 - [x] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
-- [ ] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
+- [x] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -71,6 +71,8 @@ WorktreeManagerTest의 모든 테스트에 `AO-3#<AC>` 표식(@DisplayName)을 �
 대조표: AO-1~6 AC↔테스트 매핑은 이 카드를 만들 때의 탐색 결과에 있다.
 
 검증: ./gradlew test 통과 — 전체 61개(Main 10, SessionRegistry 16, BacklogClient 17, AgentSpawner 11, WorktreeManager 7), 실패 0. 변경 전후 WorktreeManagerTest 7개 동일. 매핑: #1 createAddsWorktreeOnTaskBranchNextToRepo / #2 createRefusesExistingPathEvenIfEmpty, createRefusesExistingBranchAndKeepsIt / #3 removeDeletesWorktreeAndKeepsBranchWithCommits, removePrunesWorktreeWhoseDirectoryWasDeletedByHand / 보조 rejectsTaskIdThatEscapesWorktreeDirectory, removeRefusesWorktreeWithUncommittedChanges. ./gradlew pendingTest: BUILD SUCCESSFUL, 실패 목록 없음(이 카드는 pending 테스트를 추가하지 않음 — 기대와 일치).
+
+PR: https://github.com/coralstay/agent-orchestartor/pull/6 (merge commit으로 병합)
 <!-- SECTION:NOTES:END -->
 
 ## Final Summary
