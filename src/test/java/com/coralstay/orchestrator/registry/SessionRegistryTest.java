@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /** 가짜 프로세스는 {@code sh -c} 스크립트로 띄운다 — 실제 claude는 띄우지 않는다. */
@@ -67,6 +68,7 @@ class SessionRegistryTest {
     // --- admit ---
 
     @Test
+    @DisplayName("AO-5#1 admit은 허가를 얻고 세션을 등록한다")
     void admitRegistersSessionAndTakesPermit() throws Exception {
         var registry = new SessionRegistry(2);
 
@@ -79,6 +81,7 @@ class SessionRegistryTest {
     }
 
     @Test
+    @DisplayName("AO-5 보조: 기본 용량은 1이다")
     void defaultCapacityIsOne() throws Exception {
         var registry = new SessionRegistry();
 
@@ -88,6 +91,7 @@ class SessionRegistryTest {
     }
 
     @Test
+    @DisplayName("AO-5#1 용량이 차면 admit은 허가가 날 때까지 기다린다")
     void admitBlocksWhenFull() throws Exception {
         var registry = new SessionRegistry(1);
         registry.admit("AO-1", "implementer");
@@ -105,6 +109,7 @@ class SessionRegistryTest {
     }
 
     @Test
+    @DisplayName("AO-5 보조: 같은 태스크 중복 admit은 거부하고 허가를 돌려준다")
     void admitRejectsDuplicateTaskAndReturnsPermit() throws Exception {
         var registry = new SessionRegistry(2);
         registry.admit("AO-1", "implementer");
@@ -114,6 +119,7 @@ class SessionRegistryTest {
     }
 
     @Test
+    @DisplayName("AO-5 보조: 생성자와 admit은 잘못된 인자를 거부한다")
     void constructorAndAdmitRejectInvalidArguments() {
         assertThrows(IllegalArgumentException.class, () -> new SessionRegistry(0));
         var registry = new SessionRegistry();
@@ -123,6 +129,7 @@ class SessionRegistryTest {
     }
 
     @Test
+    @DisplayName("AO-5 보조: attach는 프로세스를 한 번만 묶는다")
     void attachBindsProcessOnce() throws Exception {
         var registry = new SessionRegistry();
         Session session = registry.admit("AO-1", "implementer");
@@ -147,6 +154,7 @@ class SessionRegistryTest {
     }
 
     @Test
+    @DisplayName("AO-5#1 retire가 허가를 반납하면 대기 중인 admit이 풀린다")
     void retireReleasesPermitAndUnblocksWaitingAdmit() throws Exception {
         var registry = new SessionRegistry(1);
         Session first = registry.admit("AO-1", "implementer");
@@ -161,6 +169,7 @@ class SessionRegistryTest {
     }
 
     @Test
+    @DisplayName("AO-5 보조: retire를 두 번 해도 허가는 한 번만 반납한다")
     void retireTwiceReleasesPermitOnlyOnce() throws Exception {
         var registry = new SessionRegistry(1);
         Session session = registry.admit("AO-1", "implementer");
@@ -172,6 +181,7 @@ class SessionRegistryTest {
     }
 
     @Test
+    @DisplayName("AO-5 보조: 옛 세션 retire는 같은 태스크의 새 세션을 지우지 않는다")
     void retireOfStaleSessionDoesNotRemoveNewSessionOfSameTask() throws Exception {
         var registry = new SessionRegistry(2);
         Session old = registry.admit("AO-1", "implementer");
@@ -187,6 +197,7 @@ class SessionRegistryTest {
     }
 
     @Test
+    @DisplayName("AO-5#2 프로세스 없이 retire해도(spawn 실패) 허가를 반납한다")
     void retireWithoutProcessReleasesPermitWhenSpawnFailed() throws Exception {
         var registry = new SessionRegistry(1);
         Session session = registry.admit("AO-1", "implementer");
@@ -199,6 +210,7 @@ class SessionRegistryTest {
     }
 
     @Test
+    @DisplayName("AO-5#2 retire는 실행 중인 프로세스와 남은 자식을 종료한다")
     void retireKillsRunningProcessAndLingeringChild() throws Exception {
         var registry = new SessionRegistry(1);
         Session session = registry.admit("AO-1", "implementer");
@@ -215,6 +227,7 @@ class SessionRegistryTest {
     }
 
     @Test
+    @DisplayName("AO-5#2 SIGTERM을 무시하는 프로세스는 유예 후 강제 종료한다")
     void retireForcesProcessThatIgnoresSigterm() throws Exception {
         var registry = new SessionRegistry(1);
         Session session = registry.admit("AO-1", "implementer");
@@ -228,6 +241,7 @@ class SessionRegistryTest {
     }
 
     @Test
+    @DisplayName("AO-5#2 정상 종료 후 retire는 세션만 제거한다")
     void retireAfterNormalExitJustRemovesSession() throws Exception {
         var registry = new SessionRegistry(1);
         Session session = registry.admit("AO-1", "implementer");
@@ -247,6 +261,7 @@ class SessionRegistryTest {
     // --- live ---
 
     @Test
+    @DisplayName("AO-5#3 live는 등록된 세션의 스냅샷을 돌려준다")
     void liveReturnsSnapshotOfRegisteredSessions() throws Exception {
         var registry = new SessionRegistry(2);
         Session spawned = registry.admit("AO-1", "implementer");
@@ -262,6 +277,7 @@ class SessionRegistryTest {
     }
 
     @Test
+    @DisplayName("AO-5#3 live 스냅샷은 불변이고 이후 변경에 영향받지 않는다")
     void liveSnapshotIsImmutableAndUnaffectedByLaterChanges() throws Exception {
         var registry = new SessionRegistry(2);
         Session first = registry.admit("AO-1", "implementer");
@@ -278,6 +294,7 @@ class SessionRegistryTest {
     }
 
     @Test
+    @DisplayName("AO-5#3 모두 retire하면 live는 비어 있다")
     void liveIsEmptyAfterAllRetired() throws Exception {
         var registry = new SessionRegistry();
         registry.retire(registry.admit("AO-1", "implementer"));
