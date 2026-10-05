@@ -1,7 +1,7 @@
 ---
-id: DRAFT-9
+id: AO-22
 title: README 라이선스 절에 AGPL-3.0 원문 링크 추가
-status: Draft
+status: To Do
 assignee: []
 created_date: '2026-10-05 07:22'
 labels:
