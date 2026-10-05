@@ -1,7 +1,7 @@
 ---
-id: DRAFT-9
+id: AO-23
 title: claude-rails 언급을 interlock으로 바꾸기
-status: Draft
+status: To Do
 assignee: []
 created_date: '2026-10-05 07:49'
 labels:
