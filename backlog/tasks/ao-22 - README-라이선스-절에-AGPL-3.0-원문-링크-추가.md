@@ -1,7 +1,7 @@
 ---
 id: AO-22
 title: README 라이선스 절에 AGPL-3.0 원문 링크 추가
-status: In Progress
+status: Done
 assignee: []
 created_date: '2026-10-05 07:22'
 updated_date: '2026-10-05 07:24'
@@ -21,5 +21,11 @@ dependencies: []
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 README 라이선스 절에 GNU AGPL-3.0 원문 링크를 건다
+- [x] #1 README 라이선스 절에 GNU AGPL-3.0 원문 링크를 건다
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+README 라이선스 절에 LICENSE 링크와 함께 GNU AGPL-3.0 원문(https://www.gnu.org/licenses/agpl-3.0.html) 링크를 걸었다. 컴포넌트 저장소 전체 라이선스 표기 통일의 일부.
+<!-- SECTION:FINAL_SUMMARY:END -->
