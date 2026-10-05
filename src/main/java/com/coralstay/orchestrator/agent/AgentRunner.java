@@ -8,7 +8,7 @@ import java.util.Objects;
 
 /**
  * 에이전트 실행 포트 (decision-7). 구현은 Claude Code 하나({@link ClaudeCodeRunner})뿐이며, 포트는 "띄우고 기다려 결과를
- * 받는다"만 약속한다. 에이전트 안의 규칙은 interlock이 강제한다.
+ * 받는다"만 약속한다. 에이전트 안의 규칙은 claude-code-agile-hooks가 강제한다.
  *
  * <p>AO-19 시점에는 시그니처 스텁이다(decision-11). 실제 동작은 DRAFT-3이 spawn/AgentSpawner를 옮겨 채운다.
  */
@@ -97,7 +97,7 @@ public interface AgentRunner {
     /**
      * Claude Code 구현: {@code claude -p} 헤드리스 프로세스. 헤드리스 JSON 파싱은 여기에만 둔다(decision-8).
      *
-     * <p>{@code --bare}·{@code --dangerously-skip-permissions}는 절대 쓰지 않는다 — 훅(interlock, git-logbook)이 꺼진다.
+     * <p>{@code --bare}·{@code --dangerously-skip-permissions}는 절대 쓰지 않는다 — 훅(claude-code-agile-hooks, git-logbook)이 꺼진다.
      */
     final class ClaudeCodeRunner implements AgentRunner {
 

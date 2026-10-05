@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  * 태스크별 git worktree를 만들고 지운다 (decision-3).
  *
  * <p>태스크 {@code AO-3}이면 저장소 {@code <parent>/<repo>} 옆에 {@code <parent>/<repo>-wt/AO-3} 디렉토리와
- * {@code task/AO-3} 브랜치를 만든다. 브랜치명은 git-logbook {@code Task-Id} 추출 규칙과 interlock 브랜치 확인을
+ * {@code task/AO-3} 브랜치를 만든다. 브랜치명은 git-logbook {@code Task-Id} 추출 규칙과 claude-code-agile-hooks 브랜치 확인을
  * 함께 만족한다.
  */
 public final class WorktreeManager {
