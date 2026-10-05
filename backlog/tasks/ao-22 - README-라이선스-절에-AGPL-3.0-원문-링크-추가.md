@@ -1,9 +1,10 @@
 ---
 id: AO-22
 title: README 라이선스 절에 AGPL-3.0 원문 링크 추가
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-10-05 07:22'
+updated_date: '2026-10-05 07:24'
 labels:
   - license
 dependencies: []
@@ -17,3 +18,8 @@ dependencies: []
 수용 기준(승격 시 AC로 등록):
 1. README 라이선스 절에 GNU AGPL-3.0 원문 링크를 건다
 <!-- SECTION:DESCRIPTION:END -->
+
+## Acceptance Criteria
+<!-- AC:BEGIN -->
+- [ ] #1 README 라이선스 절에 GNU AGPL-3.0 원문 링크를 건다
+<!-- AC:END -->
