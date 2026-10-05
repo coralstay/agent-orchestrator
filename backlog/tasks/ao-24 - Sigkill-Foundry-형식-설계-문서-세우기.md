@@ -1,7 +1,7 @@
 ---
-id: DRAFT-9
+id: AO-24
 title: Sigkill Foundry 형식 설계 문서 세우기
-status: Draft
+status: To Do
 assignee: []
 created_date: '2026-10-05 11:52'
 labels:
