@@ -21,7 +21,7 @@ import java.util.concurrent.TimeoutException;
  * {@code claude -p} 헤드리스 프로세스를 띄우고 기다리는 스포너 (RFC 06절 Agent Spawner).
  *
  * <p>{@code --bare}는 절대 쓰지 않는다(RFC 11절①, decision-5) — bare 모드는 훅을 건너뛰므로 git-logbook 트레일러와
- * claude-rails 게이트가 함께 꺼진다.
+ * interlock 게이트가 함께 꺼진다.
  *
  * <p>BacklogClient의 실행기({@code Function<List<String>, ProcessResult>})는 끝난 결과만 돌려주므로 쓰지 않는다. 스포너는
  * 살아 있는 Process가 필요하다(PID 노출, 타임아웃, 자손 종료). 대신 실행 파일 경로를 주입받아 테스트는 셸 스크립트로 대체한다.
