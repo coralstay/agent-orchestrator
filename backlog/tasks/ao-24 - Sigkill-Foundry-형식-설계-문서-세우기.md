@@ -4,7 +4,7 @@ title: Sigkill Foundry 형식 설계 문서 세우기
 status: In Progress
 assignee: []
 created_date: '2026-10-05 11:52'
-updated_date: '2026-10-05 12:10'
+updated_date: '2026-10-10 22:36'
 labels:
   - docs
 dependencies: []
@@ -25,5 +25,5 @@ dependencies: []
 <!-- AC:BEGIN -->
 - [ ] #1 design/ 구조·장 형식이 최상위 Sigkill Foundry와 같다
 - [ ] #2 1.01 · 1.02 · 3.01을 기존 문서 근거로 채우고 나머지는 골격으로 둔다
-- [ ] #3 Claude 앱에 장별 문서와 목차 문서를 만들고 design/README.md에 링크한다
+- [ ] #3 설계 문서의 원본은 design/ 하나다 — Claude 앱 편집 원본 문구 · 링크 칸을 두지 않고, 목차 상태는 실제 파일 기준
 <!-- AC:END -->
