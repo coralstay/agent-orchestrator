@@ -1,0 +1,40 @@
+// agent-orchestrator 패키지 의존 — src/main/java/com/coralstay/orchestrator 의 import 기준.
+// 실선 = 패키지 간 import, 점선 = 외부 프로세스 호출. 점선 테두리 = 시그니처 스텁(decision-11).
+digraph packages {
+  bgcolor="transparent"; rankdir=LR; nodesep=0.30; ranksep=0.55; compound=true;
+  node [shape=box, style="filled,rounded", fillcolor="#f00004", color="#f00003",
+        fontcolor="#f00001", fontname="Helvetica", fontsize=11, margin="0.16,0.08", penwidth=1.1];
+  edge [color="#f00003", arrowsize=0.7, penwidth=1.1, fontname="Helvetica", fontsize=10,
+        fontcolor="#f00002"];
+
+  subgraph cluster_orc {
+    label="com.coralstay.orchestrator"; fontname="Helvetica"; fontsize=11;
+    fontcolor="#f00002"; color="#f00003"; style="rounded";
+
+    Main      [label="Main\nCLI run <taskId>", fillcolor="#f00007", color="#f00006", fontcolor="#f00008"];
+    backlog   [label="backlog\nBacklogClient"];
+    workspace [label="workspace\nWorktreeManager"];
+    spawn     [label="spawn\nAgentSpawner", fillcolor="#f0000a", color="#f00009"];
+    registry  [label="registry\nSessionRegistry", fillcolor="#f0000e", color="#f0000d"];
+    agent     [label="agent\nAgentRunner\n(ClaudeCodeRunner)", style="filled,rounded,dashed"];
+    policy    [label="policy\nModelPolicy", style="filled,rounded,dashed"];
+    card      [label="card\nTaskCardSource", style="filled,rounded,dashed"];
+  }
+
+  subgraph cluster_ext {
+    label="외부 프로세스"; fontname="Helvetica"; fontsize=11;
+    fontcolor="#f00002"; color="#f00003"; style="rounded,dashed";
+    node [fillcolor="#f00005"];
+    bl     [label="backlog CLI\n(backlog.md)"];
+    git    [label="git"];
+    claude [label="claude -p\n(Claude Code)"];
+  }
+
+  workspace -> backlog  [label="processExecutor\nProcessResult"];
+  registry  -> spawn    [label="terminate"];
+
+  backlog -> bl     [style=dashed, label="task view --plain"];
+  workspace -> git  [style=dashed, label="worktree add/remove"];
+  spawn -> claude   [style=dashed, label="ProcessBuilder"];
+  agent -> claude   [style=dashed];
+}
