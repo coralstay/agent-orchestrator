@@ -1,3 +1,11 @@
 {
-  "testCommand": "./gradlew test"
+  "testCommand": "./gradlew test",
+  "testFirst": {
+    "sourceGlobs": [
+      "src/main/java/**"
+    ],
+    "testGlobs": [
+      "src/test/java/**"
+    ]
+  }
 }
