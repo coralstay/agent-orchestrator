@@ -2,7 +2,7 @@
 id: decision-11
 title: 테스트를 먼저 쓰고 미구현 테스트는 pending 태그로 분리한다
 date: '2026-10-04 01:38'
-status: accepted
+status: superseded
 ---
 ## Context
 
@@ -27,3 +27,5 @@ claude-rails는 `./gradlew test`가 실패하면 커밋을 막으므로, 아직 
 
 - 스텁 클래스가 main 코드에 먼저 들어간다. 실수로 호출되면 `pending:` 메시지로 바로 드러난다.
 - M2 draft는 승격 전까지 테스트를 쓰지 않는다. 승격할 때 같은 방식으로 테스트부터 쓴다.
+
+> superseded by decision-13 (AC 하나씩 TDD + 비즈니스 규칙 테스트, claude-code-agile-hooks가 강제).

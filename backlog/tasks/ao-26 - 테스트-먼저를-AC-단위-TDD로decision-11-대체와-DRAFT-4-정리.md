@@ -1,9 +1,10 @@
 ---
 id: AO-26
 title: 테스트 먼저를 AC 단위 TDD로(decision-11 대체)와 DRAFT-4 정리
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-10-11 08:34'
+updated_date: '2026-10-11 08:35'
 labels:
   - design
 dependencies: []
@@ -19,3 +20,10 @@ dependencies: []
 2. DRAFT-4: 별도 테스트 카드 없이 AC마다 TDD, ## 비즈니스 규칙 절 추가, ModelPolicyTest 제거 계획(살릴 2개는 규칙 테스트로), AC #2 · #3을 폴백 없음 · 고른 정책 클래스 기록으로
 3. decision-12와 design 문서(1.01 · 1.02 · 3.01 · 골격)에서 기본 구현 폴백 삭제 · 테스트 방식 변경을 반영한다
 <!-- SECTION:DESCRIPTION:END -->
+
+## Acceptance Criteria
+<!-- AC:BEGIN -->
+- [ ] #1 decision-13을 남겨 decision-11을 대체한다(훅이 강제함을 기록), .claude-code-agile-hooks.json에 testFirst(src/main/java/** · src/test/java/**)를 켠다
+- [ ] #2 DRAFT-4: 별도 테스트 카드 없이 AC마다 TDD, ## 비즈니스 규칙 절 추가, ModelPolicyTest 제거 계획(살릴 2개는 규칙 테스트로), AC #2 · #3을 폴백 없음 · 고른 정책 클래스 기록으로
+- [ ] #3 decision-12와 design 문서(1.01 · 1.02 · 3.01 · 골격)에서 기본 구현 폴백 삭제 · 테스트 방식 변경을 반영한다
+<!-- AC:END -->
