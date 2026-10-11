@@ -1,121 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg data-generated-by="design/build-diagrams.py" role="img" aria-label="01-packages" width="581pt" height="398pt"
- viewBox="0.00 0.00 581.00 398.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg data-generated-by="design/build-diagrams.py" role="img" aria-label="01-packages" width="582pt" height="414pt"
+ viewBox="0.00 0.00 582.00 414.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <style>:root { --diagram-ink: #1a2330; --diagram-muted: #51616c; --diagram-line: #c9d3d8; --diagram-surface: #ffffff; --diagram-surface-2: #eaf0f2; --diagram-accent: #0e7c86; --diagram-accent-bg: #d8eeef; --diagram-accent-ink: #08565d; --diagram-impl: #2b6cb0; --diagram-impl-bg: #dbe9f7; --diagram-review: #7c3aed; --diagram-review-bg: #ece3fc; --diagram-verify: #2f855a; --diagram-verify-bg: #def0e6; --diagram-logger: #5b6b78; --diagram-logger-bg: #e4e9ec; }
 @media (prefers-color-scheme: dark) { :root { --diagram-ink: #e7eef2; --diagram-muted: #9aaab4; --diagram-line: #2e3d47; --diagram-surface: #182129; --diagram-surface-2: #1f2a33; --diagram-accent: #3fc4ce; --diagram-accent-bg: #163238; --diagram-accent-ink: #8ee3e9; --diagram-impl: #7db3e8; --diagram-impl-bg: #1c2c3d; --diagram-review: #b79bf5; --diagram-review-bg: #291f3d; --diagram-verify: #7cd1a3; --diagram-verify-bg: #173226; --diagram-logger: #a6b4bd; --diagram-logger-bg: #232e36; } }</style>
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 394)">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 410)">
 <title>packages</title>
 <g id="clust1" class="cluster">
 <title>cluster_orc</title>
-<path fill="none" stroke="var(--diagram-line)" d="M20,-8C20,-8 347.83,-8 347.83,-8 353.83,-8 359.83,-14 359.83,-20 359.83,-20 359.83,-370 359.83,-370 359.83,-376 353.83,-382 347.83,-382 347.83,-382 20,-382 20,-382 14,-382 8,-376 8,-370 8,-370 8,-20 8,-20 8,-14 14,-8 20,-8"/>
-<text xml:space="preserve" text-anchor="middle" x="183.91" y="-367.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-muted)">com.coralstay.orchestrator</text>
+<path fill="none" stroke="var(--diagram-line)" d="M20,-8C20,-8 348.58,-8 348.58,-8 354.58,-8 360.58,-14 360.58,-20 360.58,-20 360.58,-386 360.58,-386 360.58,-392 354.58,-398 348.58,-398 348.58,-398 20,-398 20,-398 14,-398 8,-392 8,-386 8,-386 8,-20 8,-20 8,-14 14,-8 20,-8"/>
+<text xml:space="preserve" text-anchor="middle" x="184.29" y="-383.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-muted)">com.coralstay.orchestrator</text>
 </g>
 <g id="clust2" class="cluster">
 <title>cluster_ext</title>
-<path fill="none" stroke="var(--diagram-line)" stroke-dasharray="5,2" d="M467.08,-94C467.08,-94 553.37,-94 553.37,-94 559.37,-94 565.37,-100 565.37,-106 565.37,-106 565.37,-272 565.37,-272 565.37,-278 559.37,-284 553.37,-284 553.37,-284 467.08,-284 467.08,-284 461.08,-284 455.08,-278 455.08,-272 455.08,-272 455.08,-106 455.08,-106 455.08,-100 461.08,-94 467.08,-94"/>
-<text xml:space="preserve" text-anchor="middle" x="510.23" y="-269.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-muted)">외부 프로세스</text>
+<path fill="none" stroke="var(--diagram-line)" stroke-dasharray="5,2" d="M467.83,-94C467.83,-94 554.12,-94 554.12,-94 560.12,-94 566.12,-100 566.12,-106 566.12,-106 566.12,-272 566.12,-272 566.12,-278 560.12,-284 554.12,-284 554.12,-284 467.83,-284 467.83,-284 461.83,-284 455.83,-278 455.83,-272 455.83,-272 455.83,-106 455.83,-106 455.83,-100 461.83,-94 467.83,-94"/>
+<text xml:space="preserve" text-anchor="middle" x="510.98" y="-269.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-muted)">외부 프로세스</text>
 </g>
 <g id="node1" class="node">
 <title>Main</title>
-<path fill="var(--diagram-accent-bg)" stroke="var(--diagram-accent)" stroke-width="1.1" d="M119.67,-52C119.67,-52 39.63,-52 39.63,-52 33.63,-52 27.63,-46 27.63,-40 27.63,-40 27.63,-28 27.63,-28 27.63,-22 33.63,-16 39.63,-16 39.63,-16 119.67,-16 119.67,-16 125.67,-16 131.67,-22 131.67,-28 131.67,-28 131.67,-40 131.67,-40 131.67,-46 125.67,-52 119.67,-52"/>
-<text xml:space="preserve" text-anchor="middle" x="79.65" y="-35.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-accent-ink)">Main</text>
-<text xml:space="preserve" text-anchor="middle" x="79.65" y="-23.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-accent-ink)">CLI run &lt;taskId&gt;</text>
+<path fill="var(--diagram-accent-bg)" stroke="var(--diagram-accent)" stroke-width="1.1" d="M120.04,-52C120.04,-52 40,-52 40,-52 34,-52 28,-46 28,-40 28,-40 28,-28 28,-28 28,-22 34,-16 40,-16 40,-16 120.04,-16 120.04,-16 126.04,-16 132.04,-22 132.04,-28 132.04,-28 132.04,-40 132.04,-40 132.04,-46 126.04,-52 120.04,-52"/>
+<text xml:space="preserve" text-anchor="middle" x="80.02" y="-35.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-accent-ink)">Main</text>
+<text xml:space="preserve" text-anchor="middle" x="80.02" y="-23.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-accent-ink)">CLI run &lt;taskId&gt;</text>
 </g>
 <g id="node2" class="node">
 <title>backlog</title>
-<path fill="var(--diagram-surface)" stroke="var(--diagram-line)" stroke-width="1.1" d="M336.83,-254C336.83,-254 271.79,-254 271.79,-254 265.79,-254 259.79,-248 259.79,-242 259.79,-242 259.79,-230 259.79,-230 259.79,-224 265.79,-218 271.79,-218 271.79,-218 336.83,-218 336.83,-218 342.83,-218 348.83,-224 348.83,-230 348.83,-230 348.83,-242 348.83,-242 348.83,-248 342.83,-254 336.83,-254"/>
-<text xml:space="preserve" text-anchor="middle" x="304.31" y="-237.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">backlog</text>
-<text xml:space="preserve" text-anchor="middle" x="304.31" y="-225.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">BacklogClient</text>
+<path fill="var(--diagram-surface)" stroke="var(--diagram-line)" stroke-width="1.1" d="M337.58,-254C337.58,-254 272.54,-254 272.54,-254 266.54,-254 260.54,-248 260.54,-242 260.54,-242 260.54,-230 260.54,-230 260.54,-224 266.54,-218 272.54,-218 272.54,-218 337.58,-218 337.58,-218 343.58,-218 349.58,-224 349.58,-230 349.58,-230 349.58,-242 349.58,-242 349.58,-248 343.58,-254 337.58,-254"/>
+<text xml:space="preserve" text-anchor="middle" x="305.06" y="-237.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">backlog</text>
+<text xml:space="preserve" text-anchor="middle" x="305.06" y="-225.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">BacklogClient</text>
 </g>
 <g id="node9" class="node">
 <title>bl</title>
-<path fill="var(--diagram-surface-2)" stroke="var(--diagram-line)" stroke-width="1.1" d="M540.87,-254C540.87,-254 479.58,-254 479.58,-254 473.58,-254 467.58,-248 467.58,-242 467.58,-242 467.58,-230 467.58,-230 467.58,-224 473.58,-218 479.58,-218 479.58,-218 540.87,-218 540.87,-218 546.87,-218 552.87,-224 552.87,-230 552.87,-230 552.87,-242 552.87,-242 552.87,-248 546.87,-254 540.87,-254"/>
-<text xml:space="preserve" text-anchor="middle" x="510.23" y="-237.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">backlog CLI</text>
-<text xml:space="preserve" text-anchor="middle" x="510.23" y="-225.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">(backlog.md)</text>
+<path fill="var(--diagram-surface-2)" stroke="var(--diagram-line)" stroke-width="1.1" d="M541.62,-254C541.62,-254 480.33,-254 480.33,-254 474.33,-254 468.33,-248 468.33,-242 468.33,-242 468.33,-230 468.33,-230 468.33,-224 474.33,-218 480.33,-218 480.33,-218 541.62,-218 541.62,-218 547.62,-218 553.62,-224 553.62,-230 553.62,-230 553.62,-242 553.62,-242 553.62,-248 547.62,-254 541.62,-254"/>
+<text xml:space="preserve" text-anchor="middle" x="510.98" y="-237.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">backlog CLI</text>
+<text xml:space="preserve" text-anchor="middle" x="510.98" y="-225.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">(backlog.md)</text>
 </g>
 <g id="edge3" class="edge">
 <title>backlog&#45;&gt;bl</title>
-<path fill="none" stroke="var(--diagram-line)" stroke-width="1.1" stroke-dasharray="5,2" d="M349.31,-236C381.47,-236 425.16,-236 458.74,-236"/>
-<polygon fill="var(--diagram-line)" stroke="var(--diagram-line)" stroke-width="1.1" points="458.39,-238.45 465.39,-236 458.39,-233.55 458.39,-238.45"/>
-<text xml:space="preserve" text-anchor="middle" x="407.46" y="-237.75" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="10.00" fill="var(--diagram-muted)">task view &#45;&#45;plain</text>
+<path fill="none" stroke="var(--diagram-line)" stroke-width="1.1" stroke-dasharray="5,2" d="M350.06,-236C382.22,-236 425.91,-236 459.49,-236"/>
+<polygon fill="var(--diagram-line)" stroke="var(--diagram-line)" stroke-width="1.1" points="459.14,-238.45 466.14,-236 459.14,-233.55 459.14,-238.45"/>
+<text xml:space="preserve" text-anchor="middle" x="408.21" y="-237.75" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="10.00" fill="var(--diagram-muted)">task view &#45;&#45;plain</text>
 </g>
 <g id="node3" class="node">
 <title>workspace</title>
-<path fill="var(--diagram-surface)" stroke="var(--diagram-line)" stroke-width="1.1" d="M122.67,-238C122.67,-238 36.63,-238 36.63,-238 30.63,-238 24.63,-232 24.63,-226 24.63,-226 24.63,-214 24.63,-214 24.63,-208 30.63,-202 36.63,-202 36.63,-202 122.67,-202 122.67,-202 128.67,-202 134.67,-208 134.67,-214 134.67,-214 134.67,-226 134.67,-226 134.67,-232 128.67,-238 122.67,-238"/>
-<text xml:space="preserve" text-anchor="middle" x="79.65" y="-221.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">workspace</text>
-<text xml:space="preserve" text-anchor="middle" x="79.65" y="-209.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">WorktreeManager</text>
+<path fill="var(--diagram-surface)" stroke="var(--diagram-line)" stroke-width="1.1" d="M123.04,-238C123.04,-238 37,-238 37,-238 31,-238 25,-232 25,-226 25,-226 25,-214 25,-214 25,-208 31,-202 37,-202 37,-202 123.04,-202 123.04,-202 129.04,-202 135.04,-208 135.04,-214 135.04,-214 135.04,-226 135.04,-226 135.04,-232 129.04,-238 123.04,-238"/>
+<text xml:space="preserve" text-anchor="middle" x="80.02" y="-221.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">workspace</text>
+<text xml:space="preserve" text-anchor="middle" x="80.02" y="-209.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">WorktreeManager</text>
 </g>
 <g id="edge1" class="edge">
 <title>workspace&#45;&gt;backlog</title>
-<path fill="none" stroke="var(--diagram-line)" stroke-width="1.1" d="M135.11,-223.91C170.37,-226.45 216.01,-229.73 250.86,-232.23"/>
-<polygon fill="var(--diagram-line)" stroke="var(--diagram-line)" stroke-width="1.1" points="250.65,-234.67 257.81,-232.73 251,-229.79 250.65,-234.67"/>
-<text xml:space="preserve" text-anchor="middle" x="200.04" y="-243.82" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="10.00" fill="var(--diagram-muted)">processExecutor</text>
-<text xml:space="preserve" text-anchor="middle" x="200.04" y="-232.57" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="10.00" fill="var(--diagram-muted)">ProcessResult</text>
+<path fill="none" stroke="var(--diagram-line)" stroke-width="1.1" d="M135.58,-223.91C170.89,-226.45 216.62,-229.73 251.52,-232.23"/>
+<polygon fill="var(--diagram-line)" stroke="var(--diagram-line)" stroke-width="1.1" points="251.33,-234.67 258.49,-232.73 251.68,-229.79 251.33,-234.67"/>
+<text xml:space="preserve" text-anchor="middle" x="200.79" y="-243.82" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="10.00" fill="var(--diagram-muted)">processExecutor</text>
+<text xml:space="preserve" text-anchor="middle" x="200.79" y="-232.57" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="10.00" fill="var(--diagram-muted)">ProcessResult</text>
 </g>
 <g id="node10" class="node">
 <title>git</title>
-<path fill="var(--diagram-surface-2)" stroke="var(--diagram-line)" stroke-width="1.1" d="M525.23,-138C525.23,-138 495.23,-138 495.23,-138 489.23,-138 483.23,-132 483.23,-126 483.23,-126 483.23,-114 483.23,-114 483.23,-108 489.23,-102 495.23,-102 495.23,-102 525.23,-102 525.23,-102 531.23,-102 537.23,-108 537.23,-114 537.23,-114 537.23,-126 537.23,-126 537.23,-132 531.23,-138 525.23,-138"/>
-<text xml:space="preserve" text-anchor="middle" x="510.23" y="-115.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">git</text>
+<path fill="var(--diagram-surface-2)" stroke="var(--diagram-line)" stroke-width="1.1" d="M525.98,-138C525.98,-138 495.98,-138 495.98,-138 489.98,-138 483.98,-132 483.98,-126 483.98,-126 483.98,-114 483.98,-114 483.98,-108 489.98,-102 495.98,-102 495.98,-102 525.98,-102 525.98,-102 531.98,-102 537.98,-108 537.98,-114 537.98,-114 537.98,-126 537.98,-126 537.98,-132 531.98,-138 525.98,-138"/>
+<text xml:space="preserve" text-anchor="middle" x="510.98" y="-115.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">git</text>
 </g>
 <g id="edge4" class="edge">
 <title>workspace&#45;&gt;git</title>
-<path fill="none" stroke="var(--diagram-line)" stroke-width="1.1" stroke-dasharray="5,2" d="M127.77,-201.5C133.27,-198.4 138.58,-194.9 143.29,-191 155.06,-181.24 150.73,-171.73 163.29,-163 259.38,-96.25 407.62,-105.79 474.45,-114.47"/>
-<polygon fill="var(--diagram-line)" stroke="var(--diagram-line)" stroke-width="1.1" points="474.03,-116.88 481.29,-115.4 474.69,-112.03 474.03,-116.88"/>
-<text xml:space="preserve" text-anchor="middle" x="304.31" y="-123.67" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="10.00" fill="var(--diagram-muted)">worktree add/remove</text>
+<path fill="none" stroke="var(--diagram-line)" stroke-width="1.1" stroke-dasharray="5,2" d="M128.43,-201.52C133.96,-198.42 139.31,-194.91 144.04,-191 155.83,-181.25 151.48,-171.73 164.04,-163 260.13,-96.25 408.37,-105.79 475.2,-114.47"/>
+<polygon fill="var(--diagram-line)" stroke="var(--diagram-line)" stroke-width="1.1" points="474.78,-116.88 482.04,-115.4 475.44,-112.03 474.78,-116.88"/>
+<text xml:space="preserve" text-anchor="middle" x="305.06" y="-123.67" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="10.00" fill="var(--diagram-muted)">worktree add/remove</text>
 </g>
 <g id="node4" class="node">
 <title>spawn</title>
-<path fill="var(--diagram-impl-bg)" stroke="var(--diagram-impl)" stroke-width="1.1" d="M339.83,-196C339.83,-196 268.79,-196 268.79,-196 262.79,-196 256.79,-190 256.79,-184 256.79,-184 256.79,-172 256.79,-172 256.79,-166 262.79,-160 268.79,-160 268.79,-160 339.83,-160 339.83,-160 345.83,-160 351.83,-166 351.83,-172 351.83,-172 351.83,-184 351.83,-184 351.83,-190 345.83,-196 339.83,-196"/>
-<text xml:space="preserve" text-anchor="middle" x="304.31" y="-179.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">spawn</text>
-<text xml:space="preserve" text-anchor="middle" x="304.31" y="-167.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">AgentSpawner</text>
+<path fill="var(--diagram-impl-bg)" stroke="var(--diagram-impl)" stroke-width="1.1" d="M340.58,-196C340.58,-196 269.54,-196 269.54,-196 263.54,-196 257.54,-190 257.54,-184 257.54,-184 257.54,-172 257.54,-172 257.54,-166 263.54,-160 269.54,-160 269.54,-160 340.58,-160 340.58,-160 346.58,-160 352.58,-166 352.58,-172 352.58,-172 352.58,-184 352.58,-184 352.58,-190 346.58,-196 340.58,-196"/>
+<text xml:space="preserve" text-anchor="middle" x="305.06" y="-179.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">spawn</text>
+<text xml:space="preserve" text-anchor="middle" x="305.06" y="-167.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">AgentSpawner</text>
 </g>
 <g id="node11" class="node">
 <title>claude</title>
-<path fill="var(--diagram-surface-2)" stroke="var(--diagram-line)" stroke-width="1.1" d="M545.37,-196C545.37,-196 475.08,-196 475.08,-196 469.08,-196 463.08,-190 463.08,-184 463.08,-184 463.08,-172 463.08,-172 463.08,-166 469.08,-160 475.08,-160 475.08,-160 545.37,-160 545.37,-160 551.37,-160 557.37,-166 557.37,-172 557.37,-172 557.37,-184 557.37,-184 557.37,-190 551.37,-196 545.37,-196"/>
-<text xml:space="preserve" text-anchor="middle" x="510.23" y="-179.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">claude &#45;p</text>
-<text xml:space="preserve" text-anchor="middle" x="510.23" y="-167.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">(Claude Code)</text>
+<path fill="var(--diagram-surface-2)" stroke="var(--diagram-line)" stroke-width="1.1" d="M546.12,-196C546.12,-196 475.83,-196 475.83,-196 469.83,-196 463.83,-190 463.83,-184 463.83,-184 463.83,-172 463.83,-172 463.83,-166 469.83,-160 475.83,-160 475.83,-160 546.12,-160 546.12,-160 552.12,-160 558.12,-166 558.12,-172 558.12,-172 558.12,-184 558.12,-184 558.12,-190 552.12,-196 546.12,-196"/>
+<text xml:space="preserve" text-anchor="middle" x="510.98" y="-179.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">claude &#45;p</text>
+<text xml:space="preserve" text-anchor="middle" x="510.98" y="-167.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">(Claude Code)</text>
 </g>
 <g id="edge5" class="edge">
 <title>spawn&#45;&gt;claude</title>
-<path fill="none" stroke="var(--diagram-line)" stroke-width="1.1" stroke-dasharray="5,2" d="M352.35,-178C382.8,-178 422.56,-178 454.43,-178"/>
-<polygon fill="var(--diagram-line)" stroke="var(--diagram-line)" stroke-width="1.1" points="454.11,-180.45 461.11,-178 454.11,-175.55 454.11,-180.45"/>
-<text xml:space="preserve" text-anchor="middle" x="407.46" y="-179.75" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="10.00" fill="var(--diagram-muted)">ProcessBuilder</text>
+<path fill="none" stroke="var(--diagram-line)" stroke-width="1.1" stroke-dasharray="5,2" d="M353.1,-178C383.55,-178 423.31,-178 455.18,-178"/>
+<polygon fill="var(--diagram-line)" stroke="var(--diagram-line)" stroke-width="1.1" points="454.86,-180.45 461.86,-178 454.86,-175.55 454.86,-180.45"/>
+<text xml:space="preserve" text-anchor="middle" x="408.21" y="-179.75" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="10.00" fill="var(--diagram-muted)">ProcessBuilder</text>
 </g>
 <g id="node5" class="node">
 <title>registry</title>
-<path fill="var(--diagram-verify-bg)" stroke="var(--diagram-verify)" stroke-width="1.1" d="M118.17,-180C118.17,-180 41.13,-180 41.13,-180 35.13,-180 29.13,-174 29.13,-168 29.13,-168 29.13,-156 29.13,-156 29.13,-150 35.13,-144 41.13,-144 41.13,-144 118.17,-144 118.17,-144 124.17,-144 130.17,-150 130.17,-156 130.17,-156 130.17,-168 130.17,-168 130.17,-174 124.17,-180 118.17,-180"/>
-<text xml:space="preserve" text-anchor="middle" x="79.65" y="-163.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">registry</text>
-<text xml:space="preserve" text-anchor="middle" x="79.65" y="-151.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">SessionRegistry</text>
+<path fill="var(--diagram-verify-bg)" stroke="var(--diagram-verify)" stroke-width="1.1" d="M118.54,-180C118.54,-180 41.5,-180 41.5,-180 35.5,-180 29.5,-174 29.5,-168 29.5,-168 29.5,-156 29.5,-156 29.5,-150 35.5,-144 41.5,-144 41.5,-144 118.54,-144 118.54,-144 124.54,-144 130.54,-150 130.54,-156 130.54,-156 130.54,-168 130.54,-168 130.54,-174 124.54,-180 118.54,-180"/>
+<text xml:space="preserve" text-anchor="middle" x="80.02" y="-163.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">registry</text>
+<text xml:space="preserve" text-anchor="middle" x="80.02" y="-151.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">SessionRegistry</text>
 </g>
 <g id="edge2" class="edge">
 <title>registry&#45;&gt;spawn</title>
-<path fill="none" stroke="var(--diagram-line)" stroke-width="1.1" d="M130.62,-165.59C165.51,-168.1 212.11,-171.45 248.11,-174.03"/>
-<polygon fill="var(--diagram-line)" stroke="var(--diagram-line)" stroke-width="1.1" points="247.73,-176.46 254.89,-174.52 248.08,-171.58 247.73,-176.46"/>
-<text xml:space="preserve" text-anchor="middle" x="200.04" y="-174.57" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="10.00" fill="var(--diagram-muted)">terminate</text>
+<path fill="none" stroke="var(--diagram-line)" stroke-width="1.1" d="M131.07,-165.59C166.03,-168.1 212.71,-171.45 248.77,-174.03"/>
+<polygon fill="var(--diagram-line)" stroke="var(--diagram-line)" stroke-width="1.1" points="248.4,-176.46 255.56,-174.52 248.75,-171.58 248.4,-176.46"/>
+<text xml:space="preserve" text-anchor="middle" x="200.79" y="-174.57" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="10.00" fill="var(--diagram-muted)">terminate</text>
 </g>
 <g id="node6" class="node">
 <title>agent</title>
-<path fill="var(--diagram-surface)" stroke="var(--diagram-line)" stroke-width="1.1" stroke-dasharray="5,2" d="M131.29,-121.76C131.29,-121.76 28,-121.76 28,-121.76 22,-121.76 16,-115.76 16,-109.76 16,-109.76 16,-86.24 16,-86.24 16,-80.24 22,-74.24 28,-74.24 28,-74.24 131.29,-74.24 131.29,-74.24 137.29,-74.24 143.29,-80.24 143.29,-86.24 143.29,-86.24 143.29,-109.76 143.29,-109.76 143.29,-115.76 137.29,-121.76 131.29,-121.76"/>
-<text xml:space="preserve" text-anchor="middle" x="79.65" y="-105.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">agent</text>
-<text xml:space="preserve" text-anchor="middle" x="79.65" y="-93.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">AgentRunner</text>
-<text xml:space="preserve" text-anchor="middle" x="79.65" y="-81.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">(ClaudeCodeRunner)</text>
+<path fill="var(--diagram-surface)" stroke="var(--diagram-line)" stroke-width="1.1" stroke-dasharray="5,2" d="M131.67,-121.76C131.67,-121.76 28.38,-121.76 28.38,-121.76 22.38,-121.76 16.38,-115.76 16.38,-109.76 16.38,-109.76 16.38,-86.24 16.38,-86.24 16.38,-80.24 22.38,-74.24 28.38,-74.24 28.38,-74.24 131.67,-74.24 131.67,-74.24 137.67,-74.24 143.67,-80.24 143.67,-86.24 143.67,-86.24 143.67,-109.76 143.67,-109.76 143.67,-115.76 137.67,-121.76 131.67,-121.76"/>
+<text xml:space="preserve" text-anchor="middle" x="80.02" y="-105.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">agent</text>
+<text xml:space="preserve" text-anchor="middle" x="80.02" y="-93.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">AgentRunner</text>
+<text xml:space="preserve" text-anchor="middle" x="80.02" y="-81.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">(ClaudeCodeRunner)</text>
 </g>
 <g id="edge6" class="edge">
 <title>agent&#45;&gt;claude</title>
-<path fill="none" stroke="var(--diagram-line)" stroke-width="1.1" stroke-dasharray="5,2" d="M143.79,-90.11C201.08,-84.9 287.4,-81.95 359.83,-100 362.75,-100.73 423.69,-132.77 466.82,-155.56"/>
-<polygon fill="var(--diagram-line)" stroke="var(--diagram-line)" stroke-width="1.1" points="465.58,-157.67 472.91,-158.77 467.87,-153.34 465.58,-157.67"/>
+<path fill="none" stroke="var(--diagram-line)" stroke-width="1.1" stroke-dasharray="5,2" d="M143.98,-90.12C201.34,-84.89 287.93,-81.9 360.58,-100 363.5,-100.73 424.44,-132.77 467.57,-155.56"/>
+<polygon fill="var(--diagram-line)" stroke="var(--diagram-line)" stroke-width="1.1" points="466.33,-157.67 473.66,-158.77 468.62,-153.34 466.33,-157.67"/>
 </g>
 <g id="node7" class="node">
 <title>policy</title>
-<path fill="var(--diagram-surface)" stroke="var(--diagram-line)" stroke-width="1.1" stroke-dasharray="5,2" d="M108.04,-296C108.04,-296 51.25,-296 51.25,-296 45.25,-296 39.25,-290 39.25,-284 39.25,-284 39.25,-272 39.25,-272 39.25,-266 45.25,-260 51.25,-260 51.25,-260 108.04,-260 108.04,-260 114.04,-260 120.04,-266 120.04,-272 120.04,-272 120.04,-284 120.04,-284 120.04,-290 114.04,-296 108.04,-296"/>
-<text xml:space="preserve" text-anchor="middle" x="79.65" y="-279.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">policy</text>
-<text xml:space="preserve" text-anchor="middle" x="79.65" y="-267.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">ModelPolicy</text>
+<path fill="var(--diagram-surface)" stroke="var(--diagram-line)" stroke-width="1.1" stroke-dasharray="5,2" d="M132.04,-312.01C132.04,-312.01 28,-312.01 28,-312.01 22,-312.01 16,-306.01 16,-300.01 16,-300.01 16,-271.99 16,-271.99 16,-265.99 22,-259.99 28,-259.99 28,-259.99 132.04,-259.99 132.04,-259.99 138.04,-259.99 144.04,-265.99 144.04,-271.99 144.04,-271.99 144.04,-300.01 144.04,-300.01 144.04,-306.01 138.04,-312.01 132.04,-312.01"/>
+<text xml:space="preserve" text-anchor="middle" x="80.02" y="-295.8" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">policy</text>
+<text xml:space="preserve" text-anchor="middle" x="80.02" y="-283.8" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">AllocationPolicy (설계)</text>
+<text xml:space="preserve" text-anchor="middle" x="80.02" y="-269.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">ModelPolicy (스텁)</text>
 </g>
 <g id="node8" class="node">
 <title>card</title>
-<path fill="var(--diagram-surface)" stroke="var(--diagram-line)" stroke-width="1.1" stroke-dasharray="5,2" d="M119.29,-354C119.29,-354 40,-354 40,-354 34,-354 28,-348 28,-342 28,-342 28,-330 28,-330 28,-324 34,-318 40,-318 40,-318 119.29,-318 119.29,-318 125.29,-318 131.29,-324 131.29,-330 131.29,-330 131.29,-342 131.29,-342 131.29,-348 125.29,-354 119.29,-354"/>
-<text xml:space="preserve" text-anchor="middle" x="79.65" y="-337.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">card</text>
-<text xml:space="preserve" text-anchor="middle" x="79.65" y="-325.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">TaskCardSource</text>
+<path fill="var(--diagram-surface)" stroke="var(--diagram-line)" stroke-width="1.1" stroke-dasharray="5,2" d="M119.67,-370C119.67,-370 40.38,-370 40.38,-370 34.38,-370 28.38,-364 28.38,-358 28.38,-358 28.38,-346 28.38,-346 28.38,-340 34.38,-334 40.38,-334 40.38,-334 119.67,-334 119.67,-334 125.67,-334 131.67,-340 131.67,-346 131.67,-346 131.67,-358 131.67,-358 131.67,-364 125.67,-370 119.67,-370"/>
+<text xml:space="preserve" text-anchor="middle" x="80.02" y="-353.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">card</text>
+<text xml:space="preserve" text-anchor="middle" x="80.02" y="-341.55" font-family='"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif' font-size="11.00" fill="var(--diagram-ink)">TaskCardSource</text>
 </g>
 </g>
 </svg>

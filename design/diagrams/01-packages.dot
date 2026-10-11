@@ -17,7 +17,7 @@ digraph packages {
     spawn     [label="spawn\nAgentSpawner", fillcolor="#f0000a", color="#f00009"];
     registry  [label="registry\nSessionRegistry", fillcolor="#f0000e", color="#f0000d"];
     agent     [label="agent\nAgentRunner\n(ClaudeCodeRunner)", style="filled,rounded,dashed"];
-    policy    [label="policy\nModelPolicy", style="filled,rounded,dashed"];
+    policy    [label="policy\nAllocationPolicy (설계)\nModelPolicy (스텁)", style="filled,rounded,dashed"];
     card      [label="card\nTaskCardSource", style="filled,rounded,dashed"];
   }
 
