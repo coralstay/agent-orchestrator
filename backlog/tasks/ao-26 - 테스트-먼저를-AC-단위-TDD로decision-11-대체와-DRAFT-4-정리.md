@@ -1,10 +1,10 @@
 ---
 id: AO-26
 title: 테스트 먼저를 AC 단위 TDD로(decision-11 대체)와 DRAFT-4 정리
-status: In Progress
+status: Done
 assignee: []
 created_date: '2026-10-11 08:34'
-updated_date: '2026-10-11 08:35'
+updated_date: '2026-10-11 08:38'
 labels:
   - design
 dependencies: []
@@ -23,7 +23,13 @@ dependencies: []
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 decision-13을 남겨 decision-11을 대체한다(훅이 강제함을 기록), .claude-code-agile-hooks.json에 testFirst(src/main/java/** · src/test/java/**)를 켠다
-- [ ] #2 DRAFT-4: 별도 테스트 카드 없이 AC마다 TDD, ## 비즈니스 규칙 절 추가, ModelPolicyTest 제거 계획(살릴 2개는 규칙 테스트로), AC #2 · #3을 폴백 없음 · 고른 정책 클래스 기록으로
-- [ ] #3 decision-12와 design 문서(1.01 · 1.02 · 3.01 · 골격)에서 기본 구현 폴백 삭제 · 테스트 방식 변경을 반영한다
+- [x] #1 decision-13을 남겨 decision-11을 대체한다(훅이 강제함을 기록), .claude-code-agile-hooks.json에 testFirst(src/main/java/** · src/test/java/**)를 켠다
+- [x] #2 DRAFT-4: 별도 테스트 카드 없이 AC마다 TDD, ## 비즈니스 규칙 절 추가, ModelPolicyTest 제거 계획(살릴 2개는 규칙 테스트로), AC #2 · #3을 폴백 없음 · 고른 정책 클래스 기록으로
+- [x] #3 decision-12와 design 문서(1.01 · 1.02 · 3.01 · 골격)에서 기본 구현 폴백 삭제 · 테스트 방식 변경을 반영한다
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+decision-13(accepted)을 남겨 decision-11(superseded, 대체 포인터)을 대체: AC 하나씩 TDD + 비즈니스 규칙 테스트, 표식 <카드 ID>#<n> · #B<k>, require_test_first.py가 강제(RAIL-019 · ADR-020), 새 스텁·pending 금지, pendingTest는 당분간 유지. .claude-code-agile-hooks.json에 testFirst(src/main/java/** · src/test/java/**) 추가. DRAFT-4: AO-16 의존을 참조로 내림, 별도 테스트 카드 없이 AC마다 TDD 계획, ## 비즈니스 규칙 B1~B7, ModelPolicyTest 제거(경계·음수 테스트 논리는 B1·B2로), AC #3 폴백 없음 + 고른 정책 정규 이름·경로 기록, AC #4에 ModelPolicyTest 제거. decision-12와 design(00 · 1.01 · 1.02 · 3.01 · 3.03 · 3.04 · 4.01 · 4.02 · 용어집)에서 DefaultAllocationPolicy 폴백 삭제, 에러+시작 안 함·정책 기록 추가, 테스트 방식 서술을 decision-13으로 교체. .dot 변경 없음(재렌더 불필요). src/ 변경 없음, ./gradlew test 통과.
+<!-- SECTION:FINAL_SUMMARY:END -->
