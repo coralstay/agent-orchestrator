@@ -1,7 +1,7 @@
 ---
-id: DRAFT-9
+id: AO-26
 title: 테스트 먼저를 AC 단위 TDD로(decision-11 대체)와 DRAFT-4 정리
-status: Draft
+status: To Do
 assignee: []
 created_date: '2026-10-11 08:34'
 labels:
