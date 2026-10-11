@@ -1,7 +1,7 @@
 ---
-id: DRAFT-9
+id: AO-25
 title: '정책을 자바 코드로: ModelPolicy → AllocationPolicy (decision-10 대체)'
-status: Draft
+status: To Do
 assignee: []
 created_date: '2026-10-11 08:10'
 labels:
