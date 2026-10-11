@@ -2,8 +2,10 @@
 id: decision-10
 title: 모델 정책은 의존성 없는 설정 파일로 둔다
 date: '2026-10-03 13:03'
-status: accepted
+status: superseded
 ---
+> decision-12(정책은 자바 코드로 쓴다 — AllocationPolicy + -Dpolicy.class + ServiceLoader)로 대체됐다.
+
 ## Context
 
 예상 토큰으로 모델을 고르는 정책이 필요하다. RFC는 AllocationPolicy + YAML을 제안했지만 decision-1은 런타임 의존성을 두지 않기로 했다.

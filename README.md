@@ -7,7 +7,7 @@
 
 ## 라이선스
 
-[GNU AGPL-3.0](./LICENSE) — 저장소 전체에 적용된다. 네트워크 서비스 제공이나 상용 사용 시에도
+[GNU AGPL-3.0](./LICENSE) — 저장소 전체에 적용된다(전문: [`LICENSE`](./LICENSE), [GNU AGPL-3.0 원문](https://www.gnu.org/licenses/agpl-3.0.html)). 네트워크 서비스 제공이나 상용 사용 시에도
 AGPL 조건에 따라 수정 소스를 공개해야 한다.
 
 - **상용 라이선스 —** 저작권자가 단독이므로 듀얼 라이선스가 가능하다. AGPL 조건(네트워크
