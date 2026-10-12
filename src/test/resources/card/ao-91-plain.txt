@@ -1,0 +1,40 @@
+File: /Users/flynn_macpro/githubs/agent-orchestartor-wt/AO-91/backlog/tasks/ao-91 - 카드-소스-기록-픽스처.md
+
+Task AO-91 - 카드 소스 기록 픽스처
+==================================================
+
+Status: ◒ In Progress
+Priority: Medium
+Type: task
+Assignee: @claude
+Created: 2026-10-04 02:20 (UTC)
+Updated: 2026-10-04 04:05 (UTC)
+Labels: fixture
+Milestone: m-0
+References: decision-6, decision-9
+
+Description:
+--------------------------------------------------
+## 결과
+소절 교체가 나머지 Description을 건드리지 않는지 본다.
+  들여쓴 줄 · `코드` · 특수문자 — "따옴표" $HOME \n 그대로.
+
+### Token Budget
+
+estimated: in=200000 out=8000
+attempt 1: commits in=120000 out=3000 · session in=150000 out=3500 · model=claude-sonnet-4-5 · timeout
+
+### 메모
+- 소절 뒤 텍스트도 바이트 그대로 남아야 한다.
+- 빈 줄 두 개 뒤에도:
+
+
+끝 줄.
+
+Acceptance Criteria:
+--------------------------------------------------
+- [ ] #1 소절만 바꾼다
+
+Implementation Notes:
+--------------------------------------------------
+Modified files: src/main/java/com/coralstay/orchestrator/card/BacklogCardSource.java
