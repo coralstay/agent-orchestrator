@@ -3,10 +3,10 @@ id: AO-28
 title: >-
   최상위 TASK-14 · 15 · 17 · 18의 설계 변경을 design/에 반영한다(토큰 출처 · claim 전 계획 승인 · 단계별
   커밋 · 작업 순서)
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-10-22 05:53'
-updated_date: '2026-10-22 05:53'
+updated_date: '2026-10-22 06:16'
 labels:
   - design
 dependencies: []
