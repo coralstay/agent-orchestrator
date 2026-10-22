@@ -3,10 +3,10 @@ id: AO-28
 title: >-
   최상위 TASK-14 · 15 · 17 · 18의 설계 변경을 design/에 반영한다(토큰 출처 · claim 전 계획 승인 · 단계별
   커밋 · 작업 순서)
-status: In Progress
+status: Done
 assignee: []
 created_date: '2026-10-22 05:53'
-updated_date: '2026-10-22 06:16'
+updated_date: '2026-10-22 06:23'
 labels:
   - design
 dependencies: []
@@ -20,16 +20,16 @@ dependencies: []
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 토큰 출처: 1.01 · 1.02(P5) · 2.02 · 3.04 등에서 Tokens-Used 트레일러를 읽는다는 서술을 최상위 ADR-021 · ORC-021에 맞춰 토큰 계량 컴포넌트(이름 미정, 측정 방식 TBD)로 바꾼다
-- [ ] #2 claim과 계획 승인: claim(→ In Progress) 전에 사람의 계획 승인 커밋(Plan-Approved: <ID>, humanSigners 서명자)이 있어야 하고, 없으면 그 카드는 실행 가능 판정에서 빠지거나 claim이 막힌다는 것을 동작 · 인터페이스 · 결정 장에 반영한다(최상위 ADR-022)
-- [ ] #3 단계별 커밋 · 작업 순서: claim · 완료 커밋이 단계별 커밋 규칙(상태 전환 커밋은 그 카드 파일만)을 따르고, 실행 순서 판정이 작업 순서 파일(같은 단계 = 병렬)과 맞는다는 것을 반영한다(최상위 ADR-023, BL-016 · RAIL-023)
-- [ ] #4 각 커밋 본문에 'Refs: coralstay-software-factory TASK-14 · TASK-15 · TASK-17 · TASK-18'을 적는다
+- [x] #1 토큰 출처: 1.01 · 1.02(P5) · 2.02 · 3.04 등에서 Tokens-Used 트레일러를 읽는다는 서술을 최상위 ADR-021 · ORC-021에 맞춰 토큰 계량 컴포넌트(이름 미정, 측정 방식 TBD)로 바꾼다
+- [x] #2 claim과 계획 승인: claim(→ In Progress) 전에 사람의 계획 승인 커밋(Plan-Approved: <ID>, humanSigners 서명자)이 있어야 하고, 없으면 그 카드는 실행 가능 판정에서 빠지거나 claim이 막힌다는 것을 동작 · 인터페이스 · 결정 장에 반영한다(최상위 ADR-022)
+- [x] #3 단계별 커밋 · 작업 순서: claim · 완료 커밋이 단계별 커밋 규칙(상태 전환 커밋은 그 카드 파일만)을 따르고, 실행 순서 판정이 작업 순서 파일(같은 단계 = 병렬)과 맞는다는 것을 반영한다(최상위 ADR-023, BL-016 · RAIL-023)
+- [x] #4 각 커밋 본문에 'Refs: coralstay-software-factory TASK-14 · TASK-15 · TASK-17 · TASK-18'을 적는다
 <!-- AC:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 design/ 상대 링크 검사에서 깨진 링크가 없다
-- [ ] #2 파일 하나에 커밋 하나, push 전 Done + final summary
+- [x] #1 design/ 상대 링크 검사에서 깨진 링크가 없다
+- [x] #2 파일 하나에 커밋 하나, push 전 Done + final summary
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -51,3 +51,18 @@ dependencies: []
 2. 장마다 반영, 파일 하나에 커밋 하나(Refs 줄).
 3. 링크 검사. 구현 변경이 필요하면 별도 draft로 제안.
 <!-- SECTION:PLAN:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+최상위 coralstay-software-factory TASK-14 · 15 · 17 · 18의 설계 변경을 이 저장소 design/에 전파했다(RAIL-024). 커밋 12개, 파일당 하나, 모두 본문에 'Refs: coralstay-software-factory TASK-14 · TASK-15 · TASK-17 · TASK-18'.
+
+- AC #1 토큰 출처: Tokens-Used 트레일러를 읽는다는 서술을 토큰 계량 컴포넌트(이름 미정, 측정 TBD 최상위 Q-18)로 — 1.01 · 1.02 P5 · P6 · 1.04 · 2.02 · 2.03 ORC-021 · 3.01 · 3.03 · 3.04 · 4.03. 남은 Tokens-Used 5곳은 decision-5 · 8 출처가 사라졌다는 이력 메모
+- AC #2 claim 전 계획 승인: Plan-Approved: <ID>(%G?=G ∧ %GS ∈ humanSigners, 최상위 ADR-022) 없이는 실행 가능 판정에서 빠지거나 claim이 막힌다는 설계 요구 — 1.01 · 1.02 P7 · 2.02 · 2.03 ORC-005 · BL-017 · 3.01 · 3.02(실패 경로) · 3.04 · 3.05. 구현은 별도 카드
+- AC #3 단계별 커밋 · 작업 순서: claim · 실제 기록 커밋은 카드 파일만, 실행 순서는 work-order.md(같은 단계 = 병렬, 동시성 허가가 상한), backlog/ 미커밋 변경 중 claim 금지 — 1.01 · 1.02 P4 · 2.02 · 2.03 BL-016 · 3.02 · 3.04
+- AC #4 12개 커밋 모두 Refs 줄 확인(grep)
+
+검증: design/ 상대 링크 검사 → 백틱 안 템플릿 예시(<이름>.svg) 1건뿐(기존), git status 깨끗, 다이어그램 변경 없음.
+이 저장소 결정과의 어긋남(3.05 · 1.02에 기록, 결정 자체는 고치지 않음): decision-5(트레일러만 읽음)는 ADR-021과 충돌 — Q-18 확정 뒤 대체 결정 필요. decision-8 commits 값 출처 상실. decision-9는 claim 전 계획 승인 · 작업 순서 최신 확인을 요구하지 않음. 최상위 3.04 §3은 착수를 task/<ID>에서, decision-9는 main에서 커밋 — 미기록 충돌 가능성.
+후속 카드 후보: isRunnable/claim에 승인 검사, claim 전 작업 순서 최신 확인, commits 값을 계량 컴포넌트 출력으로(Q-18 대기), decision-5 · 8 · 9 대체 결정, 이 저장소 00에 ADR-025 전파 규칙.
+<!-- SECTION:FINAL_SUMMARY:END -->
