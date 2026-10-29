@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -112,19 +113,68 @@ public final class BacklogClient {
     public static final String IN_PROGRESS = "In Progress";
     public static final String DONE = "Done";
 
+    /** 병합 여부를 판정하는 기준 브랜치. */
+    public static final String MAIN_BRANCH = "main";
+
     /**
-     * 스폰해도 되는 태스크인가: 상태가 To Do이고 직접 의존 태스크가 전부 Done일 때만 true.
+     * 배정해도 되는 태스크인가(ORC-005, decision-14): 상태가 To Do이고, 직접 의존 태스크가 전부 Done이고, 미병합
+     * {@code task/<ID>} 브랜치가 없을 때만 true.
      *
-     * <p>In Progress는 사람이 선점한 락이므로 false. backlog의 {@code isReady}/{@code task list --ready}는
+     * <p>착수는 미병합 {@code task/<ID>} 브랜치의 존재다 — 사람이든 에이전트 세션이든 착수하면 브랜치가 생기므로 브랜치가
+     * 있는 카드는 main 보드에서 To Do로 보여도 배정하지 않는다. backlog의 {@code isReady}/{@code task list --ready}는
      * In Progress도 ready로 치므로(1.51.0 실측) 그대로 쓰지 않고 여기서 직접 판정한다.
      *
      * @param lookup 의존 태스크 ID → Task (보통 {@code this::view})
+     * @param hasUnmergedTaskBranch 태스크 ID → 미병합 {@code task/<ID>} 브랜치 존재 여부(보통 {@code
+     *     this::hasUnmergedTaskBranch})
      */
-    public static boolean isRunnable(Task task, Function<String, Task> lookup) {
+    public static boolean isRunnable(
+            Task task, Function<String, Task> lookup, Predicate<String> hasUnmergedTaskBranch) {
         if (!TO_DO.equals(task.status())) {
             return false;
         }
-        return task.dependencies().stream().allMatch(id -> DONE.equals(lookup.apply(id).status()));
+        if (!task.dependencies().stream().allMatch(id -> DONE.equals(lookup.apply(id).status()))) {
+            return false;
+        }
+        return !hasUnmergedTaskBranch.test(task.id());
+    }
+
+    /**
+     * {@code task/<id>} 브랜치가 로컬({@code refs/heads}) 또는 원격({@code refs/remotes/<remote>})에 있고 {@link
+     * #MAIN_BRANCH}에 병합되지 않았는가.
+     *
+     * <p>병합 여부는 {@code git cherry main <브랜치>}로 본다: main에 같은 패치가 없는 커밋({@code +})이 하나라도 있으면
+     * 미병합이다. 커밋이 전부 main에 있거나(merge commit · fast-forward · cherry-pick · rebase 병합) main 위에 커밋이
+     * 없는 브랜치는 병합된 것으로 본다. 커밋 여러 개를 squash로 병합하면 패치가 달라져 미병합으로 남는다(브랜치를 지우면
+     * 풀린다). 실행기는 저장소 루트에서 명령을 실행해야 한다.
+     *
+     * @throws IllegalStateException git이 0이 아닌 종료코드로 끝났을 때
+     */
+    public boolean hasUnmergedTaskBranch(String id) {
+        String local = "refs/heads/task/" + id;
+        String remoteSuffix = "/task/" + id;
+        List<String> refs = git("for-each-ref", "--format=%(refname)", local, "refs/remotes")
+                .lines()
+                .map(String::strip)
+                .filter(ref -> ref.equals(local) || (ref.startsWith("refs/remotes/") && ref.endsWith(remoteSuffix)))
+                .toList();
+        for (String ref : refs) {
+            if (git("cherry", MAIN_BRANCH, ref).lines().anyMatch(line -> line.startsWith("+"))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String git(String... args) {
+        List<String> command = new ArrayList<>(List.of("git"));
+        command.addAll(List.of(args));
+        ProcessResult result = executor.apply(command);
+        if (result.exitCode() != 0) {
+            throw new IllegalStateException(String.join(" ", command)
+                    + " 실패(exit " + result.exitCode() + "): " + result.stderr().strip());
+        }
+        return result.stdout();
     }
 
     private static final Pattern TITLE = Pattern.compile("^Task (\\S+) - (.+)$");
