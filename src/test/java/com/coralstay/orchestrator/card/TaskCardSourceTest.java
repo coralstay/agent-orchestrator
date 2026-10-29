@@ -60,11 +60,6 @@ class TaskCardSourceTest {
         }
 
         @Override
-        public void claim(String id, String agent) {
-            cards.put(id, read(id).claimedBy(agent));
-        }
-
-        @Override
         public void recordAttempt(String id, Attempt attempt) {
             TokenBudget budget = read(id).tokenBudget().orElseThrow();
             sections.put(id, budget.withAttempt(attempt).render());
@@ -199,21 +194,7 @@ class TaskCardSourceTest {
                 check.reasons().toString());
     }
 
-    // --- DRAFT-1#3 claim / recordAttempt / recordActual ---
-
-    @Test
-    @DisplayName("DRAFT-1#3 claim은 In Progress와 담당자 agent로 바꾸고 나머지는 둔다")
-    void claimSetsInProgressAndAgent() {
-        var source = sourceWith("estimated: in=200000 out=8000\n");
-
-        source.claim("AO-99", "@claude");
-
-        Card card = source.read("AO-99");
-        assertEquals(TaskCardSource.IN_PROGRESS, card.status());
-        assertEquals(List.of("@claude"), card.assignees());
-        assertEquals(List.of("AO-1", "AO-17"), card.dependencies());
-        assertEquals(Optional.of(new Tokens(200000, 8000)), card.tokenBudget().orElseThrow().estimated());
-    }
+    // --- DRAFT-1#3 recordAttempt / recordActual ---
 
     @Test
     @DisplayName("DRAFT-1#3 recordAttempt는 attempt n 줄을 순서대로 덧붙인다")
@@ -238,7 +219,6 @@ class TaskCardSourceTest {
         var source = sourceWith("estimated: in=200000 out=8000\n");
         var actual = new Actual(new Tokens(300000, 9000), new Tokens(380000, 9800), 2);
 
-        source.claim("AO-99", "@claude");
         source.recordAttempt("AO-99", TIMEOUT);
         source.recordActual("AO-99", actual);
 

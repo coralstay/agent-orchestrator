@@ -1,0 +1,49 @@
+package com.coralstay.orchestrator.card;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+/**
+ * 카드 포트의 공개 API 모양(decision-14 · decision-5). 동작 테스트는 pending({@link TaskCardSourceTest},
+ * {@link BacklogCardSourceTest})이고, 여기서는 구현 없이도 확인할 수 있는 계약만 본다.
+ */
+class CardSourceApiTest {
+
+    static List<String> methodNames(Class<?> type) {
+        return Arrays.stream(type.getDeclaredMethods()).map(Method::getName).toList();
+    }
+
+    static List<String> fieldNames(Class<?> type) {
+        return Arrays.stream(type.getDeclaredFields()).map(Field::getName).toList();
+    }
+
+    static List<String> nestedNames(Class<?> type) {
+        return Arrays.stream(type.getDeclaredClasses()).map(Class::getSimpleName).toList();
+    }
+
+    // --- AO-30#1 claim · 사람 락 제거(decision-14) ---
+
+    @Test
+    @DisplayName("AO-30#1 TaskCardSource에는 claim · IN_PROGRESS가, Card에는 claimedBy가 없다")
+    void taskCardSourceHasNoClaim() {
+        assertFalse(methodNames(TaskCardSource.class).contains("claim"));
+        assertFalse(fieldNames(TaskCardSource.class).contains("IN_PROGRESS"));
+        assertFalse(methodNames(TaskCardSource.Card.class).contains("claimedBy"));
+    }
+
+    @Test
+    @DisplayName("AO-30#1 BacklogCardSource에는 claim · isLocked · LockKind · LockVerdict · AGENT가 없다")
+    void backlogCardSourceHasNoClaimOrHumanLock() {
+        assertFalse(methodNames(BacklogCardSource.class).contains("claim"));
+        assertFalse(methodNames(BacklogCardSource.class).contains("isLocked"));
+        assertEquals(List.of("CommandRunner"), nestedNames(BacklogCardSource.class));
+        assertFalse(fieldNames(BacklogCardSource.class).contains("AGENT"));
+    }
+}

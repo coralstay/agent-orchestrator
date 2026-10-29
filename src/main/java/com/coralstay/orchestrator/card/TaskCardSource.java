@@ -5,7 +5,8 @@ import java.util.Optional;
 
 /**
  * 카드 접근 포트(decision-6). 오케스트레이터 코어는 카드 시스템(backlog.md 등)을 모른 채 이 포트로 카드를 읽고,
- * 검증하고, claim·시도·실제치를 기록한다.
+ * 검증하고, 시도·실제치를 기록한다. 카드를 In Progress로 바꾸는 착수는 에이전트 세션이 태스크 브랜치에서 하므로
+ * 이 포트에 없다(decision-14).
  *
  * <p>상태 전이와 Token Budget 파싱·출력은 값 타입({@link Card}, {@link TokenBudget}, {@link Tokens})에 두고,
  * 구현체는 저장·커밋만 맡는다. 예상·실제 토큰은 카드 Description의 {@code ### Token Budget} 소절에 둔다:
@@ -20,9 +21,6 @@ import java.util.Optional;
  */
 public interface TaskCardSource {
 
-    /** claim 뒤 카드 상태(decision-9). */
-    String IN_PROGRESS = "In Progress";
-
     /** 카드를 읽는다. Token Budget 형식이 틀려도 예외 없이 {@link TokenBudget#unparsed()}에 담아 돌려준다. */
     Card read(String id);
 
@@ -30,9 +28,6 @@ public interface TaskCardSource {
     default CardCheck validate(Card card) {
         throw new UnsupportedOperationException("pending: DRAFT-1");
     }
-
-    /** 카드를 In Progress + 담당자 {@code agent}로 바꾼다(decision-9 claim). */
-    void claim(String id, String agent);
 
     /** Done에 이르지 못한 시도를 {@code attempt n} 줄로 덧붙인다(n은 1부터 순서대로). */
     void recordAttempt(String id, Attempt attempt);
@@ -50,11 +45,6 @@ public interface TaskCardSource {
             List<String> acceptanceCriteria,
             List<String> targetFiles,
             Optional<TokenBudget> tokenBudget) {
-
-        /** claim 결과: 상태 In Progress, 담당자는 {@code agent} 하나. 나머지 필드는 그대로. */
-        public Card claimedBy(String agent) {
-            throw new UnsupportedOperationException("pending: DRAFT-1");
-        }
 
         /** Token Budget만 바꾼 사본. */
         public Card withTokenBudget(TokenBudget budget) {

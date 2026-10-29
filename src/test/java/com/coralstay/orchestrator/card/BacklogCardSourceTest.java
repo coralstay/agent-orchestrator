@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.coralstay.orchestrator.backlog.BacklogClient.ProcessResult;
-import com.coralstay.orchestrator.card.BacklogCardSource.LockKind;
-import com.coralstay.orchestrator.card.BacklogCardSource.LockVerdict;
 import com.coralstay.orchestrator.card.TaskCardSource.Actual;
 import com.coralstay.orchestrator.card.TaskCardSource.Attempt;
 import com.coralstay.orchestrator.card.TaskCardSource.Card;
@@ -183,51 +181,6 @@ class BacklogCardSourceTest {
         assertEquals(Optional.empty(), card.tokenBudget());
     }
 
-    // --- DRAFT-2#2 claim ---
-
-    @Test
-    @DisplayName("DRAFT-2#2 claim은 main에서 task edit -s In Progress -a @claude 후 카드 파일만 add·commit한다")
-    void claimEditsThenCommitsOnlyCardFile() {
-        var runner = runner();
-
-        source(runner).claim("AO-90", "@claude");
-
-        Call edit = runner.only("backlog", "task", "edit");
-        assertEquals(List.of("backlog", "task", "edit", "AO-90", "-s", "In Progress", "-a", "@claude"), edit.argv());
-        Call add = runner.only("git", "add");
-        assertEquals(List.of("git", "add", "--"), add.argv().subList(0, 3));
-        assertEquals(1, add.argv().size() - 3, "카드 파일 하나만 add한다: " + add.argv());
-        assertEquals(REPO.resolve(CARD_90), REPO.resolve(add.argv().get(3)).normalize());
-        Call commit = runner.only("git", "commit");
-        assertFalse(commit.argv().contains("-a") || commit.argv().contains("--all"), commit.argv().toString());
-        assertTrue(runner.indexOf(edit) < runner.indexOf(add), "edit → add 순서");
-        assertTrue(runner.indexOf(add) < runner.indexOf(commit), "add → commit 순서");
-        for (Call call : List.of(edit, add, commit)) {
-            assertEquals(REPO, call.workingDir(), "claim은 main 작업 트리에서 한다: " + call.argv());
-        }
-    }
-
-    @Test
-    @DisplayName("DRAFT-2#2 claim 커밋 메시지는 git-trail 형식([type][subsystem] 설명, 50자 이하)이고 카드 ID를 담는다")
-    void claimCommitMessageFollowsGitTrail() {
-        var runner = runner();
-
-        source(runner).claim("AO-90", "@claude");
-
-        assertGitTrailMessage(runner.only("git", "commit"), "AO-90");
-    }
-
-    @Test
-    @DisplayName("DRAFT-2#2 claim 커밋 환경에는 부모에 있던 AI_AGENT·CLAUDE_CODE_SESSION_ID가 없다")
-    void claimCommitEnvStripsAiToolVariables() {
-        var runner = runner();
-
-        source(runner).claim("AO-90", "@claude");
-
-        assertAgentFreeEnv(runner.only("git", "commit"));
-        assertAgentFreeEnv(runner.only("git", "add"));
-    }
-
     // --- DRAFT-2#3 recordAttempt / recordActual ---
 
     @Test
@@ -301,94 +254,6 @@ class BacklogCardSourceTest {
         assertEquals(WORKTREE.resolve(CARD_91), WORKTREE.resolve(runner.only("git", "add").argv().get(3)).normalize());
         assertGitTrailMessage(commit, "AO-91");
         assertAgentFreeEnv(commit);
-    }
-
-    // --- DRAFT-2#4 isLocked ---
-
-    static final String SHARED = "src/main/java/com/coralstay/orchestrator/card/BacklogCardSource.java";
-    static final String OTHER = "src/main/java/com/coralstay/orchestrator/Main.java";
-
-    static Card lockCard(String id, String status, List<String> assignees, List<String> files) {
-        return new Card(id, "락 판정 " + id, status, assignees, List.of(), List.of(), files, Optional.empty());
-    }
-
-    static final Card SELF = lockCard("AO-50", "To Do", List.of(), List.of(SHARED));
-
-    @Test
-    @DisplayName("DRAFT-2#4 같은 대상 파일을 가진 다른 카드가 사람 담당 In Progress면 락이다")
-    void humanInProgressOnSameFileLocks() {
-        Card human = lockCard("AO-51", "In Progress", List.of("@flynn"), List.of(OTHER, SHARED));
-
-        LockVerdict verdict = source(runner()).isLocked(SELF, List.of(SELF, human));
-
-        assertEquals(new LockVerdict(LockKind.HUMAN_LOCK, List.of("AO-51"), List.of(SHARED)), verdict);
-        assertTrue(verdict.locked());
-    }
-
-    @Test
-    @DisplayName("DRAFT-2#4 같은 대상 파일의 @claude 담당 In Progress는 사람 락이 아니라 에이전트 실행분으로 보고한다")
-    void claudeInProgressOnSameFileIsAgentOwned() {
-        Card agent = lockCard("AO-52", "In Progress", List.of("@claude"), List.of(SHARED));
-
-        LockVerdict verdict = source(runner()).isLocked(SELF, List.of(SELF, agent));
-
-        assertEquals(new LockVerdict(LockKind.AGENT_OWNED, List.of("AO-52"), List.of(SHARED)), verdict);
-        assertFalse(verdict.locked());
-    }
-
-    @Test
-    @DisplayName("DRAFT-2#4 사람 담당 In Progress라도 대상 파일이 다르면 free다")
-    void humanInProgressOnDifferentFileIsFree() {
-        Card human = lockCard("AO-53", "In Progress", List.of("@flynn"), List.of(OTHER));
-
-        LockVerdict verdict = source(runner()).isLocked(SELF, List.of(SELF, human));
-
-        assertEquals(new LockVerdict(LockKind.FREE, List.of(), List.of()), verdict);
-    }
-
-    @Test
-    @DisplayName("DRAFT-2#4 이 카드가 To Do이고 같은 파일의 다른 카드도 In Progress가 아니면 free다")
-    void toDoCardWithoutInProgressPeersIsFree() {
-        Card peerTodo = lockCard("AO-54", "To Do", List.of("@flynn"), List.of(SHARED));
-        Card peerDone = lockCard("AO-55", "Done", List.of("@flynn"), List.of(SHARED));
-
-        LockVerdict verdict = source(runner()).isLocked(SELF, List.of(SELF, peerTodo, peerDone));
-
-        assertEquals(new LockVerdict(LockKind.FREE, List.of(), List.of()), verdict);
-    }
-
-    @Test
-    @DisplayName("DRAFT-2#4 이 카드 자신이 사람 담당 In Progress면 락이다")
-    void selfHumanInProgressLocks() {
-        Card self = lockCard("AO-50", "In Progress", List.of("@flynn"), List.of(SHARED));
-
-        LockVerdict verdict = source(runner()).isLocked(self, List.of(self));
-
-        assertEquals(LockKind.HUMAN_LOCK, verdict.kind());
-        assertEquals(List.of("AO-50"), verdict.cardIds());
-    }
-
-    @Test
-    @DisplayName("DRAFT-2#4 담당자 없는 In Progress는 사람 락으로 본다(보수적)")
-    void unassignedInProgressCountsAsHuman() {
-        Card nobody = lockCard("AO-56", "In Progress", List.of(), List.of(SHARED));
-
-        LockVerdict verdict = source(runner()).isLocked(SELF, List.of(SELF, nobody));
-
-        assertEquals(LockKind.HUMAN_LOCK, verdict.kind());
-        assertEquals(List.of("AO-56"), verdict.cardIds());
-    }
-
-    @Test
-    @DisplayName("DRAFT-2#4 사람 락과 에이전트 실행분이 함께 있으면 사람 락이 우선한다")
-    void humanLockWinsOverAgentOwned() {
-        Card agent = lockCard("AO-52", "In Progress", List.of("@claude"), List.of(SHARED));
-        Card human = lockCard("AO-51", "In Progress", List.of("@flynn"), List.of(SHARED));
-
-        LockVerdict verdict = source(runner()).isLocked(SELF, List.of(SELF, agent, human));
-
-        assertEquals(LockKind.HUMAN_LOCK, verdict.kind());
-        assertEquals(List.of("AO-51"), verdict.cardIds());
     }
 
     // --- 검증 헬퍼 ---
