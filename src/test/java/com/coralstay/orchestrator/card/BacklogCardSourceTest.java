@@ -43,7 +43,8 @@ class BacklogCardSourceTest {
             "PATH", "/usr/bin:/bin",
             "HOME", "/home/tester",
             "AI_AGENT", "claude-code/2.1.285",
-            "CLAUDE_CODE_SESSION_ID", "11111111-2222-3333-4444-555555555555");
+            "CLAUDE_CODE_SESSION_ID", "11111111-2222-3333-4444-555555555555",
+            "CLAUDE_PID", "4242");
 
     /** git-trail 형식: {@code [type][subsystem] 설명}. */
     static final Pattern GIT_TRAIL_SUBJECT = Pattern.compile("^\\[[a-z]+\\]\\[[a-z0-9-]+\\] \\S.*$");
@@ -218,7 +219,7 @@ class BacklogCardSourceTest {
     }
 
     @Test
-    @DisplayName("DRAFT-2#3 recordAttempt는 모든 명령을 워크트리에서 실행하고 카드 파일을 커밋한다")
+    @DisplayName("DRAFT-2#3 AO-30#2 AO-30#B2 recordAttempt는 워크트리에서 카드를 커밋하고 커밋 환경에 AI 도구 변수가 없다")
     void recordAttemptRunsInWorktreeAndCommitsCard() {
         var runner = runner();
 
@@ -241,7 +242,7 @@ class BacklogCardSourceTest {
     }
 
     @Test
-    @DisplayName("DRAFT-2#3 recordActual은 워크트리에서 카드를 커밋하고 커밋 환경에 AI 도구 변수가 없다")
+    @DisplayName("DRAFT-2#3 AO-30#2 AO-30#B2 recordActual은 워크트리에서 카드를 커밋하고 커밋 환경에 AI 도구 변수가 없다")
     void recordActualRunsInWorktreeAndCommitsCard() {
         var runner = runner();
 
@@ -264,6 +265,7 @@ class BacklogCardSourceTest {
         }
         assertFalse(call.env().containsKey("AI_AGENT"));
         assertFalse(call.env().containsKey("CLAUDE_CODE_SESSION_ID"));
+        assertFalse(call.env().containsKey("CLAUDE_PID"), "AO-30#B2 GF-130은 CLAUDE_PID로도 에이전트를 판별한다");
         assertEquals("/usr/bin:/bin", call.env().get("PATH"), "나머지 부모 환경은 유지한다");
         assertEquals("/home/tester", call.env().get("HOME"));
     }

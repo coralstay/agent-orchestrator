@@ -46,4 +46,13 @@ class CardSourceApiTest {
         assertEquals(List.of("CommandRunner"), nestedNames(BacklogCardSource.class));
         assertFalse(fieldNames(BacklogCardSource.class).contains("AGENT"));
     }
+
+    // --- AO-30#2 커밋 환경에서 지우는 변수(decision-5) ---
+
+    @Test
+    @DisplayName("AO-30#2 AO-30#B2 오케스트레이터 커밋 환경에서 AI_AGENT · CLAUDE_CODE_SESSION_ID · CLAUDE_PID를 지운다")
+    void strippedEnvCoversAgentDetectionVariables() {
+        assertEquals(
+                List.of("AI_AGENT", "CLAUDE_CODE_SESSION_ID", "CLAUDE_PID"), BacklogCardSource.STRIPPED_ENV);
+    }
 }
