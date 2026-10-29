@@ -4,6 +4,9 @@ title: 카드의 예상·실제 토큰은 Description의 Token Budget 섹션에 
 date: '2026-10-03 13:03'
 status: accepted
 ---
+> **2026-10-29 단서(AO-29).** 아래 형식의 `commits …` 항목은 최상위 Q-18 이후로 보류한다(decision-8 단서).
+> 그때까지 `attempt n` · `actual` 줄에는 `session`만 적는다.
+
 ## Context
 
 오케스트레이터는 카드에서 예상 토큰을 읽고, 끝나면 실제 토큰을 카드에 기록해야 한다. 카드는 오케스트레이터가 아니라 사용자의 LLM 도구가 만든다.
