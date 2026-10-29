@@ -4,7 +4,7 @@ title: '충돌 결정 반영(문서): claim 커밋 폐기 · 착수 = task 브�
 status: In Progress
 assignee: []
 created_date: '2026-10-29 02:31'
-updated_date: '2026-10-29 11:06'
+updated_date: '2026-10-29 11:07'
 labels:
   - design
 dependencies: []
@@ -30,7 +30,7 @@ references:
 - [x] #3 design/(01-배경과-문제 · 02-원칙 P4 · P5 · P7 · P9 · 04 리스크 · 2.02 · 2.03 ORC-005 · ORC-021 · 3.01 · 3.02 · 3.04 · 3.05 · 4.03 · 용어집)의 claim · 사람 락 · work-order 문구를 결정에 맞게 고친다 — PR #20이 넣은 문구 포함
 - [x] #4 영향받는 카드 · draft를 고친다: AO-7(실행 순서 · AC#2), AO-20 AC#3, AO-8 · AO-21 스모크 (a), m-0 완료 조건, doc-1 D11, DRAFT-1 · DRAFT-2. AO-6(CommitLedger)은 Q-18 의존으로 보류 메모를 남기고 AO-7 · AO-20 의존에서 뺀다
 - [x] #5 보완(2026-10-29): 착수 검사는 훅이 브랜치 생성 · 전환과 세션의 -s "In Progress" 두 시점에 한다는 것을 decision-14와 design/에 반영한다 — 오케스트레이터의 git worktree add는 훅을 거치지 않으므로 (수동)
-- [ ] #6 squash 대응(2026-10-29): decision-14와 design/에 병합 뒤 task 브랜치 삭제 규칙과, 지우지 않은 squash 브랜치는 착수 중으로 보이는 한계를 적는다 (수동)
+- [x] #6 squash 대응(2026-10-29): decision-14와 design/에 병합 뒤 task 브랜치 삭제 규칙과, 지우지 않은 squash 브랜치는 착수 중으로 보이는 한계를 적는다 (수동)
 <!-- AC:END -->
 
 ## Definition of Done
@@ -73,4 +73,6 @@ references:
 - AC#5(보완, 유저 결정 2026-10-29): 오케스트레이터의 `git worktree add`는 훅을 거치지 않으므로 착수 검사는 브랜치 생성 · 전환과 세션의 `In Progress` 전환 두 시점이라고 고쳤다 — 카드(bf47a24), decision-14(779f9f5), 1.01(a8bc74b) · 1.02(f703cf0) · 2.02(64c7030) · 2.03(30530cd) · 3.01(623f201) · 3.02(1e6581b) · 3.04(6d2bcd3) · 3.05(79e6e7c) · 용어집(5182376). AC `(수동)` 표식 면제를 decision-13(dff751e) · 4.02(03ff5f1)에 적었다.
 
 검증: design/ · 진행 중 카드 · draft · milestone · doc에서 claim · 사람 락 · work-order grep 0건. 남은 언급은 대체된 decision-9 본문, decision-14 · decision-5의 대체 설명, 3.05 · 1.02의 대체 기록, Done 카드(AO-2 · 9 · 17 · 18 · 28) 이력, AO-29 · AO-30 카드 자신뿐이다. 커밋마다 파일 하나, 본문에 Refs: coralstay-software-factory TASK-19. push 안 함(PR #20과 함께).
+
+- AC#6(squash 대응, 유저 결정 2026-10-29): 병합 뒤 task/<ID> 브랜치 삭제가 규칙(GitHub 'Automatically delete head branches' + git fetch --prune · 로컬 브랜치 삭제)이고 판정은 git cherry 유지, squash 병합하고 지우지 않은 브랜치는 착수로 남아 배정이 막히는 한계를 적었다 — 카드(0f18b8b), decision-14 병합 방식 단서 · 한계(bc5f33a), 3.02 전체 서술(044b97e), 2.02(a143d57) · 3.04(51ff6e4) 참조. merge commit 전용 DoD를 병합 방식 무관 + 병합 뒤 삭제로: AO-20(f018375), 같은 문구의 To Do 카드 AO-21(92a5405). Done 카드의 merge commit 기록은 이력이라 두었다.
 <!-- SECTION:FINAL_SUMMARY:END -->
