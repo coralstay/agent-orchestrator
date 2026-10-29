@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-03 03:18'
-updated_date: '2026-10-04 01:47'
+updated_date: '2026-10-29 02:43'
 labels:
   - skeleton
   - e2e
@@ -20,7 +20,7 @@ references:
   - decision-5
   - decision-6
   - decision-8
-  - decision-9
+  - decision-14
 documentation:
   - ../coralstay-software-factory/README.md
   - ../coralstay-software-factory/에이전트_레일_파이프라인.html
@@ -49,7 +49,7 @@ type: task
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [ ] #1 `make-fixture.sh`: git·backlog init, git-trail 설치, `.claude-rails.json`, 실패하는 테스트 1개, `### Token Budget`(estimated)을 가진 카드 1개(AC 1개 = 함수 1개)로 대상 저장소를 만든다
-- [ ] #2 `smoke.sh`: run 후 (a) main 카드 claim(In Progress·@claude) (b) 워크트리·브랜치 (c) 잔존 claude 프로세스 없음 (d) AC 커밋의 git-trail 트레일러 (e) 브랜치 카드 Done + Token Budget actual 병기 (f) runs.jsonl 값 = 트레일러 합·세션 총량을 PASS/FAIL로 출력한다
+- [ ] #2 `smoke.sh`: run 후 (a) 착수(main 카드는 To Do 그대로, `task/<id>` 브랜치 카드는 세션이 In Progress로 바꿈) (b) 워크트리·브랜치 (c) 잔존 claude 프로세스 없음 (d) AC 커밋의 git-trail 트레일러 (e) 브랜치 카드 Done + Token Budget actual(`session`) (f) runs.jsonl 값 = 세션 총량(트레일러 합은 최상위 Q-18 이후)을 PASS/FAIL로 출력한다
 - [ ] #3 헤드리스 Claude가 claude-rails 태스크 규칙을 통과하는지와 peak RSS를 기록하고 doc-1 D5·D9와 팩토리 README 검증 상태 표·RFC 09절에 반영했다
 <!-- AC:END -->
 
