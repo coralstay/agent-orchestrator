@@ -4,7 +4,7 @@ title: '충돌 결정 반영(문서): claim 커밋 폐기 · 착수 = task 브�
 status: In Progress
 assignee: []
 created_date: '2026-10-29 02:31'
-updated_date: '2026-10-29 02:46'
+updated_date: '2026-10-29 03:46'
 labels:
   - design
 dependencies: []
@@ -29,6 +29,7 @@ references:
 - [x] #2 decision-5를 고친다(CommitLedger · 트레일러 합산은 Q-18 이후로 보류, 지우는 환경변수에 CLAUDE_PID 추가, 직접 커밋은 실제치 기록뿐)하고 decision-8에 commits는 Q-18 이후라는 단서를 단다
 - [x] #3 design/(01-배경과-문제 · 02-원칙 P4 · P5 · P7 · P9 · 04 리스크 · 2.02 · 2.03 ORC-005 · ORC-021 · 3.01 · 3.02 · 3.04 · 3.05 · 4.03 · 용어집)의 claim · 사람 락 · work-order 문구를 결정에 맞게 고친다 — PR #20이 넣은 문구 포함
 - [x] #4 영향받는 카드 · draft를 고친다: AO-7(실행 순서 · AC#2), AO-20 AC#3, AO-8 · AO-21 스모크 (a), m-0 완료 조건, doc-1 D11, DRAFT-1 · DRAFT-2. AO-6(CommitLedger)은 Q-18 의존으로 보류 메모를 남기고 AO-7 · AO-20 의존에서 뺀다
+- [ ] #5 보완(2026-10-29): 착수 검사는 훅이 브랜치 생성 · 전환과 세션의 -s "In Progress" 두 시점에 한다는 것을 decision-14와 design/에 반영한다 — 오케스트레이터의 git worktree add는 훅을 거치지 않으므로 (수동)
 <!-- AC:END -->
 
 ## Definition of Done
