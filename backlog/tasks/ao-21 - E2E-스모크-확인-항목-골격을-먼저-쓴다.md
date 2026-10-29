@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:38'
-updated_date: '2026-10-04 01:47'
+updated_date: '2026-10-29 02:43'
 labels:
   - test-first
   - skeleton
@@ -14,8 +14,8 @@ dependencies:
   - AO-20
 references:
   - decision-6
-  - decision-9
   - decision-11
+  - decision-14
 documentation:
   - backlog/docs/doc-1 - 팩토리-문서-검증-로그.md
 modified_files:
@@ -43,7 +43,7 @@ AO-8의 E2E 확인 항목 (a)~(f)를 `scripts/smoke.sh`의 함수로 먼저 만�
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 (a) claim (b) 워크트리·브랜치 (c) 잔존 claude 프로세스 없음 (d) AC 커밋 트레일러 (e) 브랜치 카드 Done + Token Budget actual (f) runs.jsonl 일치를 각각 함수로 만든다
+- [ ] #1 (a) 착수(main 카드 To Do 그대로·브랜치 카드 In Progress 이후) (b) 워크트리·브랜치 (c) 잔존 claude 프로세스 없음 (d) AC 커밋 트레일러 (e) 브랜치 카드 Done + Token Budget actual (f) runs.jsonl 일치를 각각 함수로 만든다
 - [ ] #2 각 함수는 지금은 `FAIL <항목> not implemented`를 출력하고, 전체 결과 요약과 종료코드(실패 있으면 1)를 낸다
 - [ ] #3 실제 claude를 실행하지 않는다(실행 부분은 AO-8에서 채움)
 <!-- AC:END -->
