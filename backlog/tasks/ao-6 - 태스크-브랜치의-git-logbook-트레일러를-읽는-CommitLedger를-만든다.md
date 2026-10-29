@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-03 03:18'
-updated_date: '2026-10-03 03:25'
+updated_date: '2026-10-29 02:44'
 labels:
   - skeleton
   - ledger
@@ -78,4 +78,6 @@ decision-5: 토큰 측정은 git-logbook(구 git-format)이 한다. 오케스트
 
 <!-- SECTION:NOTES:BEGIN -->
 Tokens-Used는 '직전 커밋 이후 세션 델타'라 커밋 간 합산이 곧 태스크 총량의 근사다 — 이 한계는 git-logbook이 스스로 밝히고 있으므로 runs.jsonl에도 근사치임을 필드명으로 드러낸다. 헤드리스 세션에서 트레일러가 실측되는지는 T8에서 확인.
+
+2026-10-29(AO-29): 보류. coding-agent-git-commit-tool이 더 이상 Tokens-Used를 남기지 않아(최상위 ADR-021) 합산할 트레일러가 없다. 토큰 계량 컴포넌트를 정하는 최상위 Q-18 이후 다시 정한다(decision-5 · 8 개정). AO-7 · AO-20 의존에서 뺐다. 로컬 브랜치 task/AO-6과 워크트리 agent-orchestrator-wt/AO-6은 그대로 둔다.
 <!-- SECTION:NOTES:END -->
