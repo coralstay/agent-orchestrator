@@ -3,6 +3,7 @@ id: doc-1
 title: 팩토리 문서 검증 로그
 type: specification
 created_date: '2026-10-03 03:15'
+updated_date: '2026-10-29 02:44'
 ---
 
 # 팩토리 문서 검증 로그
@@ -24,9 +25,9 @@ coralstay-software-factory(`~/githubs/coralstay-software-factory`) 문서의 가
 | D8 | README 상단 경고문 | "구현 코드는 한 줄도 없다" | agent-orchestartor 링크 + 스켈레톤 범위로 갱신 | run 배선 + 기록 | ⏳ |
 | D9 | README 로드맵 2 "실측 3종" 중 peak RSS | `claude` 프로세스 1개 peak RSS 미측정 (Semaphore 상한 근거) | 2026-10-03 스파이크(사소한 태스크 1개): 240~290MB, 17~19초, $0.12~0.13. E2E에서 실제 태스크 규모로 재측정 후 팩토리 기록 | E2E 픽스처(AO-8) | 🔍 1차 실측 |
 | D10 | RFC 04·08절, 아키텍처.md 4절 | 카드에 예상 토큰 필드가 없음 | 카드 Description의 `### Token Budget` 소절(estimated / attempt n / actual) 스키마와 수명 주기 서술 신설 (decision-6) | BacklogCardSource | ⏳ |
-| D11 | RFC 06절 오케스트레이터, fig.7(`09-orchestrator.dot`) | 예상 토큰 → 모델 배정, claim, 실제치 기록 흐름이 없음 | 실행 순서(카드 검증 → 판정 → 정책 → claim → 워크트리 → 실행 → 실제치 → 브랜치 상태 판정) 서술·다이어그램 반영 (decision-9·10) | run 배선(AO-7) | ⏳ |
+| D11 | RFC 06절 오케스트레이터, fig.7(`09-orchestrator.dot`) | 예상 토큰 → 모델 배정, 착수, 실제치 기록 흐름이 없음 | 실행 순서(카드 검증 → 판정(미병합 `task/<id>` 브랜치 없음) → 정책 → 워크트리 → 실행(세션이 브랜치에서 착수) → 실제치 → 브랜치 상태 판정) 서술·다이어그램 반영 (decision-10·14) | run 배선(AO-7) | ⏳ |
 | D12 | RFC 06절 "역할 하나당 다른 프로바이더로 교체 가능", README 왜·어떻게 표 | 다중 프로바이더를 기본 방향처럼 서술 | 범위는 Claude Code 전용, 실행부만 AgentRunner 포트로 분리한다고 정정 (decision-7) | AgentRunner | ⏳ |
-| D13 | RFC 06절 토큰 측정 | 커밋 트레일러 합계를 태스크 총량처럼 서술 | 트레일러는 마지막 커밋 뒤 턴을 포함하지 않음(스파이크: 입력 약 26% 누락) → 커밋 귀속분과 세션 총량 병기로 정정 (decision-8) | run 배선(AO-7) | ⏳ |
+| D13 | RFC 06절 토큰 측정 | 커밋 트레일러 합계를 태스크 총량처럼 서술 | 트레일러는 마지막 커밋 뒤 턴을 포함하지 않음(스파이크: 입력 약 26% 누락) → 커밋 귀속분과 세션 총량 병기로 정정, 커밋 귀속분은 최상위 Q-18 이후 (decision-8) | run 배선(AO-7) | ⏳ |
 
 ## 기록 규칙
 
