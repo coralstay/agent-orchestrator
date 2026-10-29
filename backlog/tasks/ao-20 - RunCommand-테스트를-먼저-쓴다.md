@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:38'
-updated_date: '2026-10-04 01:47'
+updated_date: '2026-10-29 02:43'
 labels:
   - test-first
   - skeleton
@@ -15,14 +15,13 @@ dependencies:
   - AO-17
   - AO-18
   - AO-19
-  - AO-6
 references:
   - decision-6
   - decision-7
   - decision-8
-  - decision-9
   - decision-10
   - decision-11
+  - decision-14
 documentation:
   - backlog/docs/doc-1 - 팩토리-문서-검증-로그.md
 modified_files:
@@ -54,7 +53,7 @@ AO-7 (RunCommand)을 구현하기 전에 테스트부터 쓴다. 공개 API 시�
 <!-- AC:BEGIN -->
 - [ ] #1 `RunCommand` 시그니처 스텁(생성자 포트 주입, execute, judge, record)을 만들고 컴파일된다
 - [ ] #2 AO-7 #1~5(실행 불가 시 exit 3, 순서와 finally retire, 브랜치 상태 판정, actual/attempt 분기와 워크트리 정리, runs.jsonl 한 줄)를 모든 포트를 가짜로 주입한 pending 테스트로 쓴다
-- [ ] #3 WorktreeManager가 claim 커밋 기준으로 생성되는지(기준 커밋 인자 전달)를 검증하는 테스트를 포함한다
+- [ ] #3 미병합 `task/<id>` 브랜치가 있으면 스폰하지 않고, 없으면 main HEAD 기준으로 워크트리를 만들며 main 카드를 고치지 않는지 검증하는 테스트를 포함한다(decision-14)
 <!-- AC:END -->
 
 ## Definition of Done
@@ -76,5 +75,5 @@ AO-7 (RunCommand)을 구현하기 전에 테스트부터 쓴다. 공개 API 시�
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-CommitLedger는 AO-6 브랜치에만 있다 — AO-6이 main에 병합된 뒤 시작한다.
+2026-10-29(AO-29): AO-6(CommitLedger)은 최상위 Q-18 의존으로 보류해 의존에서 뺐다. 실제치 테스트는 session만 다룬다(decision-5 · 8 개정).
 <!-- SECTION:NOTES:END -->
