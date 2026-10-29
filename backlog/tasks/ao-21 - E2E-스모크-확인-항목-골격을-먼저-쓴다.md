@@ -5,7 +5,7 @@ status: To Do
 assignee:
   - '@claude'
 created_date: '2026-10-04 01:38'
-updated_date: '2026-10-29 02:43'
+updated_date: '2026-10-29 11:07'
 labels:
   - test-first
   - skeleton
@@ -52,7 +52,7 @@ AO-8의 E2E 확인 항목 (a)~(f)를 `scripts/smoke.sh`의 함수로 먼저 만�
 <!-- DOD:BEGIN -->
 - [ ] #1 `./gradlew test`가 통과한다(pending 제외)
 - [ ] #2 `./gradlew pendingTest`의 실패 목록이 이 카드에서 기대한 테스트와 일치한다
-- [ ] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(merge commit으로 병합)
+- [ ] #3 `task/AO-<n>` 브랜치를 푸시하고 PR을 열었다(병합 방식 무관, 병합 뒤 브랜치 삭제 — decision-14)
 <!-- DOD:END -->
 
 ## Implementation Plan
