@@ -34,7 +34,8 @@ claim 커밋은 main에 오케스트레이터 커밋을 남겨 squash · rebase 
 ## Consequences
 
 - 오케스트레이터가 직접 하는 커밋은 실제치 기록(`recordAttempt` · `recordActual`)뿐이다(decision-5).
-- PR 병합 방식 제약(merge commit만)이 사라진다.
+- PR 병합 방식 제약(merge commit만)이 사라진다 — 단 병합 뒤 `task/<ID>` 브랜치를 지우는 것이 규칙이다(GitHub 저장소 설정 'Automatically delete head branches' + 로컬 `git fetch --prune` · 로컬 브랜치 삭제, 유저 결정 2026-10-29). 이 규칙을 지키면 병합 방식은 무엇이든 된다.
+- 알려진 한계: 커밋이 여러 개인 브랜치를 squash 병합하면 패치 ID가 달라 `git cherry`가 계속 미병합으로 본다. 판정은 `git cherry`로 두므로, squash 병합하고 지우지 않은 브랜치는 지울 때까지 착수로 보여 배정이 막힌다(AO-30 `BacklogClient.hasUnmergedTaskBranch`).
 - 알려진 한계: backlog.md 1.51.0은 main에서 브랜치를 ID 할당에만 훑으므로, 착수한 카드도 main 보드에는 `To Do`로 보인다.
 - 실패한 실행은 브랜치에 attempt 기록과 함께 남는다. 브랜치가 남아 있는 한 그 카드는 다시 배정되지 않고 사람이 판단한다.
 - 코드(`claim` · 사람 락 판정 · `isRunnable`의 브랜치 검사)는 AO-30에서 맞춘다.
