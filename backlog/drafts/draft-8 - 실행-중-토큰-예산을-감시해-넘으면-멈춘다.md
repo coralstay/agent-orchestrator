@@ -5,7 +5,7 @@ status: Draft
 assignee:
   - '@claude'
 created_date: '2026-10-03 13:09'
-updated_date: '2026-10-03 13:09'
+updated_date: '2026-10-29 02:45'
 labels:
   - m2
   - budget
@@ -60,4 +60,6 @@ M1은 사후 합산까지만 한다(유저 결정). 감지 단위가 커밋 경�
 
 <!-- SECTION:NOTES:BEGIN -->
 세션 총량 기준 감시가 필요하면 stream-json 실시간 usage를 쓰는 방안도 검토.
+
+2026-10-29(AO-29): AC#1의 CommitLedger(AO-6)는 최상위 Q-18(토큰 계량 컴포넌트) 의존으로 보류다 — coding-agent-git-commit-tool이 더 이상 Tokens-Used를 남기지 않는다(최상위 ADR-021). 승격할 때 감시 데이터의 출처를 Q-18 결과로 다시 정한다.
 <!-- SECTION:NOTES:END -->
