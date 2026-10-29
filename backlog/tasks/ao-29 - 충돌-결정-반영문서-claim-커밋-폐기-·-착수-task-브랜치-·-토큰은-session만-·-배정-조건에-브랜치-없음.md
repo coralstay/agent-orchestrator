@@ -1,10 +1,10 @@
 ---
-id: DRAFT-9
+id: AO-29
 title: '충돌 결정 반영(문서): claim 커밋 폐기 · 착수 = task 브랜치 · 토큰은 session만 · 배정 조건에 브랜치 없음'
-status: Draft
+status: To Do
 assignee: []
 created_date: '2026-10-29 02:31'
-updated_date: '2026-10-29 02:31'
+updated_date: '2026-10-29 02:34'
 labels:
   - design
 dependencies: []
@@ -13,7 +13,7 @@ dependencies: []
 ## Description
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
-최상위 coralstay-software-factory DRAFT-1(승격 후 TASK-19 예정)의 전파. 유저 결정(2026-10-29) A1 · A2 · A3 · A4 · A5가 이 저장소의 decision-5 · 8 · 9와 design/, 그리고 열린 PR #20(AO-28)이 넣은 claim · 작업 순서 문구와 충돌한다. 유저 결정: PR #20은 단독 병합하지 않고 이 카드를 task/AO-28 위에 쌓아 고친 뒤 함께 병합한다.
+최상위 coralstay-software-factory TASK-19의 전파. 유저 결정(2026-10-29) A1 · A2 · A3 · A4 · A5가 이 저장소의 decision-5 · 8 · 9와 design/, 그리고 열린 PR #20(AO-28)이 넣은 claim · 작업 순서 문구와 충돌한다. 유저 결정: PR #20은 단독 병합하지 않고 이 카드를 task/AO-28 위에 쌓아 고친 뒤 함께 병합한다.
 
 - A1 · A2: main claim 커밋(decision-9)을 없앤다. 에이전트 세션이 task/<ID> 브랜치에서 In Progress로 바꾸고, 착수 판단은 미병합 task/<ID> 브랜치의 존재다. 전환 실패는 '착수 안 됨' 일반 실패로 회수, 같은 카드 중복 실행은 오케스트레이터 자체 잠금(SessionRegistry.admit). 오케스트레이터는 훅(계획 승인 · 작업 순서 검사)을 모른다.
 - A3: 오케스트레이터가 직접 하는 커밋은 실제치 기록뿐이고, AI_AGENT · CLAUDE_CODE_SESSION_ID · CLAUDE_PID를 지우고 실행한다. '프로그램 커밋' 구분은 coding-agent-git-commit-tool GF-130 때.

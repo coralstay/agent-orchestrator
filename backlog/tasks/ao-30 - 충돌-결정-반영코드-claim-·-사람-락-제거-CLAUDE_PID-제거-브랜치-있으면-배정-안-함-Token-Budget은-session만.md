@@ -1,21 +1,22 @@
 ---
-id: DRAFT-10
+id: AO-30
 title: >-
   충돌 결정 반영(코드): claim · 사람 락 제거, CLAUDE_PID 제거, 브랜치 있으면 배정 안 함, Token Budget은
   session만
-status: Draft
+status: To Do
 assignee: []
 created_date: '2026-10-29 02:31'
-updated_date: '2026-10-29 02:31'
+updated_date: '2026-10-29 02:34'
 labels:
   - code
-dependencies: []
+dependencies:
+  - AO-29
 ---
 
 ## Description
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
-DRAFT-9(문서)의 코드 반영. 최상위 DRAFT-1(TASK-19 예정) 전파.
+AO-29(문서)의 코드 반영. 최상위 TASK-19 전파.
 
 ## 비즈니스 규칙
 - B1 (AC #3) task/<ID> 브랜치가 로컬이나 원격에 있고 main에 병합되지 않았으면 그 카드는 배정하지 않는다
