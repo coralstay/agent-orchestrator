@@ -7,7 +7,7 @@ status: accepted
 ## Context
 
 RFC 12절의 walking skeleton 정의는 "Implementer 1개 스폰 → 작업 → 토큰 집계 → /clear → 회수"이고
-worktree는 언급하지 않는다. 그러나 계층 대응(태스크 = 파일, 에이전트 배정 = 파일)과 사람 선점 락의 전제는
+worktree는 언급하지 않는다. 그러나 계층 대응(태스크 = 파일, 에이전트 배정 = 파일)과 착수 판정(decision-14: 미병합 `task/<ID>` 브랜치)의 전제는
 "워크트리 분리로 에이전트끼리 물리적으로 갈라져 있다"는 것이다.
 
 ## Decision
