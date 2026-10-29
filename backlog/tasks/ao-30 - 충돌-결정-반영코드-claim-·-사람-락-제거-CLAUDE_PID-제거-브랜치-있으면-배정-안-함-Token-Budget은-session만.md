@@ -3,10 +3,10 @@ id: AO-30
 title: >-
   충돌 결정 반영(코드): claim · 사람 락 제거, CLAUDE_PID 제거, 브랜치 있으면 배정 안 함, Token Budget은
   session만
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-10-29 02:31'
-updated_date: '2026-10-29 02:34'
+updated_date: '2026-10-29 05:43'
 labels:
   - code
 dependencies:
