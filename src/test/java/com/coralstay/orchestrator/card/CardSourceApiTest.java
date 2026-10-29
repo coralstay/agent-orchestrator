@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -54,5 +55,24 @@ class CardSourceApiTest {
     void strippedEnvCoversAgentDetectionVariables() {
         assertEquals(
                 List.of("AI_AGENT", "CLAUDE_CODE_SESSION_ID", "CLAUDE_PID"), BacklogCardSource.STRIPPED_ENV);
+    }
+
+    // --- AO-30#4 Token Budget 실제치는 commits 없이 session만(decision-6 · decision-8, 최상위 Q-18 전) ---
+
+    @Test
+    @DisplayName("AO-30#4 AO-30#B3 commits 없이 session만으로 Attempt · Actual을 만든다")
+    void attemptAndActualWithSessionOnly() {
+        var session = new TaskCardSource.Tokens(150000, 3500);
+
+        var attempt = new TaskCardSource.Attempt(session, "claude-sonnet-4-5", "timeout");
+        var actual = new TaskCardSource.Actual(session, 2);
+
+        assertEquals(Optional.empty(), attempt.commits());
+        assertEquals(session, attempt.session());
+        assertEquals("claude-sonnet-4-5", attempt.model());
+        assertEquals("timeout", attempt.reason());
+        assertEquals(Optional.empty(), actual.commits());
+        assertEquals(session, actual.session());
+        assertEquals(2, actual.attempts());
     }
 }

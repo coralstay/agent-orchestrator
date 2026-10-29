@@ -90,8 +90,8 @@ class TaskCardSourceTest {
         return source;
     }
 
-    static final Attempt TIMEOUT = new Attempt(
-            new Tokens(120000, 3000), new Tokens(150000, 3500), "claude-sonnet-4-5", "timeout");
+    /** session만 있는 시도(AO-30#B3 — commits는 최상위 Q-18 전까지 생략). */
+    static final Attempt TIMEOUT = new Attempt(new Tokens(150000, 3500), "claude-sonnet-4-5", "timeout");
 
     // --- DRAFT-1#1 read ---
 
@@ -118,8 +118,24 @@ class TaskCardSourceTest {
     }
 
     @Test
-    @DisplayName("DRAFT-1#1 read는 attempt n 줄과 actual 줄을 TokenBudget에 담는다")
+    @DisplayName("DRAFT-1#1 AO-30#4 AO-30#B3 read는 session만 있는 attempt n 줄과 actual 줄을 TokenBudget에 담는다")
     void readParsesAttemptsAndActual() {
+        var source = sourceWith("""
+                estimated: in=200000 out=8000
+                attempt 1: session in=150000 out=3500 · model=claude-sonnet-4-5 · timeout
+                actual: session in=380000 out=9800 · attempts 2
+                """);
+
+        TokenBudget budget = source.read("AO-99").tokenBudget().orElseThrow();
+
+        assertEquals(List.of(TIMEOUT), budget.attempts());
+        assertEquals(Optional.of(new Actual(new Tokens(380000, 9800), 2)), budget.actual());
+        assertEquals(List.of(), budget.unparsed());
+    }
+
+    @Test
+    @DisplayName("DRAFT-1#1 AO-30#4 read는 commits가 있는 줄도 읽는다(commits는 생략 가능한 항목)")
+    void readParsesLinesWithCommits() {
         var source = sourceWith("""
                 estimated: in=200000 out=8000
                 attempt 1: commits in=120000 out=3000 · session in=150000 out=3500 · model=claude-sonnet-4-5 · timeout
@@ -128,9 +144,13 @@ class TaskCardSourceTest {
 
         TokenBudget budget = source.read("AO-99").tokenBudget().orElseThrow();
 
-        assertEquals(List.of(TIMEOUT), budget.attempts());
         assertEquals(
-                Optional.of(new Actual(new Tokens(300000, 9000), new Tokens(380000, 9800), 2)), budget.actual());
+                List.of(new Attempt(
+                        Optional.of(new Tokens(120000, 3000)), new Tokens(150000, 3500), "claude-sonnet-4-5", "timeout")),
+                budget.attempts());
+        assertEquals(
+                Optional.of(new Actual(Optional.of(new Tokens(300000, 9000)), new Tokens(380000, 9800), 2)),
+                budget.actual());
         assertEquals(List.of(), budget.unparsed());
     }
 
@@ -173,7 +193,7 @@ class TaskCardSourceTest {
     @DisplayName("DRAFT-1#2 estimated 줄이 없으면 사유와 함께 거절한다")
     void validateRejectsMissingEstimated() {
         var source = sourceWith(
-                "attempt 1: commits in=1 out=1 · session in=2 out=2 · model=claude-sonnet-4-5 · timeout\n");
+                "attempt 1: session in=2 out=2 · model=claude-sonnet-4-5 · timeout\n");
 
         CardCheck check = assertDoesNotThrow(() -> source.validate(source.read("AO-99")));
 
@@ -197,10 +217,10 @@ class TaskCardSourceTest {
     // --- DRAFT-1#3 recordAttempt / recordActual ---
 
     @Test
-    @DisplayName("DRAFT-1#3 recordAttempt는 attempt n 줄을 순서대로 덧붙인다")
+    @DisplayName("DRAFT-1#3 AO-30#4 AO-30#B3 recordAttempt는 session만 있는 attempt n 줄을 순서대로 덧붙인다")
     void recordAttemptAppendsNumberedLines() {
         var source = sourceWith("estimated: in=200000 out=8000\n");
-        var second = new Attempt(new Tokens(90000, 2000), new Tokens(95000, 2100), "claude-opus-4-1", "tests-failed");
+        var second = new Attempt(new Tokens(95000, 2100), "claude-opus-4-1", "tests-failed");
 
         source.recordAttempt("AO-99", TIMEOUT);
         source.recordAttempt("AO-99", second);
@@ -208,16 +228,16 @@ class TaskCardSourceTest {
         assertEquals(List.of(TIMEOUT, second), source.read("AO-99").tokenBudget().orElseThrow().attempts());
         assertEquals("""
                 estimated: in=200000 out=8000
-                attempt 1: commits in=120000 out=3000 · session in=150000 out=3500 · model=claude-sonnet-4-5 · timeout
-                attempt 2: commits in=90000 out=2000 · session in=95000 out=2100 · model=claude-opus-4-1 · tests-failed
+                attempt 1: session in=150000 out=3500 · model=claude-sonnet-4-5 · timeout
+                attempt 2: session in=95000 out=2100 · model=claude-opus-4-1 · tests-failed
                 """.strip(), source.section("AO-99").strip());
     }
 
     @Test
-    @DisplayName("DRAFT-1#3 recordActual은 시도 기록을 두고 actual 줄을 더한다")
+    @DisplayName("DRAFT-1#3 AO-30#4 AO-30#B3 recordActual은 시도 기록을 두고 session만 있는 actual 줄을 더한다")
     void recordActualKeepsAttemptsAndAddsActual() {
         var source = sourceWith("estimated: in=200000 out=8000\n");
-        var actual = new Actual(new Tokens(300000, 9000), new Tokens(380000, 9800), 2);
+        var actual = new Actual(new Tokens(380000, 9800), 2);
 
         source.recordAttempt("AO-99", TIMEOUT);
         source.recordActual("AO-99", actual);
@@ -228,8 +248,8 @@ class TaskCardSourceTest {
         assertEquals(Optional.of(actual), budget.actual());
         assertEquals("""
                 estimated: in=200000 out=8000
-                attempt 1: commits in=120000 out=3000 · session in=150000 out=3500 · model=claude-sonnet-4-5 · timeout
-                actual: commits in=300000 out=9000 · session in=380000 out=9800 · attempts 2
+                attempt 1: session in=150000 out=3500 · model=claude-sonnet-4-5 · timeout
+                actual: session in=380000 out=9800 · attempts 2
                 """.strip(), source.section("AO-99").strip());
     }
 

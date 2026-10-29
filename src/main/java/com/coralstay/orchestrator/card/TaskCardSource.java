@@ -1,6 +1,7 @@
 package com.coralstay.orchestrator.card;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -13,9 +14,12 @@ import java.util.Optional;
  *
  * <pre>
  * estimated: in=200000 out=8000
- * attempt 1: commits in=… out=… · session in=… out=… · model=claude-sonnet-… · timeout
- * actual: commits in=… out=… · session in=… out=… · attempts 2
+ * attempt 1: session in=… out=… · model=claude-sonnet-… · timeout
+ * actual: session in=… out=… · attempts 2
  * </pre>
+ *
+ * <p>{@code commits in=… out=… · }(커밋 트레일러 합계)는 {@code session} 앞에 올 수 있는 생략 가능한 항목이다. 트레일러를
+ * 남기는 도구가 없어 최상위 Q-18(토큰 계량 컴포넌트) 전까지는 {@code session}만 기록한다(decision-6 · decision-8).
  *
  * <p>시그니처 스텁(decision-11): 동작은 DRAFT-1에서 구현한다.
  */
@@ -100,11 +104,36 @@ public interface TaskCardSource {
         }
     }
 
-    /** Done에 이르지 못한 시도 하나: {@code commits}는 트레일러 합계, {@code session}은 헤드리스 JSON usage 합계. */
-    record Attempt(Tokens commits, Tokens session, String model, String reason) {}
+    /**
+     * Done에 이르지 못한 시도 하나: {@code commits}는 트레일러 합계(생략 가능 — Q-18 전까지 비어 있다), {@code session}은
+     * 헤드리스 JSON usage 합계.
+     */
+    record Attempt(Optional<Tokens> commits, Tokens session, String model, String reason) {
 
-    /** Done 실행의 실제치(모든 시도의 합계)와 시도 횟수. */
-    record Actual(Tokens commits, Tokens session, int attempts) {}
+        public Attempt {
+            Objects.requireNonNull(commits);
+            Objects.requireNonNull(session);
+        }
+
+        /** {@code session}만 있는 시도. */
+        public Attempt(Tokens session, String model, String reason) {
+            this(Optional.empty(), session, model, reason);
+        }
+    }
+
+    /** Done 실행의 실제치(모든 시도의 합계)와 시도 횟수. {@code commits}는 생략 가능하다({@link Attempt} 참고). */
+    record Actual(Optional<Tokens> commits, Tokens session, int attempts) {
+
+        public Actual {
+            Objects.requireNonNull(commits);
+            Objects.requireNonNull(session);
+        }
+
+        /** {@code session}만 있는 실제치. */
+        public Actual(Tokens session, int attempts) {
+            this(Optional.empty(), session, attempts);
+        }
+    }
 
     /** {@link #validate} 결과. {@code ok}이면 {@code reasons}는 비어 있다. */
     record CardCheck(boolean ok, List<String> reasons) {}

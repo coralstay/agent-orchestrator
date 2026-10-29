@@ -27,8 +27,8 @@ Token Budget 소절을 가진 카드를 읽는다.
 ### Token Budget
 
 estimated: in=200000 out=8000
-attempt 1: commits in=120000 out=3000 · session in=150000 out=3500 · model=claude-sonnet-4-5 · timeout
-actual: commits in=300000 out=9000 · session in=380000 out=9800 · attempts 2
+attempt 1: session in=150000 out=3500 · model=claude-sonnet-4-5 · timeout
+actual: session in=380000 out=9800 · attempts 2
 
 ## 대상 파일
 - `src/main/java/com/coralstay/orchestrator/card/BacklogCardSource.java`

@@ -130,8 +130,8 @@ class BacklogCardSourceTest {
         return plain.substring(start, end).stripTrailing();
     }
 
-    static final Attempt TIMEOUT = new Attempt(
-            new Tokens(120000, 3000), new Tokens(150000, 3500), "claude-sonnet-4-5", "timeout");
+    /** session만 있는 시도(AO-30#B3 — commits는 최상위 Q-18 전까지 생략). */
+    static final Attempt TIMEOUT = new Attempt(new Tokens(150000, 3500), "claude-sonnet-4-5", "timeout");
 
     // --- DRAFT-2#1 read ---
 
@@ -158,15 +158,14 @@ class BacklogCardSourceTest {
     }
 
     @Test
-    @DisplayName("DRAFT-2#1 read는 Description의 ### Token Budget 소절(estimated/attempt/actual)을 파싱한다")
+    @DisplayName("DRAFT-2#1 AO-30#4 read는 Description의 ### Token Budget 소절(estimated/attempt/actual, session만)을 파싱한다")
     void readParsesTokenBudgetFromDescription() {
         Card card = source(runner()).read("AO-90");
 
         TokenBudget budget = card.tokenBudget().orElseThrow();
         assertEquals(Optional.of(new Tokens(200000, 8000)), budget.estimated());
         assertEquals(List.of(TIMEOUT), budget.attempts());
-        assertEquals(
-                Optional.of(new Actual(new Tokens(300000, 9000), new Tokens(380000, 9800), 2)), budget.actual());
+        assertEquals(Optional.of(new Actual(new Tokens(380000, 9800), 2)), budget.actual());
         assertEquals(List.of(), budget.unparsed(), "다음 ## 제목(대상 파일)은 소절에 포함되지 않는다");
     }
 
@@ -185,10 +184,10 @@ class BacklogCardSourceTest {
     // --- DRAFT-2#3 recordAttempt / recordActual ---
 
     @Test
-    @DisplayName("DRAFT-2#3 recordAttempt는 Token Budget 소절만 바꾼 Description을 task edit -d로 쓰고 나머지는 그대로 둔다")
+    @DisplayName("DRAFT-2#3 AO-30#4 AO-30#B3 recordAttempt는 Token Budget 소절만 session만 있는 줄로 바꿔 task edit -d로 쓴다")
     void recordAttemptRewritesOnlyTokenBudgetSubsection() {
         var runner = runner();
-        var second = new Attempt(new Tokens(90000, 2000), new Tokens(95000, 2100), "claude-opus-4-1", "tests-failed");
+        var second = new Attempt(new Tokens(95000, 2100), "claude-opus-4-1", "tests-failed");
 
         source(runner).recordAttempt("AO-91", second);
 
@@ -196,16 +195,16 @@ class BacklogCardSourceTest {
                 ### Token Budget
 
                 estimated: in=200000 out=8000
-                attempt 1: commits in=120000 out=3000 · session in=150000 out=3500 · model=claude-sonnet-4-5 · timeout
-                attempt 2: commits in=90000 out=2000 · session in=95000 out=2100 · model=claude-opus-4-1 · tests-failed
+                attempt 1: session in=150000 out=3500 · model=claude-sonnet-4-5 · timeout
+                attempt 2: session in=95000 out=2100 · model=claude-opus-4-1 · tests-failed
                 """);
     }
 
     @Test
-    @DisplayName("DRAFT-2#3 recordActual은 시도 기록을 두고 actual 줄을 더하며 소절 밖은 그대로 둔다")
+    @DisplayName("DRAFT-2#3 AO-30#4 AO-30#B3 recordActual은 시도 기록을 두고 session만 있는 actual 줄을 더한다")
     void recordActualRewritesOnlyTokenBudgetSubsection() {
         var runner = runner();
-        var actual = new Actual(new Tokens(300000, 9000), new Tokens(380000, 9800), 2);
+        var actual = new Actual(new Tokens(380000, 9800), 2);
 
         source(runner).recordActual("AO-91", actual);
 
@@ -213,8 +212,8 @@ class BacklogCardSourceTest {
                 ### Token Budget
 
                 estimated: in=200000 out=8000
-                attempt 1: commits in=120000 out=3000 · session in=150000 out=3500 · model=claude-sonnet-4-5 · timeout
-                actual: commits in=300000 out=9000 · session in=380000 out=9800 · attempts 2
+                attempt 1: session in=150000 out=3500 · model=claude-sonnet-4-5 · timeout
+                actual: session in=380000 out=9800 · attempts 2
                 """);
     }
 
@@ -246,7 +245,7 @@ class BacklogCardSourceTest {
     void recordActualRunsInWorktreeAndCommitsCard() {
         var runner = runner();
 
-        source(runner).recordActual("AO-91", new Actual(new Tokens(1, 1), new Tokens(2, 2), 1));
+        source(runner).recordActual("AO-91", new Actual(new Tokens(2, 2), 1));
 
         for (Call call : runner.calls) {
             assertEquals(WORKTREE, call.workingDir(), "워크트리 기준이어야 한다: " + call.argv());

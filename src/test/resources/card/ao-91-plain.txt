@@ -22,7 +22,7 @@ Description:
 ### Token Budget
 
 estimated: in=200000 out=8000
-attempt 1: commits in=120000 out=3000 · session in=150000 out=3500 · model=claude-sonnet-4-5 · timeout
+attempt 1: session in=150000 out=3500 · model=claude-sonnet-4-5 · timeout
 
 ### 메모
 - 소절 뒤 텍스트도 바이트 그대로 남아야 한다.
