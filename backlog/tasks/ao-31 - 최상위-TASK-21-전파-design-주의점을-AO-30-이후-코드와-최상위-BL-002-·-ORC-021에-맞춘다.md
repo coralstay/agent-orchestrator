@@ -1,13 +1,15 @@
 ---
-id: DRAFT-9
+id: AO-31
 title: '최상위 TASK-21 전파: design/ 주의점을 AO-30 이후 코드와 최상위 BL-002 · ORC-021에 맞춘다'
-status: Draft
+status: To Do
 assignee: []
 created_date: '2026-10-30T16:24:00Z'
-updated_date: '2026-10-30T16:24:00Z'
+updated_date: '2026-10-30T16:35:00Z'
 labels:
   - design
 dependencies: []
+documentation:
+  - /Users/flynn_macpro/.claude/plans/starry-greeting-curry.md
 ---
 
 ## Description
