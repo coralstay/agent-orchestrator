@@ -293,5 +293,14 @@ class CoverageBuildConfigTest {
         }
     }
 
+    @Test
+    @DisplayName("AO-32#4 프로젝트 설정 coverageCommand가 테스트 · 리포트 · 검증을 차례로 돈다")
+    void coverageCommandRunsTestReportAndVerification() throws IOException {
+        String config = Files.readString(Path.of(".claude-code-agile-hooks.json"));
+        Matcher m = Pattern.compile("\"coverageCommand\"\\s*:\\s*\"([^\"]*)\"").matcher(config);
+        assertTrue(m.find(), "coverageCommand가 있어야 한다");
+        assertEquals("./gradlew test jacocoTestReport jacocoTestCoverageVerification", m.group(1));
+    }
+
     // == Coverage ==
 }
