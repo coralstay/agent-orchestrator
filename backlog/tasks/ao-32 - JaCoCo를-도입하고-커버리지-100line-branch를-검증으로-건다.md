@@ -4,7 +4,7 @@ title: JaCoCo를 도입하고 커버리지 100%(line + branch)를 검증으로 �
 status: In Progress
 assignee: []
 created_date: '2026-10-30T16:50:00Z'
-updated_date: '2026-10-30T16:52:00Z'
+updated_date: '2026-10-30T17:07:00Z'
 labels:
   - build
   - test
@@ -56,3 +56,38 @@ claude-code-agile-hooks의 pre_push_coverage_check는 Java 프로젝트에 cover
 3. AC3: 미달 클래스마다 테스트 먼저(ID#3 표식) → 100%.
 4. AC4: 유저가 coverageCommand 추가 → push 게이트 통과 확인.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## 구현 노트 (AO-32)
+
+### AC #1 — JaCoCo 플러그인 · 리포트 · 검증 (B2)
+- build.gradle.kts: jacoco 플러그인, toolVersion 0.8.16, jacocoTestReport(XML + HTML, dependsOn test), jacocoTestCoverageVerification(LINE · BRANCH COVEREDRATIO minimum 1.0, failOnViolation 기본값 true), check → 검증 의존. pendingTest · test의 excludeTags("pending")는 그대로.
+- 버전: Maven Central 최신이 0.8.16(2026-10-26 확인). Java 25 클래스 파일 정식 지원은 0.8.14부터라 테스트가 0.8.14 이상을 요구한다. 실제 Gradle 9.4.1 + Java 25 toolchain에서 리포트 · 검증이 돈다.
+- 커밋: 568d51e(빌드), 4a237c4(테스트 CoverageBuildConfigTest: AO-32#1 · AO-32#B2)
+
+### AC #2 — pending 스텁 클래스 파일만 제외 (B1)
+- build.gradle.kts의 pendingStubClasses 7개, 리포트 · 검증 둘 다 measuredClasses 한 필터를 쓴다:
+  - card/TaskCardSource.class — DRAFT-1 (default validate만 있음)
+  - card/TaskCardSource$Card.class — DRAFT-1 (withTokenBudget 스텁)
+  - card/TaskCardSource$TokenBudget.class — DRAFT-1 (parse · render · with*)
+  - card/TaskCardSource$Tokens.class — DRAFT-1 (parse · toString)
+  - card/BacklogCardSource.class — DRAFT-2 (read · record* · processRunner; 생성자는 필드 대입뿐)
+  - agent/AgentRunner$ClaudeCodeRunner.class — DRAFT-3 (command · parseSession · start; 생성자는 필드 대입뿐)
+  - policy/ModelPolicy.class — DRAFT-4 (AO-25로 AllocationPolicy가 대체)
+- 측정에 남긴 것: TaskCardSource$Attempt · $Actual(검증 로직) · $CardCheck, AgentRunner(기본 run은 실제 위임) · $Tokens · $Session · $AgentRun, ModelPolicy$Choice · $Source · $PolicyFormatException.
+- 테스트(CoverageBuildConfigTest): AO-32#2 — 항목마다 소스에서 그 타입의 메서드(생성자 제외)가 전부 throw new UnsupportedOperationException("pending: DRAFT-n")인지 확인(구현되면 실패해 항목을 지우게 함), 두 태스크가 같은 필터를 쓰는지 확인. AO-32#B1 — 항목 주석의 draft ID가 스텁의 pending ID와 같은지 확인.
+- 커밋: a9374ff(빌드), da78bdf(테스트)
+
+### AC #3 — 측정 대상 LINE · BRANCH 100%
+- 테스트 파일(전부 AO-32#3): MainCoverageTest(bad8373), AgentRunnerValuesTest(078852d), ModelPolicyValuesTest(1bb108b), CardValuesTest(8971d71), SessionRegistryArgsTest(2f90626), WorktreeManagerArgsTest(79382ac), BacklogClientEdgeTest(646ea12), AgentSpawnerEdgeTest(cec865a).
+- 테스트 가능하게 바꾼 소스:
+  - BacklogClient: stderr Future 대기를 package-private awaitStderr로 분리(3e1a27d), 동작 동일.
+  - AgentSpawner: 대기 스레드 처리를 settle(result, process, Callable)로 분리, awaitExit를 CompletableFuture.allOf 한 번의 대기로, SpawnedAgent 생성자 · drain을 package-private으로(92c230f). settle은 검사 예외도 실패로 완료한다.
+  - Main: System.exit은 돌아오지 않아 그 줄이 JaCoCo에서 영영 미커버로 남는다. 비정상 종료를 별도 non-daemon 스레드의 System.exit(code)로 맡기고 main은 정상 반환(cba8597). 종료코드는 자식 JVM(-javaagent 전달)으로 확인한다.
+- 수치(./gradlew clean test jacocoTestReport jacocoTestCoverageVerification, exit 0, 2회 연속): LINE covered 358 / missed 0, BRANCH covered 135 / missed 0.
+
+### AC #4 — coverageCommand
+- .claude-code-agile-hooks.json은 유저가 설정(e588479), 수정하지 않음. 테스트 AO-32#4(CoverageBuildConfigTest, 0f58ea6)가 값 ./gradlew test jacocoTestReport jacocoTestCoverageVerification을 확인. push 게이트 통과는 수동 확인 대상.
+<!-- SECTION:NOTES:END -->
