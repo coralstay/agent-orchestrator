@@ -10,11 +10,14 @@ public final class Main {
 
     private Main() {}
 
-    /** 파싱 결과: 성공한 명령 또는 usage 오류. */
-    sealed interface ParseResult permits Command, UsageError {}
+    /** 파싱 결과: 성공한 명령, 도움말, 또는 usage 오류. */
+    sealed interface ParseResult permits Command, Help, UsageError {}
 
     /** 파싱된 명령. 이름과 대상 taskId. */
     record Command(String name, String taskId) implements ParseResult {}
+
+    /** 도움말 출력 요청. */
+    record Help() implements ParseResult {}
 
     /** 인자가 잘못됐을 때의 사유. */
     record UsageError(String reason) implements ParseResult {}
@@ -25,6 +28,9 @@ public final class Main {
             return new UsageError("명령이 없습니다");
         }
         String name = args[0];
+        if ("-h".equals(name) || "--help".equals(name) || "help".equals(name)) {
+            return new Help();
+        }
         if (!"run".equals(name)) {
             return new UsageError("알 수 없는 명령: " + name);
         }
@@ -44,6 +50,12 @@ public final class Main {
             case Command command -> {
                 // RunCommand 연결은 AO-7에서 한다.
                 out.println(command.taskId());
+                yield 0;
+            }
+            case Help help -> {
+                out.println(USAGE);
+                out.println("  run <taskId>   지정한 백로그 태스크에 대한 역할형 에이전트 세션 실행");
+                out.println("  -h, --help     이 도움말 출력");
                 yield 0;
             }
             case UsageError error -> {

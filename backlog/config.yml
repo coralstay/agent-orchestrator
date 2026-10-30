@@ -1,4 +1,4 @@
-project_name: "agent-orchestartor"
+project_name: "agent-orchestrator"
 default_status: "To Do"
 statuses: ["To Do", "In Progress", "Done"]
 labels: []
