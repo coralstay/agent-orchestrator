@@ -59,6 +59,13 @@ jacoco {
 // AO-32 B1: 메서드가 전부 pending 스텁인 클래스 파일만 측정에서 뺀다. 주석은 그 스텁을 구현할 카드다 —
 // 구현 카드는 자기 항목을 지운다(제외는 '아직 구현 없음'의 표시이지 커버리지 면제가 아니다).
 val pendingStubClasses = listOf<String>(
+    "com/coralstay/orchestrator/card/TaskCardSource.class", // DRAFT-1 validate
+    "com/coralstay/orchestrator/card/TaskCardSource\$Card.class", // DRAFT-1 withTokenBudget
+    "com/coralstay/orchestrator/card/TaskCardSource\$TokenBudget.class", // DRAFT-1 parse · render · with*
+    "com/coralstay/orchestrator/card/TaskCardSource\$Tokens.class", // DRAFT-1 parse · toString
+    "com/coralstay/orchestrator/card/BacklogCardSource.class", // DRAFT-2 read · record* · processRunner
+    "com/coralstay/orchestrator/agent/AgentRunner\$ClaudeCodeRunner.class", // DRAFT-3 command · parseSession · start
+    "com/coralstay/orchestrator/policy/ModelPolicy.class", // DRAFT-4 AllocationPolicy로 대체(AO-25)
 )
 
 // 리포트와 검증이 같은 대상을 재도록 한 곳에서 거른다.
