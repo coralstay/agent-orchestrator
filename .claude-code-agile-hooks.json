@@ -10,5 +10,6 @@
   },
   "humanSigners": [
     "human"
-  ]
+  ],
+  "coverageCommand": "./gradlew test jacocoTestReport jacocoTestCoverageVerification"
 }
