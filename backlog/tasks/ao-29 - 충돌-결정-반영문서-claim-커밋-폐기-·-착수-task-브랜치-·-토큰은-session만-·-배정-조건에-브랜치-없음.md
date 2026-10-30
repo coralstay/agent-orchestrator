@@ -1,10 +1,10 @@
 ---
 id: AO-29
 title: '충돌 결정 반영(문서): claim 커밋 폐기 · 착수 = task 브랜치 · 토큰은 session만 · 배정 조건에 브랜치 없음'
-status: In Progress
+status: Done
 assignee: []
-created_date: '2026-10-29 02:31'
-updated_date: '2026-10-29 11:07'
+created_date: 2026-10-29 02:31
+updated_date: '2026-10-30T16:34:00Z'
 labels:
   - design
 dependencies: []
