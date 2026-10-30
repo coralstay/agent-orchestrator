@@ -1,10 +1,10 @@
 ---
 id: AO-32
 title: JaCoCo를 도입하고 커버리지 100%(line + branch)를 검증으로 건다
-status: In Progress
+status: Done
 assignee: []
 created_date: '2026-10-30T16:50:00Z'
-updated_date: '2026-10-30T17:14:00Z'
+updated_date: '2026-10-30T17:15:00Z'
 labels:
   - build
   - test
