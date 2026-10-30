@@ -76,6 +76,9 @@ val measuredClasses = files(sourceSets.main.map { main ->
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
     classDirectories.setFrom(measuredClasses)
+    // claude-code-agile-hooks의 커버리지 게이트는 '이번 실행이 쓴 리포트'를 요구한다. 테스트가 UP-TO-DATE여도
+    // 리포트는 매번 다시 쓴다(입력이 같으면 내용도 같다).
+    outputs.upToDateWhen { false }
     reports {
         xml.required = true
         html.required = true
