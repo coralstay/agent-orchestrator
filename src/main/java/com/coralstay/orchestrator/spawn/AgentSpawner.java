@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
@@ -48,7 +49,7 @@ public final class AgentSpawner {
         private final Instant startedAt;
         private final CompletableFuture<AgentResult> result;
 
-        private SpawnedAgent(
+        SpawnedAgent(
                 String role, ProcessHandle process, Instant startedAt, CompletableFuture<AgentResult> result) {
             this.role = role;
             this.process = process;
@@ -161,27 +162,34 @@ public final class AgentSpawner {
                 .start(() -> drain(process.getErrorStream(), stderr));
 
         var result = new CompletableFuture<AgentResult>();
-        Thread.ofVirtual().name("agent-wait-" + process.pid()).start(() -> {
-            try {
-                boolean exited = process.waitFor(timeout.toMillis(), TimeUnit.MILLISECONDS);
-                if (!exited) {
-                    terminate(process.toHandle());
-                }
-                int exitCode = process.waitFor();
-                Duration duration = Duration.between(startedAt, Instant.now());
-                outDrain.join(DRAIN_GRACE);
-                errDrain.join(DRAIN_GRACE);
-                result.complete(new AgentResult(
-                        exitCode, text(stdout), text(stderr), process.pid(), !exited, duration));
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+        Thread.ofVirtual().name("agent-wait-" + process.pid()).start(() -> settle(result, process.toHandle(), () -> {
+            boolean exited = process.waitFor(timeout.toMillis(), TimeUnit.MILLISECONDS);
+            if (!exited) {
                 terminate(process.toHandle());
-                result.completeExceptionally(new IllegalStateException("에이전트 대기 중 인터럽트", e));
-            } catch (RuntimeException e) {
-                result.completeExceptionally(e);
             }
-        });
+            int exitCode = process.waitFor();
+            Duration duration = Duration.between(startedAt, Instant.now());
+            outDrain.join(DRAIN_GRACE);
+            errDrain.join(DRAIN_GRACE);
+            return new AgentResult(exitCode, text(stdout), text(stderr), process.pid(), !exited, duration);
+        }));
         return new SpawnedAgent(role, process.toHandle(), startedAt, result);
+    }
+
+    /**
+     * 대기 작업 {@code wait}의 결과로 {@code result}를 완료한다. 대기 중 인터럽트되면 인터럽트 상태를 되살리고
+     * {@code process}와 자손을 종료한 뒤 실패로, 그 밖의 예외는 그 예외로 실패 완료한다.
+     */
+    static void settle(CompletableFuture<AgentResult> result, ProcessHandle process, Callable<AgentResult> wait) {
+        try {
+            result.complete(wait.call());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            terminate(process);
+            result.completeExceptionally(new IllegalStateException("에이전트 대기 중 인터럽트", e));
+        } catch (Exception e) {
+            result.completeExceptionally(e);
+        }
     }
 
     /** {@link #start} 후 {@link SpawnedAgent#await()}. */
@@ -218,27 +226,24 @@ public final class AgentSpawner {
         return awaitExit(survivors, TERMINATE_GRACE);
     }
 
-    /** 모두 끝나거나 grace가 지날 때까지 기다린 뒤, 모두 끝났는지 돌려준다. */
+    /**
+     * 모두 끝나거나 grace가 지날 때까지 기다린 뒤, 모두 끝났는지 돌려준다. 인터럽트되면 기다리지 않고 인터럽트 상태를
+     * 되살린 채 판정한다.
+     */
     private static boolean awaitExit(List<ProcessHandle> handles, Duration grace) {
-        long deadline = System.nanoTime() + grace.toNanos();
-        for (ProcessHandle handle : handles) {
-            long remaining = deadline - System.nanoTime();
-            if (remaining <= 0) {
-                break;
-            }
-            try {
-                handle.onExit().get(remaining, TimeUnit.NANOSECONDS);
-            } catch (TimeoutException | ExecutionException e) {
-                break;
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
+        CompletableFuture<?>[] exits = handles.stream().map(ProcessHandle::onExit).toArray(CompletableFuture[]::new);
+        try {
+            CompletableFuture.allOf(exits).get(grace.toNanos(), TimeUnit.NANOSECONDS);
+        } catch (TimeoutException | ExecutionException e) {
+            // 유예 안에 끝나지 않은 것이 있다 — 아래에서 살아 있는지로 판정한다
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
         return handles.stream().noneMatch(ProcessHandle::isAlive);
     }
 
-    private static void drain(InputStream in, ByteArrayOutputStream sink) {
+    /** {@code in}을 끝까지 {@code sink}로 옮긴다. 스트림 오류가 나면 그때까지 읽은 것만 남긴다. */
+    static void drain(InputStream in, ByteArrayOutputStream sink) {
         byte[] buffer = new byte[8192];
         try (in) {
             int n;

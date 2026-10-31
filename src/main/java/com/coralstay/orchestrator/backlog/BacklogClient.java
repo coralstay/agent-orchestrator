@@ -92,17 +92,24 @@ public final class BacklogClient {
                     Future<String> stderr = pool.submit(() -> read(process.getErrorStream()));
                     String stdout = read(process.getInputStream());
                     int exitCode = process.waitFor();
-                    return new ProcessResult(exitCode, stdout, stderr.get());
+                    return new ProcessResult(exitCode, stdout, awaitStderr(stderr, command));
                 }
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new IllegalStateException("interrupted: " + command, e);
-            } catch (ExecutionException e) {
-                throw new IllegalStateException("stderr read failed: " + command, e.getCause());
             }
         };
+    }
+
+    /** stderr를 읽는 작업의 결과. 읽기가 실패했으면 원인을 담은 {@link IllegalStateException}. */
+    static String awaitStderr(Future<String> stderr, List<String> command) throws InterruptedException {
+        try {
+            return stderr.get();
+        } catch (ExecutionException e) {
+            throw new IllegalStateException("stderr read failed: " + command, e.getCause());
+        }
     }
 
     private static String read(InputStream in) throws IOException {

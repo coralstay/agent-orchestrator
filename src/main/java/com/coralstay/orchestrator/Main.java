@@ -69,7 +69,9 @@ public final class Main {
     public static void main(String[] args) {
         int code = run(args, System.out, System.err);
         if (code != 0) {
-            System.exit(code);
+            // System.exit은 돌아오지 않아 그 줄의 커버리지 프로브가 끝내 실행되지 않는다(AO-32). 종료는 별도 스레드에
+            // 맡기고 main은 정상 반환한다 — JVM은 그 non-daemon 스레드의 System.exit(code)로 끝난다.
+            Thread.ofPlatform().name("exit-" + code).start(() -> System.exit(code));
         }
     }
 }

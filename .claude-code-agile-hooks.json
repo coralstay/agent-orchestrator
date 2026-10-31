@@ -7,5 +7,9 @@
     "testGlobs": [
       "src/test/java/**"
     ]
-  }
+  },
+  "humanSigners": [
+    "human"
+  ],
+  "coverageCommand": "./gradlew test jacocoTestReport jacocoTestCoverageVerification"
 }
