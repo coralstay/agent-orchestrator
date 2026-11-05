@@ -1,0 +1,9 @@
+.gradle/
+build/
+.orchestrator/
+.idea/
+*.iml
+.DS_Store
+
+# claude-code-agile-hooks 커버리지 게이트 로그(로컬 기록)
+/.claude-code-agile-hooks/

@@ -1,0 +1,15 @@
+{
+  "testCommand": "./gradlew test",
+  "testFirst": {
+    "sourceGlobs": [
+      "src/main/java/**"
+    ],
+    "testGlobs": [
+      "src/test/java/**"
+    ]
+  },
+  "humanSigners": [
+    "human"
+  ],
+  "coverageCommand": "./gradlew test jacocoTestReport jacocoTestCoverageVerification"
+}
