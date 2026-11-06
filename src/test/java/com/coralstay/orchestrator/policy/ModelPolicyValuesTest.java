@@ -1,3 +1,12 @@
+// ---
+// title: ModelPolicyValuesTest
+// description: ModelPolicy 값 타입(Choice·PolicyFormatException) 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 // AO-32: ModelPolicy의 값 타입(Choice · Source · PolicyFormatException)을 덮는다(ModelPolicy 본체 스텁은 측정 제외).
 package com.coralstay.orchestrator.policy;
 

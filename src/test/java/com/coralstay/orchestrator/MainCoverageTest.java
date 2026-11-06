@@ -1,3 +1,12 @@
+// ---
+// title: MainCoverageTest
+// description: Main의 도움말·null 인자·main 종료 경로 커버리지 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 // AO-32: Main의 도움말 · 빈 인자 · 프로세스 종료코드를 덮는다(커버리지 100%).
 package com.coralstay.orchestrator;
 

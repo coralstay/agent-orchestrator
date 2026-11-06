@@ -1,3 +1,12 @@
+// ---
+// title: BacklogCardSource
+// description: backlog.md CLI로 구현한 카드 접근 포트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.card;
 
 import com.coralstay.orchestrator.backlog.BacklogClient.ProcessResult;

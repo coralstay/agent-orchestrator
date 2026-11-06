@@ -1,3 +1,12 @@
+// ---
+// title: ModelPolicy
+// description: 카드의 예상 토큰으로 Claude 모델을 고르는 정책
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.policy;
 
 import java.io.IOException;

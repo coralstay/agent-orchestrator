@@ -1,3 +1,12 @@
+// ---
+// title: CoverageBuildConfigTest
+// description: build.gradle.kts의 JaCoCo 커버리지 설정을 검사하는 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 // AO-32: JaCoCo 커버리지 빌드 설정(build.gradle.kts)과 프로젝트 설정의 coverageCommand를 검증한다.
 package com.coralstay.orchestrator.coverage;
 

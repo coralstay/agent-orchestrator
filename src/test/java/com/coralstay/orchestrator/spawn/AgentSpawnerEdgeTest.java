@@ -1,3 +1,12 @@
+// ---
+// title: AgentSpawnerEdgeTest
+// description: AgentSpawner의 실행 실패·잘못된 인자 경계 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 // AO-32: AgentSpawner의 오류 · 인터럽트 경로(시작 실패, 대기 실패, 스트림 오류, 인터럽트 중 종료)를 덮는다.
 package com.coralstay.orchestrator.spawn;
 

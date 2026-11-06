@@ -1,3 +1,12 @@
+// ---
+// title: AgentRunnerValuesTest
+// description: AgentRunner 값 타입(Tokens·Session 등)의 동작 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 // AO-32: AgentRunner의 기본 run · Tokens · Session 값 규칙을 덮는다(ClaudeCodeRunner 스텁은 측정 제외).
 package com.coralstay.orchestrator.agent;
 

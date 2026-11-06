@@ -1,3 +1,12 @@
+// ---
+// title: AgentRunner
+// description: 에이전트 실행 포트와 Claude Code 구현(띄우고 기다려 결과를 돌려준다)
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.agent;
 
 import java.nio.file.Path;

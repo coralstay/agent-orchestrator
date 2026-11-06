@@ -1,3 +1,12 @@
+// ---
+// title: BacklogClientTest
+// description: BacklogClient.parse의 정상 출력 파싱과 실행 가능 판정 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.backlog;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

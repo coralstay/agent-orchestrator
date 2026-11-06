@@ -1,3 +1,12 @@
+// ---
+// title: AgentSpawnerTest
+// description: AgentSpawner가 셸 스크립트로 주입한 가짜 claude를 띄우는 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.spawn;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -1,3 +1,12 @@
+// ---
+// title: SessionRegistryArgsTest
+// description: SessionRegistry.admit의 null 인자 거부 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 // AO-32: SessionRegistry.admit의 null 인자 거부를 덮는다(빈 문자열은 기존 테스트가 본다).
 package com.coralstay.orchestrator.registry;
 

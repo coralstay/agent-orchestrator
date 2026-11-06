@@ -1,3 +1,12 @@
+// ---
+// title: BacklogClient
+// description: backlog task view --plain 출력을 읽어 Task 값으로 파싱하는 클라이언트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.backlog;
 
 import java.io.IOException;

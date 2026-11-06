@@ -1,3 +1,12 @@
+// ---
+// title: WorktreeManager
+// description: 태스크별 git worktree와 task/<id> 브랜치를 만들고 지우는 관리자
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.workspace;
 
 import com.coralstay.orchestrator.backlog.BacklogClient;

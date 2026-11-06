@@ -1,3 +1,12 @@
+// ---
+// title: SessionRegistry
+// description: 살아 있는 에이전트 세션을 추적하고 동시 실행 수를 Semaphore로 제한
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.registry;
 
 import com.coralstay.orchestrator.spawn.AgentSpawner;

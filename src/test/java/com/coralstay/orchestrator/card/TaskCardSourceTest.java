@@ -1,3 +1,12 @@
+// ---
+// title: TaskCardSourceTest
+// description: 카드 포트 계약 테스트(pending 태그)
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.card;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

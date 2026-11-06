@@ -1,3 +1,12 @@
+// ---
+// title: BacklogCardSourceTest
+// description: BacklogCardSource의 명령 인자·작업 디렉토리·환경 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.card;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

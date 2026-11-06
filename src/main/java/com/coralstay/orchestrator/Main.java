@@ -1,3 +1,12 @@
+// ---
+// title: Main
+// description: CLI 진입점. run <taskId> 한 형식만 해석하고 잘못된 인자는 종료 코드 2
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator;
 
 import java.io.PrintStream;

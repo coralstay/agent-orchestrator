@@ -1,3 +1,12 @@
+// ---
+// title: SessionRegistryTest
+// description: SessionRegistry의 admit·attach·retire와 동시성 제한 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.registry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

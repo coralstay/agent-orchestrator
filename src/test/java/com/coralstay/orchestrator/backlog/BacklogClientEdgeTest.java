@@ -1,3 +1,12 @@
+// ---
+// title: BacklogClientEdgeTest
+// description: BacklogClient.parse의 누락·경계 입력 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 // AO-32: BacklogClient의 파싱 실패 · 의존성 블록 경계 · 하위 브랜치 · 실행기 오류 경로를 덮는다.
 package com.coralstay.orchestrator.backlog;
 

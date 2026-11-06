@@ -1,3 +1,12 @@
+// ---
+// title: CardValuesTest
+// description: 카드 포트 값 타입(CardCheck)의 동등성 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 // AO-32: 카드 포트의 측정 대상 값 타입 CardCheck를 덮는다(메서드가 전부 스텁인 타입은 측정 제외).
 package com.coralstay.orchestrator.card;
 

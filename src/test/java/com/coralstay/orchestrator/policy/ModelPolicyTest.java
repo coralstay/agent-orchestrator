@@ -1,3 +1,12 @@
+// ---
+// title: ModelPolicyTest
+// description: ModelPolicy의 모델 선택과 설정 파일 파싱 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.policy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

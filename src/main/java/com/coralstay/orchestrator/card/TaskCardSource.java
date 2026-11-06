@@ -1,3 +1,12 @@
+// ---
+// title: TaskCardSource
+// description: 카드 읽기·검증·Token Budget 기록을 추상화한 카드 접근 포트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.card;
 
 import java.util.List;

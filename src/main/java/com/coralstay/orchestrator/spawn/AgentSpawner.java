@@ -1,3 +1,12 @@
+// ---
+// title: AgentSpawner
+// description: claude -p 헤드리스 프로세스를 띄우고 기다리는 스포너
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.spawn;
 
 import java.io.ByteArrayOutputStream;
