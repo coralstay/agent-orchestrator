@@ -51,7 +51,7 @@ class AgentSpawnerTest {
      * {@code dumpThreads(JSON)} 결과에서 이름이 name인 스레드의 virtual 여부. 스레드 객체마다 {@code "tid"}로 시작하고
      * virtual thread에만 {@code "virtual": true}가 붙는다. 그 이름의 스레드가 없으면 empty.
      */
-    static Optional<Boolean> isVirtual(String json, String name) {
+    static Optional<Boolean> isVirtual(String json, String name) {  // ---- 1
         String nameField = "\"name\": \"" + name + "\"";
         return Arrays.stream(json.split("\"tid\":"))
                 .filter(chunk -> chunk.contains(nameField))
@@ -89,7 +89,7 @@ class AgentSpawnerTest {
 
     @Test
     @DisplayName("AO-4#1 프롬프트는 argv 원소 하나로 그대로 넘긴다")
-    void commandPassesPromptAsSingleArgumentVerbatim() {
+    void commandPassesPromptAsSingleArgumentVerbatim() {  // ---- 2
         String prompt = "line1\n\"quoted\" $HOME `id`; rm -rf / && echo";
 
         List<String> command = new AgentSpawner().command("implementer", prompt);
@@ -182,7 +182,7 @@ class AgentSpawnerTest {
 
     @Test
     @DisplayName("AO-4 보조: 큰 출력도 막히지 않고 양쪽 스트림을 비운다")
-    void spawnDrainsLargeOutputOnBothStreamsWithoutBlocking() throws IOException {
+    void spawnDrainsLargeOutputOnBothStreamsWithoutBlocking() throws IOException {  // ---- 3
         // 파이프 버퍼(64KiB 안팎)를 훨씬 넘는 양을 stdout·stderr 양쪽에 쓴다
         Path exe = fake("head -c 1048576 /dev/zero | tr '\\0' a; head -c 1048576 /dev/zero | tr '\\0' b >&2");
 
@@ -207,7 +207,7 @@ class AgentSpawnerTest {
 
     @Test
     @DisplayName("AO-4#3 타임아웃이면 프로세스와 자손을 모두 종료한다")
-    void spawnTimeoutKillsProcessAndAllDescendants() throws IOException {
+    void spawnTimeoutKillsProcessAndAllDescendants() throws IOException {  // ---- 4
         // 백그라운드 자식과 전경 자식을 하나씩 두고, 둘 다 30초 동안 버티게 한다
         Path pids = tmp.resolve("pids");
         Path exe = fake("""
@@ -230,7 +230,7 @@ class AgentSpawnerTest {
 
     @Test
     @DisplayName("AO-4#3 SIGTERM을 무시하면 SIGKILL로 강제 종료한다")
-    void terminateForcesProcessThatIgnoresSigterm() throws IOException {
+    void terminateForcesProcessThatIgnoresSigterm() throws IOException {  // ---- 5
         Path exe = fake("""
                 trap '' TERM
                 echo ready
@@ -243,3 +243,21 @@ class AgentSpawnerTest {
                 "SIGTERM을 무시해도 유예 후 SIGKILL로 끝나야 한다");
     }
 }
+
+// ======== 노트 ========
+// 1 virtual thread 여부는 JSON 스레드 덤프로
+//   설명: Thread.getAllStackTraces()는 virtual thread를 빼므로, virtual thread까지 담는 JSON 스레드 덤프에서 이름으로 찾아 virtual 여부를 읽는다.
+//   개념: virtual thread
+// 2 프롬프트는 argv 원소 하나
+//   설명: 따옴표 · 개행 · $가 있어도 셸을 거치지 않고 그대로 전달된다.
+//   관련: AO-4#1
+// 3 큰 출력도 막히지 않는다
+//   설명: 파이프 버퍼(64KiB 안팎)를 훨씬 넘는 양을 stdout · stderr 양쪽에 써도 프로세스가 멈추지 않아야 한다.
+//   관련: AO-4
+//   개념: 파이프 교착
+// 4 타임아웃은 자손까지 종료
+//   설명: 백그라운드 자식과 전경 자식을 하나씩 두고 둘 다 죽는지 본다.
+//   관련: AO-4#3, AgentSpawner.terminate
+// 5 SIGTERM을 무시하면 SIGKILL
+//   설명: 유예 뒤에도 살아 있는 프로세스는 destroyForcibly로 강제 종료된다.
+//   관련: AO-4#3

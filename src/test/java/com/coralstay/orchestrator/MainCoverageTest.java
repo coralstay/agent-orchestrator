@@ -36,11 +36,11 @@ class MainCoverageTest {
      * Main을 별도 JVM으로 띄워 실제 종료코드를 본다(System.exit은 테스트 JVM에서 부를 수 없다). 테스트 JVM의
      * {@code -javaagent}(JaCoCo, append=true)를 그대로 넘겨 자식 JVM의 실행도 커버리지에 합친다.
      */
-    static Exit runMain(String... args) throws IOException, InterruptedException {
+    static Exit runMain(String... args) throws IOException, InterruptedException {  // ---- 1
         List<String> command = new ArrayList<>();
         command.add(Path.of(System.getProperty("java.home"), "bin", "java").toString());
         ManagementFactory.getRuntimeMXBean().getInputArguments().stream()
-                .filter(arg -> arg.startsWith("-javaagent:"))
+                .filter(arg -> arg.startsWith("-javaagent:"))  // ---- 2
                 .forEach(command::add);
         command.add("-cp");
         command.add(System.getProperty("java.class.path"));
@@ -50,7 +50,7 @@ class MainCoverageTest {
         process.getOutputStream().close();
         String stderr = new String(process.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
         String stdout = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-        assertTrue(process.waitFor(30, TimeUnit.SECONDS), "Main이 30초 안에 끝나야 한다");
+        assertTrue(process.waitFor(30, TimeUnit.SECONDS), "Main이 30초 안에 끝나야 한다");  // ---- 3
         return new Exit(process.exitValue(), stdout, stderr);
     }
 
@@ -99,3 +99,16 @@ class MainCoverageTest {
 
     // == Coverage ==
 }
+
+// ======== 노트 ========
+// 1 Main을 별도 JVM으로 띄운다
+//   설명: System.exit은 테스트 JVM에서 부를 수 없어 자식 JVM의 실제 종료코드를 본다.
+//   관련: Main.java
+//   개념: 종료 코드
+// 2 JaCoCo 에이전트를 자식 JVM에도 넘긴다
+//   설명: 테스트 JVM의 -javaagent(JaCoCo, append=true)를 그대로 넘겨 자식 JVM의 실행도 커버리지에 합친다. 안 넘기면 main의 종료 분기가 100% 게이트에서 빠진다.
+//   관련: AO-32, build.gradle.kts
+//   개념: JaCoCo 에이전트
+// 3 30초 안에 끝나야 한다
+//   설명: 자식 JVM이 종료 스레드 때문에 멈추지 않는지 확인하는 안전 장치다.
+//   관련: Main.java

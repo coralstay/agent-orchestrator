@@ -27,7 +27,7 @@ class CardValuesTest {
     @DisplayName("AO-32#3 CardCheck는 판정과 사유를 값으로 담는다(같은 내용이면 같다)")
     void cardCheckIsValue() {
         CardCheck ok = new CardCheck(true, List.of());
-        CardCheck missing = new CardCheck(false, List.of("AC 없음"));
+        CardCheck missing = new CardCheck(false, List.of("AC 없음"));  // ---- 1
 
         assertTrue(ok.ok());
         assertEquals(List.of("AC 없음"), missing.reasons());
@@ -37,3 +37,8 @@ class CardValuesTest {
 
     // == Coverage ==
 }
+
+// ======== 노트 ========
+// 1 판정과 사유를 값으로 담는다
+//   설명: CardCheck는 ok 여부와 사유 목록을 담는 값 타입이다. 같은 내용이면 같다.
+//   관련: card/TaskCardSource.java

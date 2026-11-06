@@ -39,7 +39,7 @@ import java.util.function.Function;
 public final class BacklogCardSource implements TaskCardSource {
 
     /** 오케스트레이터 커밋 환경에서 지우는 AI 도구 환경변수(decision-5). */
-    public static final List<String> STRIPPED_ENV = List.of("AI_AGENT", "CLAUDE_CODE_SESSION_ID", "CLAUDE_PID");
+    public static final List<String> STRIPPED_ENV = List.of("AI_AGENT", "CLAUDE_CODE_SESSION_ID", "CLAUDE_PID");  // ---- 1
 
     /**
      * 외부 명령 실행기. {@code env}는 자식 프로세스의 <b>전체</b> 환경이다(부모 환경을 상속하지 않고 이 맵으로 대체).
@@ -47,7 +47,7 @@ public final class BacklogCardSource implements TaskCardSource {
      */
     @FunctionalInterface
     public interface CommandRunner {
-        ProcessResult run(List<String> argv, Path workingDir, Map<String, String> env);
+        ProcessResult run(List<String> argv, Path workingDir, Map<String, String> env);  // ---- 2
     }
 
     private final CommandRunner runner;
@@ -67,11 +67,11 @@ public final class BacklogCardSource implements TaskCardSource {
         this.runner = Objects.requireNonNull(runner);
         this.repoRoot = Objects.requireNonNull(repoRoot);
         this.worktreeOf = Objects.requireNonNull(worktreeOf);
-        this.parentEnv = Map.copyOf(parentEnv);
+        this.parentEnv = Map.copyOf(parentEnv);  // ---- 3
     }
 
     /** ProcessBuilder로 실행하는 운영용 실행기. 환경을 {@code env}로 통째로 바꾼다. */
-    public static CommandRunner processRunner() {
+    public static CommandRunner processRunner() {  // ---- 4
         throw new UnsupportedOperationException("pending: DRAFT-2");
     }
 
@@ -90,3 +90,19 @@ public final class BacklogCardSource implements TaskCardSource {
         throw new UnsupportedOperationException("pending: DRAFT-2");
     }
 }
+
+// ======== 노트 ========
+// 1 커밋 환경에서 AI 도구 변수를 지운다
+//   설명: 오케스트레이터가 직접 하는 커밋(실제치 기록뿐)은 이 변수를 뺀 환경으로 실행한다. 안 지우면 부모 Claude 세션의 커밋으로 표시된다. coding-agent-git-commit-tool GF-130이 CLAUDE_CODE_SESSION_ID · CLAUDE_PID로 에이전트를 판별할 예정이라 CLAUDE_PID도 지운다.
+//   관련: decision-5, coding-agent-git-commit-tool GF-130
+//   개념: 환경 변수 상속
+// 2 env는 자식의 전체 환경
+//   설명: 부모 환경을 상속하지 않고 이 맵으로 통째로 대체한다. 그래야 STRIPPED_ENV가 확실히 빠진다. 테스트는 인자 · 작업 디렉토리 · 환경을 캡처하는 가짜를 넣는다.
+//   관련: BacklogCardSourceTest
+// 3 부모 환경은 방어적 복사
+//   설명: 생성 뒤 바깥에서 맵을 바꿔도 자식 환경이 달라지지 않게 불변 사본을 둔다.
+//   개념: 방어적 복사
+// 4 아직 구현 없는 스텁 (DRAFT-2)
+//   설명: read · record* 와 함께 pending 스텁이다. build.gradle.kts pendingStubClasses에 올라 커버리지 측정에서 빠지며, 구현 카드가 그 항목을 지운다.
+//   관련: build.gradle.kts, DRAFT-2
+//   개념: 시그니처 스텁

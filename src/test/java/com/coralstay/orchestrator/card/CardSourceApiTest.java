@@ -42,7 +42,7 @@ class CardSourceApiTest {
 
     @Test
     @DisplayName("AO-30#1 TaskCardSource에는 claim · IN_PROGRESS가, Card에는 claimedBy가 없다")
-    void taskCardSourceHasNoClaim() {
+    void taskCardSourceHasNoClaim() {  // ---- 1
         assertFalse(methodNames(TaskCardSource.class).contains("claim"));
         assertFalse(fieldNames(TaskCardSource.class).contains("IN_PROGRESS"));
         assertFalse(methodNames(TaskCardSource.Card.class).contains("claimedBy"));
@@ -61,7 +61,7 @@ class CardSourceApiTest {
 
     @Test
     @DisplayName("AO-30#2 AO-30#B2 오케스트레이터 커밋 환경에서 AI_AGENT · CLAUDE_CODE_SESSION_ID · CLAUDE_PID를 지운다")
-    void strippedEnvCoversAgentDetectionVariables() {
+    void strippedEnvCoversAgentDetectionVariables() {  // ---- 2
         assertEquals(
                 List.of("AI_AGENT", "CLAUDE_CODE_SESSION_ID", "CLAUDE_PID"), BacklogCardSource.STRIPPED_ENV);
     }
@@ -71,7 +71,7 @@ class CardSourceApiTest {
     @Test
     @DisplayName("AO-30#4 AO-30#B3 commits 없이 session만으로 Attempt · Actual을 만든다")
     void attemptAndActualWithSessionOnly() {
-        var session = new TaskCardSource.Tokens(150000, 3500);
+        var session = new TaskCardSource.Tokens(150000, 3500);  // ---- 3
 
         var attempt = new TaskCardSource.Attempt(session, "claude-sonnet-4-5", "timeout");
         var actual = new TaskCardSource.Actual(session, 2);
@@ -85,3 +85,14 @@ class CardSourceApiTest {
         assertEquals(2, actual.attempts());
     }
 }
+
+// ======== 노트 ========
+// 1 claim · 사람 락은 없다
+//   설명: 착수 전환은 에이전트 세션이 태스크 브랜치에서 하므로 포트에 claim이 없다. 리플렉션으로 이름이 없음을 확인한다.
+//   관련: decision-14, AO-30#1
+// 2 커밋 환경에서 지우는 변수
+//   설명: AI_AGENT · CLAUDE_CODE_SESSION_ID · CLAUDE_PID를 지워야 오케스트레이터 커밋이 에이전트 세션 커밋으로 표시되지 않는다.
+//   관련: decision-5, AO-30#B2
+// 3 session만으로 시도 · 실제치를 만든다
+//   설명: commits 없이 session만 기록한다. 토큰 계량 컴포넌트가 정해질 때까지(Q-18) 이 모양이 유지된다.
+//   관련: decision-6, decision-8, AO-30#B3

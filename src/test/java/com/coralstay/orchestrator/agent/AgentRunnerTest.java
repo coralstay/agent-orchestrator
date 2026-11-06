@@ -40,7 +40,7 @@ import org.junit.jupiter.params.provider.ValueSource;
  */
 class AgentRunnerTest {
 
-    static final String RESOURCE = "/agent/claude-headless-result.json";
+    static final String RESOURCE = "/agent/claude-headless-result.json";  // ---- 1
 
     static String resource() throws IOException {
         try (InputStream in = AgentRunnerTest.class.getResourceAsStream(RESOURCE)) {
@@ -85,7 +85,7 @@ class AgentRunnerTest {
     @Test
     @Tag("pending")
     @DisplayName("DRAFT-3#2 --disallowedTools로 git push를 막고 마지막 인자로 둔다")
-    void commandDisallowsGitPushAsLastArgument() {
+    void commandDisallowsGitPushAsLastArgument() {  // ---- 2
         List<String> argv = new ClaudeCodeRunner().command("x", "sonnet");
 
         assertEquals("Bash(git push:*)", valueAfter(argv, "--disallowedTools"));
@@ -96,7 +96,7 @@ class AgentRunnerTest {
     @Test
     @Tag("pending")
     @DisplayName("DRAFT-3#2 --bare·--dangerously-skip-permissions는 넣지 않는다")
-    void commandNeverBareOrSkipPermissions() {
+    void commandNeverBareOrSkipPermissions() {  // ---- 3
         List<String> argv = new ClaudeCodeRunner().command("x", "sonnet");
 
         assertFalse(argv.contains("--bare"), "bare는 훅을 끈다 (RFC 11절①)");
@@ -109,7 +109,7 @@ class AgentRunnerTest {
     @Test
     @Tag("pending")
     @DisplayName("DRAFT-3#3 실제 헤드리스 JSON에서 session_id와 in=80943 out=782를 읽는다")
-    void parseSessionReadsSpikeOutput() throws IOException {
+    void parseSessionReadsSpikeOutput() throws IOException {  // ---- 4
         Session session = ClaudeCodeRunner.parseSession(resource());
 
         assertTrue(session.available(), () -> "unavailable: " + session.unavailableReason());
@@ -139,3 +139,19 @@ class AgentRunnerTest {
         assertFalse(session.unavailableReason().isBlank());
     }
 }
+
+// ======== 노트 ========
+// 1 실제 헤드리스 출력으로 파싱을 검증
+//   설명: 2026-10-03 스파이크에서 얻은 실제 claude 헤드리스 JSON(세션과 무관한 필드만 덜어냄)을 클래스패스 자원으로 쓴다. 실제 claude는 띄우지 않는다.
+//   관련: agent/AgentRunner.java
+// 2 --disallowedTools는 마지막 인자
+//   설명: --disallowedTools는 가변 인자라 뒤에 오는 인자를 도구 이름으로 삼킨다. 그래서 git push 차단 값을 맨 마지막에 둔다.
+//   관련: DRAFT-3#2
+//   개념: 가변 인자 옵션
+// 3 --bare · skip-permissions 금지
+//   설명: 두 옵션 모두 훅(claude-code-agile-hooks, git-logbook)을 꺼 버리므로 절대 넣지 않는다.
+//   관련: decision-5, decision-7
+// 4 in = input + cache_creation + cache_read
+//   설명: 실제 출력에서 in=80943 out=782를 읽는다. usage.iterations는 합산하지 않는다(중복 집계 방지).
+//   관련: decision-8, DRAFT-3#3
+//   개념: 토큰 합산

@@ -35,15 +35,15 @@ import java.util.Optional;
 public interface TaskCardSource {
 
     /** 카드를 읽는다. Token Budget 형식이 틀려도 예외 없이 {@link TokenBudget#unparsed()}에 담아 돌려준다. */
-    Card read(String id);
+    Card read(String id);  // ---- 1
 
     /** 실행 가능 여부를 사유와 함께 돌려준다. 누락·형식 오류로 예외를 던지지 않는다. */
-    default CardCheck validate(Card card) {
+    default CardCheck validate(Card card) {  // ---- 2
         throw new UnsupportedOperationException("pending: DRAFT-1");
     }
 
     /** Done에 이르지 못한 시도를 {@code attempt n} 줄로 덧붙인다(n은 1부터 순서대로). */
-    void recordAttempt(String id, Attempt attempt);
+    void recordAttempt(String id, Attempt attempt);  // ---- 3
 
     /** Done에 이른 실행의 합계를 {@code actual} 줄로 기록한다. */
     void recordActual(String id, Actual actual);
@@ -99,7 +99,7 @@ public interface TaskCardSource {
      * 토큰 수(decision-8). 입력은 캐시 쓰기·읽기를 포함한다. 텍스트 형식은 git-trail {@code Tokens-Used}와 같은
      * {@code in=N out=M}이다.
      */
-    record Tokens(long in, long out) {
+    record Tokens(long in, long out) {  // ---- 4
 
         /** {@code in=N out=M}을 파싱한다. 형식이 틀리면 {@link IllegalArgumentException}. */
         public static Tokens parse(String text) {
@@ -117,7 +117,7 @@ public interface TaskCardSource {
      * Done에 이르지 못한 시도 하나: {@code commits}는 트레일러 합계(생략 가능 — Q-18 전까지 비어 있다), {@code session}은
      * 헤드리스 JSON usage 합계.
      */
-    record Attempt(Optional<Tokens> commits, Tokens session, String model, String reason) {
+    record Attempt(Optional<Tokens> commits, Tokens session, String model, String reason) {  // ---- 5
 
         public Attempt {
             Objects.requireNonNull(commits);
@@ -147,3 +147,21 @@ public interface TaskCardSource {
     /** {@link #validate} 결과. {@code ok}이면 {@code reasons}는 비어 있다. */
     record CardCheck(boolean ok, List<String> reasons) {}
 }
+
+// ======== 노트 ========
+// 1 포트: 코어는 카드 시스템을 모른다
+//   설명: 오케스트레이터 코어는 backlog.md 등을 모른 채 이 포트로만 카드를 읽는다. Token Budget 형식이 틀려도 예외 없이 unparsed에 담는다.
+//   관련: decision-6, BacklogCardSource.java
+//   개념: 포트와 어댑터
+// 2 validate는 던지지 않는다
+//   설명: 누락 · 형식 오류도 예외 대신 사유가 담긴 CardCheck로 돌려준다. 아직 스텁이다(DRAFT-1).
+//   관련: DRAFT-1
+// 3 착수 전환은 이 포트에 없다
+//   설명: 카드를 In Progress로 바꾸는 일은 에이전트 세션이 태스크 브랜치에서 한다. 이 포트는 시도 · 실제치 기록만 맡는다.
+//   관련: decision-14
+// 4 토큰 텍스트 형식 in=N out=M
+//   설명: 입력은 캐시 쓰기 · 읽기를 포함한다. 텍스트 형식은 git-trail Tokens-Used와 같다. agent 패키지에도 같은 모양의 Tokens가 있어 나중에 하나로 합친다.
+//   관련: decision-8, agent/AgentRunner.java
+// 5 commits는 생략 가능
+//   설명: 커밋 트레일러 합계(commits)는 토큰 계량 컴포넌트가 정해질 때까지(Q-18) 비어 있고 session만 기록한다.
+//   관련: decision-6, decision-8, 최상위 Q-18

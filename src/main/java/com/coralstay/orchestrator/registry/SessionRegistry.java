@@ -44,7 +44,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public final class SessionRegistry {
 
     /** 기본 동시 실행 상한. 스켈레톤은 Implementer 1개만 띄운다. */
-    public static final int DEFAULT_CAPACITY = 1;
+    public static final int DEFAULT_CAPACITY = 1;  // ---- 1
 
     /**
      * admit으로 허가를 얻은 세션. 프로세스는 스폰 후 {@link #attach}로 붙는다 — 그 전에 retire해도(스폰 실패) 허가는
@@ -102,7 +102,7 @@ public final class SessionRegistry {
         if (capacity < 1) {
             throw new IllegalArgumentException("capacity는 1 이상이어야 합니다: " + capacity);
         }
-        this.permits = new Semaphore(capacity, true);
+        this.permits = new Semaphore(capacity, true);  // ---- 2
     }
 
     /**
@@ -116,7 +116,7 @@ public final class SessionRegistry {
     public Session admit(String taskId, String role) throws InterruptedException {
         requireText(taskId, "taskId");
         requireText(role, "role");
-        permits.acquire();
+        permits.acquire();  // ---- 3
         var session = new Session(taskId, role, Instant.now());
         if (sessions.putIfAbsent(taskId, session) != null) {
             permits.release();
@@ -136,7 +136,7 @@ public final class SessionRegistry {
         if (sessions.get(session.taskId) != session) {
             throw new IllegalStateException("등록된 세션이 아닙니다(이미 retire됨?): " + session.taskId);
         }
-        if (!session.process.compareAndSet(null, process)) {
+        if (!session.process.compareAndSet(null, process)) {  // ---- 4
             throw new IllegalStateException("이미 프로세스가 붙은 세션입니다: " + session.taskId);
         }
     }
@@ -161,9 +161,9 @@ public final class SessionRegistry {
         Objects.requireNonNull(session, "session");
         boolean removed;
         try {
-            session.process().ifPresent(AgentSpawner::terminate);
+            session.process().ifPresent(AgentSpawner::terminate);  // ---- 5
         } finally {
-            removed = sessions.remove(session.taskId, session);
+            removed = sessions.remove(session.taskId, session);  // ---- 6
             if (removed) {
                 permits.release();
             }
@@ -200,3 +200,26 @@ public final class SessionRegistry {
         return value;
     }
 }
+
+// ======== 노트 ========
+// 1 동시 실행 상한 기본 1
+//   설명: 스켈레톤은 Implementer 한 개만 띄운다. 최종 상한은 min(그래프 폭, 자원 상한)이지만 그래프 폭 계측은 범위 밖이라 생성자로만 바꾼다.
+//   관련: 설계 문서 2.04 품질 요구사항
+// 2 공정 Semaphore
+//   설명: fair=true라 기다리는 순서대로 허가를 받는다. 동시 실행 수 제한의 근거가 되는 한 줄이다.
+//   개념: 공정 세마포어
+// 3 admit: 허가 → 등록, 중복이면 허가 반납
+//   설명: 용량이 차 있으면 다른 세션이 retire될 때까지 기다린다. 같은 taskId가 이미 있으면 얻은 허가를 돌려주고 IllegalStateException을 던져 허가가 새지 않게 한다. 태스크 하나에 worktree 하나다.
+//   관련: decision-3, SessionRegistryTest
+//   개념: admit → attach → retire
+// 4 attach는 한 번만
+//   설명: CAS로 프로세스를 한 번만 붙인다. 이미 붙었거나 등록되지 않은 세션이면 IllegalStateException.
+//   개념: compare-and-set
+// 5 회수 = 프로세스 종료 + 제거 + 허가 반납
+//   설명: 자손 포함 종료를 먼저 시도한다. 한계: root가 이미 정상 종료했다면 남은 백그라운드 자손은 재부모화되어 descendants()로 보이지 않아 죽이지 못한다.
+//   관련: spawn/AgentSpawner.java, 최상위 Q-17
+//   개념: 재부모화
+// 6 멱등한 회수
+//   설명: remove(key, value)가 성공한 호출에서만 허가를 반납한다. 두 번 불러도 Semaphore 용량이 몰래 늘지 않는다. 종료 중 예외가 나도 finally에서 제거와 반납을 수행한다.
+//   관련: SessionRegistryTest
+//   개념: 멱등

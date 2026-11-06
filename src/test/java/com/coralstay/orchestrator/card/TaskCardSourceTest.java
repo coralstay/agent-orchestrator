@@ -36,10 +36,10 @@ import org.junit.jupiter.params.provider.ValueSource;
  * 타입이 맡으므로 DRAFT-1 구현 전까지 이 테스트들은 pending이다.
  */
 @Tag("pending")
-class TaskCardSourceTest {
+class TaskCardSourceTest {  // ---- 1
 
     /** Token Budget 소절 본문을 텍스트로 들고 있다가 read 때 파싱하고, 기록 때 다시 출력하는 메모리 구현. */
-    static final class InMemoryCardSource implements TaskCardSource {
+    static final class InMemoryCardSource implements TaskCardSource {  // ---- 2
 
         private final Map<String, Card> cards = new HashMap<>();
         private final Map<String, String> sections = new HashMap<>();
@@ -165,7 +165,7 @@ class TaskCardSourceTest {
 
     @Test
     @DisplayName("DRAFT-1#1 read는 형식이 틀린 줄을 예외 없이 unparsed로 돌려준다")
-    void readKeepsMalformedLinesAsUnparsed() {
+    void readKeepsMalformedLinesAsUnparsed() {  // ---- 3
         var source = sourceWith("estimated: 200k tokens\n");
 
         Card card = assertDoesNotThrow(() -> source.read("AO-99"));
@@ -266,7 +266,7 @@ class TaskCardSourceTest {
 
     @Test
     @DisplayName("DRAFT-1 보조: Tokens는 git-trail 트레일러 값 in=59858 out=465를 파싱한다")
-    void tokensParsesTrailerValue() {
+    void tokensParsesTrailerValue() {  // ---- 4
         assertEquals(new Tokens(59858, 465), Tokens.parse("in=59858 out=465"));
         assertEquals(new Tokens(0, 0), Tokens.parse("in=0 out=0"));
         assertEquals(new Tokens(3_000_000_000L, 1), Tokens.parse("in=3000000000 out=1"));
@@ -297,3 +297,17 @@ class TaskCardSourceTest {
         assertThrows(IllegalArgumentException.class, () -> Tokens.parse(text));
     }
 }
+
+// ======== 노트 ========
+// 1 DRAFT-1 구현 전까지 전부 pending
+//   설명: 포트 계약 테스트다. 파싱 · 출력 · 상태 전이는 포트의 값 타입이 맡으므로 구현 전에는 pending이다.
+//   관련: decision-11, DRAFT-1
+// 2 메모리 구현은 저장만 한다
+//   설명: Token Budget 소절 본문을 텍스트로 들고 있다가 read 때 파싱하고 기록 때 다시 출력한다. 파싱 · 출력 책임이 값 타입에 있음을 드러낸다.
+//   관련: card/TaskCardSource.java
+// 3 형식 오류는 unparsed로
+//   설명: read는 예외 없이 인식하지 못한 줄을 unparsed에 담는다. validate가 그 줄을 사유로 거절한다.
+//   관련: DRAFT-1#1, DRAFT-1#2
+// 4 git-trail 트레일러와 같은 벡터
+//   설명: Tokens-Used 트레일러 값 in=59858 out=465를 같은 형식으로 파싱해 CommitLedger와 호환됨을 보인다.
+//   관련: AO-6 AC5, decision-8

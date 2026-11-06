@@ -37,9 +37,9 @@ import io, os, re, subprocess, sys, pathlib, tempfile
 
 ROOT = pathlib.Path(__file__).parent
 DIA = ROOT / "diagrams"
-BUILD_MARK = 'data-generated-by="design/build-diagrams.py"'
+BUILD_MARK = 'data-generated-by="design/build-diagrams.py"'  # ---- 1
 
-TOKENS = {
+TOKENS = {  # ---- 2
     "#f00001": "var(--diagram-ink)",     "#f00002": "var(--diagram-muted)",
     "#f00003": "var(--diagram-line)",    "#f00004": "var(--diagram-surface)",
     "#f00005": "var(--diagram-surface-2)", "#f00006": "var(--diagram-accent)",
@@ -60,7 +60,7 @@ MERMAID_TOKENS = {
 }
 # 토큰 값 — RFC(2026-09-26, git 이력)의 :root(--diagram-*)가 라이트,
 # 같은 문서의 다크 블록(--ink · --line · --accent · --role-* …)이 다크 값이다.
-LIGHT = {
+LIGHT = {  # ---- 3
     "ink": "#1a2330", "muted": "#51616c", "line": "#c9d3d8",
     "surface": "#ffffff", "surface-2": "#eaf0f2",
     "accent": "#0e7c86", "accent-bg": "#d8eeef", "accent-ink": "#08565d",
@@ -97,7 +97,7 @@ def finish(svg: str, name: str, mermaid: bool) -> str:
     svg = re.sub(r"<!--.*?-->\s*", "", svg, flags=re.S)
     # Graphviz가 깔아두는 흰 배경 폴리곤 제거(투명 배경 유지)
     svg = re.sub(r'<polygon fill="white"[^/]*/>\s*', "", svg)
-    svg = tokenize(svg)
+    svg = tokenize(svg)  # ---- 4
     if not mermaid:
         svg = re.sub(r'font-family="[^"]*"', f"font-family='{FONT}'", svg)
 
@@ -119,7 +119,7 @@ def finish(svg: str, name: str, mermaid: bool) -> str:
     return '<?xml version="1.0" encoding="UTF-8"?>\n' + svg.strip() + "\n"
 
 
-def render_mmd(path: pathlib.Path) -> str | None:
+def render_mmd(path: pathlib.Path) -> str | None:  # ---- 5
     """mermaid 소스를 mermaid-cli로 렌더한다. 실패하면 None(기존 SVG 유지 판단은 호출자)."""
     with tempfile.TemporaryDirectory() as tmp:
         raw = pathlib.Path(tmp) / f"{path.stem}.svg"
@@ -141,7 +141,7 @@ def render_mmd(path: pathlib.Path) -> str | None:
 
 
 def render_dot(path: pathlib.Path) -> str:
-    out = subprocess.run(["dot", "-Tsvg", str(path)], capture_output=True, text=True)
+    out = subprocess.run(["dot", "-Tsvg", str(path)], capture_output=True, text=True)  # ---- 6
     if out.returncode:
         sys.exit(f"dot 실패: {path}\n{out.stderr}")
     return finish(out.stdout, path.stem, mermaid=False)
@@ -162,7 +162,7 @@ def main() -> None:
                 if not target.exists():
                     sys.exit(f"mermaid-cli 실패, 대체할 SVG도 없다: {src}")
                 old = io.open(target, encoding="utf-8").read()
-                if BUILD_MARK in old:
+                if BUILD_MARK in old:  # ---- 7
                     print(f"    기존 {target.name}을 그대로 둔다")
                     written += 1
                     continue
@@ -176,3 +176,29 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+# ======== 노트 ========
+# 1 생성물 표지
+#   설명: finish가 SVG 루트에 이 속성을 심는다. mermaid-cli가 실패했을 때 기존 SVG가 이미 이 스크립트가 만든 것인지(토큰화 완료) 알아보는 데 쓴다.
+#   관련: design/diagrams/*.svg
+#   개념: 생성물
+# 2 센티넬 hex → CSS 변수
+#   설명: 원본 .dot에는 #f00001 같은 센티넬 색을 쓰고, 빌드가 var(--diagram-*)로 바꾼다. 그래서 SVG 하나가 라이트/다크 테마를 그대로 따라간다. 색을 고치려면 .dot이 아니라 이 표와 LIGHT/DARK 값을 본다.
+#   관련: design/diagrams/*.dot, ~/.claude/CLAUDE.md 다이어그램 표기 원칙
+#   개념: 센티넬 색
+# 3 라이트 · 다크 토큰 값
+#   설명: 라이트 값은 RFC(2026-09-26, git 이력)의 :root(--diagram-*)이고, 다크 값은 같은 문서의 다크 블록에서 가져왔다. theme_style이 SVG 안 <style>에 @media (prefers-color-scheme: dark)로 넣는다.
+#   개념: prefers-color-scheme
+# 4 정리 → 토큰화 → 테마 삽입 순서
+#   설명: finish는 XML 선언 · DOCTYPE · 주석 · Graphviz의 흰 배경 폴리곤을 지우고 토큰화한 뒤 테마 <style>을 넣어 독립 SVG 문서로 만든다. 순서를 바꾸면 센티넬이 남는다.
+#   개념: 독립 SVG
+# 5 mermaid는 DOT에 없는 것만
+#   설명: 시퀀스 다이어그램처럼 DOT에 대응물이 없는 것만 mermaid로 쓴다. 렌더는 npx mermaid-cli와 로컬 Chrome이 필요하고, 실패하면 None을 돌려 호출자가 기존 SVG를 지킨다.
+#   관련: ~/.claude/CLAUDE.md 다이어그램 표기 원칙
+#   개념: mermaid-cli
+# 6 DOT 렌더
+#   설명: Graphviz dot -Tsvg 결과를 finish로 정리한다. dot이 실패하면 즉시 종료한다(생성물을 일부만 쓰지 않는다).
+#   개념: Graphviz
+# 7 mermaid 실패 시 기존 SVG 유지
+#   설명: mermaid-cli가 실패해도 기존 SVG가 이미 이 스크립트의 생성물이면 그대로 둔다. 아직 원시 mermaid 출력이면 토큰화만 해서 쓴다.
+#   관련: design/diagrams/*.mmd

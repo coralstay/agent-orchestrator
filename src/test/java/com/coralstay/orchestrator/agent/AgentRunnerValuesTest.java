@@ -39,7 +39,7 @@ class AgentRunnerValuesTest {
         AgentRun expected = new AgentRun(0, "out", "err", 42L, false, Duration.ofSeconds(1),
                 Session.unavailable("no json"));
         List<Object> started = new ArrayList<>();
-        AgentRunner runner = (role, cwd, prompt, model, timeout) -> {
+        AgentRunner runner = (role, cwd, prompt, model, timeout) -> {  // ---- 1
             started.addAll(List.of(role, cwd, prompt, model, timeout));
             return new RunningAgent() {
                 public String role() {
@@ -76,7 +76,7 @@ class AgentRunnerValuesTest {
         assertEquals(0L, new Tokens(0, 0).in());
         assertThrows(IllegalArgumentException.class, () -> new Tokens(-1, 0));
         var e = assertThrows(IllegalArgumentException.class, () -> new Tokens(0, -1));
-        assertTrue(e.getMessage().contains("out=-1"), e.getMessage());
+        assertTrue(e.getMessage().contains("out=-1"), e.getMessage());  // ---- 2
     }
 
     @Test
@@ -103,3 +103,11 @@ class AgentRunnerValuesTest {
 
     // == Coverage ==
 }
+
+// ======== 노트 ========
+// 1 포트를 람다로 구현한 가짜
+//   설명: start만 구현하면 되는 함수형 모양이라 람다로 가짜 러너를 만든다. 기본 메서드 run이 start 뒤 await를 부르는지 본다.
+//   관련: agent/AgentRunner.java
+// 2 음수 토큰 거부 메시지에 값이 들어간다
+//   설명: in · out 어느 쪽이든 음수면 거부하고, 메시지에 문제가 된 값이 포함돼야 진단된다.
+//   관련: AgentRunner.Tokens

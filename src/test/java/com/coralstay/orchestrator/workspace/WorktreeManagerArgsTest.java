@@ -21,9 +21,14 @@ class WorktreeManagerArgsTest {
 
     @Test
     @DisplayName("AO-32#3 null 태스크 ID는 git을 부르기 전에 IllegalArgumentException")
-    void nullTaskIdIsRejected() {
+    void nullTaskIdIsRejected() {  // ---- 1
         assertThrows(IllegalArgumentException.class, () -> WorktreeManager.branchName(null));
     }
 
     // == Coverage ==
 }
+
+// ======== 노트 ========
+// 1 null ID는 git을 부르기 전에 거부
+//   설명: ID 검증이 git 호출보다 앞서야 경로 조작과 의미 없는 git 실패를 막는다.
+//   관련: workspace/WorktreeManager.java

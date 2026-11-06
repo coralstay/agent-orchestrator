@@ -42,7 +42,7 @@ class WorktreeManagerTest {
     WorktreeManager manager;
 
     @BeforeEach
-    void initRepo() throws IOException {
+    void initRepo() throws IOException {  // ---- 1
         Path root = tmp.toRealPath(); // macOS: /var → /private/var. git이 돌려주는 경로와 비교하려고 실경로 사용
         repo = Files.createDirectory(root.resolve("app"));
         Path emptyHooks = Files.createDirectory(root.resolve("no-hooks"));
@@ -72,7 +72,7 @@ class WorktreeManagerTest {
 
     @Test
     @DisplayName("AO-3#2 create는 경로가 이미 있으면(빈 디렉토리여도) 예외를 던진다")
-    void createRefusesExistingPathEvenIfEmpty() throws IOException {
+    void createRefusesExistingPathEvenIfEmpty() throws IOException {  // ---- 2
         // git은 빈 디렉토리면 그대로 worktree add를 해버리므로 직접 막아야 한다
         Path path = Files.createDirectories(manager.worktreePath("AO-3"));
 
@@ -136,7 +136,7 @@ class WorktreeManagerTest {
 
     @Test
     @DisplayName("AO-3 보조: 커밋하지 않은 변경이 있는 worktree는 remove를 거부한다")
-    void removeRefusesWorktreeWithUncommittedChanges() throws IOException {
+    void removeRefusesWorktreeWithUncommittedChanges() throws IOException {  // ---- 3
         Path path = manager.create("AO-3");
         Files.writeString(path.resolve("README"), "dirty\n");
 
@@ -187,3 +187,14 @@ class WorktreeManagerTest {
         }
     }
 }
+
+// ======== 노트 ========
+// 1 전역 훅이 끼어들지 않는 임시 저장소
+//   설명: 저장소 로컬 core.hooksPath를 빈 디렉토리로 두고 user.name · email도 로컬에 설정해, 개발자의 전역 훅 · 설정이 테스트에 영향을 주지 않게 한다.
+//   개념: 테스트 격리
+// 2 빈 디렉토리여도 거부
+//   설명: git은 빈 디렉토리면 그대로 worktree add를 해버리므로 WorktreeManager가 직접 막아야 한다.
+//   관련: AO-3#2
+// 3 미커밋 변경이 있으면 remove 거부
+//   설명: --force를 쓰지 않으므로 remove가 실패하고 worktree는 그대로 남는다. 부분 작업은 사람이 판단한다.
+//   관련: WorktreeManager.remove

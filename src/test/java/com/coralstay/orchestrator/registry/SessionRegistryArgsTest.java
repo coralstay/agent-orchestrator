@@ -23,7 +23,7 @@ class SessionRegistryArgsTest {
     @Test
     @DisplayName("AO-32#3 admit은 null taskId · role을 거부하고 허가를 소비하지 않는다")
     void admitRejectsNullWithoutTakingPermit() {
-        var registry = new SessionRegistry(1);
+        var registry = new SessionRegistry(1);  // ---- 1
 
         assertThrows(IllegalArgumentException.class, () -> registry.admit(null, "implementer"));
         assertThrows(IllegalArgumentException.class, () -> registry.admit("AO-1", null));
@@ -32,3 +32,9 @@ class SessionRegistryArgsTest {
 
     // == Coverage ==
 }
+
+// ======== 노트 ========
+// 1 null 인자는 허가를 소비하지 않는다
+//   설명: null taskId · role은 permits.acquire 전에 거부한다. 거부된 뒤에도 용량 1의 허가가 그대로 남아 있어야 한다.
+//   관련: registry/SessionRegistry.java
+//   개념: 허가 누수
