@@ -1,3 +1,12 @@
+// ---
+// title: AgentRunner
+// description: 에이전트 실행 포트와 Claude Code 구현(띄우고 기다려 결과를 돌려준다)
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.agent;
 
 import java.nio.file.Path;
@@ -21,10 +30,10 @@ public interface AgentRunner {
      * @param model {@code --model} 값 (decision-10 정책 파일에서 고른 모델)
      * @param timeout 양수. 지나면 프로세스와 자손을 종료하고 {@link AgentRun#timedOut()}=true
      */
-    RunningAgent start(String role, Path cwd, String prompt, String model, Duration timeout);
+    RunningAgent start(String role, Path cwd, String prompt, String model, Duration timeout);  // ---- 1
 
     /** {@link #start} 후 {@link RunningAgent#await()}. */
-    default AgentRun run(String role, Path cwd, String prompt, String model, Duration timeout) {
+    default AgentRun run(String role, Path cwd, String prompt, String model, Duration timeout) {  // ---- 2
         return start(role, cwd, prompt, model, timeout).await();
     }
 
@@ -66,7 +75,7 @@ public interface AgentRunner {
      */
     record Tokens(long in, long out) {
         public Tokens {
-            if (in < 0 || out < 0) {
+            if (in < 0 || out < 0) {  // ---- 3
                 throw new IllegalArgumentException("토큰은 음수일 수 없습니다: in=" + in + " out=" + out);
             }
         }
@@ -105,7 +114,7 @@ public interface AgentRunner {
         public static final String DEFAULT_PERMISSION_MODE = "auto";
 
         /** 헤드리스 세션이 원격에 푸시하지 못하게 막는 {@code --disallowedTools} 값. */
-        public static final String DISALLOWED_TOOLS = "Bash(git push:*)";
+        public static final String DISALLOWED_TOOLS = "Bash(git push:*)";  // ---- 4
 
         private final String executable;
         private final String permissionMode;
@@ -123,7 +132,7 @@ public interface AgentRunner {
          * {@code [executable, -p, <prompt>, --model, <m>, --permission-mode, <mode>, --output-format, json,
          * --disallowedTools, Bash(git push:*)]}. 프롬프트는 argv 원소 하나.
          */
-        public List<String> command(String prompt, String model) {
+        public List<String> command(String prompt, String model) {  // ---- 5
             throw new UnsupportedOperationException("pending: DRAFT-3");
         }
 
@@ -141,3 +150,24 @@ public interface AgentRunner {
         }
     }
 }
+
+// ======== 노트 ========
+// 1 start는 핸들을 바로 돌려준다
+//   설명: 프로세스를 띄운 직후 반환하므로 핸들이 돌아오는 시점에 PID를 읽을 수 있다. 세션 레지스트리가 이 PID로 추적하고 회수한다.
+//   관련: registry/SessionRegistry.java
+//   개념: 포트
+// 2 run = start 뒤 await
+//   설명: 기다리기까지 한 번에 하는 편의 메서드. 구현체는 start만 채우면 된다.
+//   개념: 기본 메서드
+// 3 토큰은 음수일 수 없다
+//   설명: in · out 어느 쪽이든 음수면 거부한다. in = input + cache_creation + cache_read, out = output (decision-8).
+//   관련: decision-8, AgentRunnerValuesTest
+//   개념: 불변식
+// 4 헤드리스 세션의 push 금지
+//   설명: --disallowedTools 값으로 원격 push를 막는다. --bare · --dangerously-skip-permissions는 훅이 꺼지므로 쓰지 않는다.
+//   관련: decision-7, claude-code-agile-hooks
+//   개념: 권한 모드
+// 5 아직 구현 없는 스텁 (DRAFT-3)
+//   설명: pending 스텁이라 UnsupportedOperationException을 던진다. build.gradle.kts의 pendingStubClasses에 올라 있어 커버리지 측정에서 빠진다. 구현 카드가 그 항목을 지운다.
+//   관련: build.gradle.kts, DRAFT-3
+//   개념: 시그니처 스텁

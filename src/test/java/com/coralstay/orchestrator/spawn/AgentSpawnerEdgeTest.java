@@ -1,3 +1,12 @@
+// ---
+// title: AgentSpawnerEdgeTest
+// description: AgentSpawner의 실행 실패·잘못된 인자 경계 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 // AO-32: AgentSpawner의 오류 · 인터럽트 경로(시작 실패, 대기 실패, 스트림 오류, 인터럽트 중 종료)를 덮는다.
 package com.coralstay.orchestrator.spawn;
 
@@ -57,7 +66,7 @@ class AgentSpawnerEdgeTest {
 
     @Test
     @DisplayName("AO-32#3 start: 실행 파일을 띄우지 못하면 UncheckedIOException")
-    void startWrapsLaunchFailure() {
+    void startWrapsLaunchFailure() {  // ---- 1
         var spawner = new AgentSpawner(tmp.resolve("no-such-claude").toString(), "auto");
 
         var e = assertThrows(UncheckedIOException.class,
@@ -102,7 +111,7 @@ class AgentSpawnerEdgeTest {
 
     @Test
     @DisplayName("AO-32#3 settle: 대기 중 인터럽트되면 프로세스를 종료하고 인터럽트 상태를 남긴 채 실패로 완료한다")
-    void settleOnInterruptTerminatesAndFails() throws Exception {
+    void settleOnInterruptTerminatesAndFails() throws Exception {  // ---- 2
         var future = new CompletableFuture<AgentResult>();
         InterruptedException interrupt = new InterruptedException();
 
@@ -172,7 +181,7 @@ class AgentSpawnerEdgeTest {
 
     @Test
     @DisplayName("AO-32#3 terminate: 인터럽트된 스레드에서도 대상을 끝내고 인터럽트 상태를 남긴다")
-    void terminateUnderInterruptStillKills() throws Exception {
+    void terminateUnderInterruptStillKills() throws Exception {  // ---- 3
         ProcessHandle target = sleeper();
 
         Thread.currentThread().interrupt();
@@ -185,3 +194,14 @@ class AgentSpawnerEdgeTest {
 
     // == Coverage ==
 }
+
+// ======== 노트 ========
+// 1 실행 파일이 없으면 UncheckedIOException
+//   설명: 프로세스를 띄우지 못하면 IOException을 그대로 던지지 않고 실행 파일 이름을 담아 감싼다.
+//   관련: spawn/AgentSpawner.java
+// 2 인터럽트되면 정리하고 실패 완료
+//   설명: 대기 중 인터럽트되면 프로세스를 종료하고 인터럽트 상태를 남긴 채 실패로 완료한다.
+//   관련: AgentSpawner.settle
+// 3 인터럽트된 스레드에서도 종료는 끝낸다
+//   설명: 회수는 인터럽트 중에도 자손을 끝내야 한다. 인터럽트 상태는 되살려 둔다.
+//   관련: AgentSpawner.terminate

@@ -1,3 +1,12 @@
+// ---
+// title: BacklogClientEdgeTest
+// description: BacklogClient.parse의 누락·경계 입력 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 // AO-32: BacklogClient의 파싱 실패 · 의존성 블록 경계 · 하위 브랜치 · 실행기 오류 경로를 덮는다.
 package com.coralstay.orchestrator.backlog;
 
@@ -38,7 +47,7 @@ class BacklogClientEdgeTest {
 
     @Test
     @DisplayName("AO-32#3 parse: 빈 줄 없이 바로 이어지는 Dependents 블록은 직접 의존으로 읽지 않는다")
-    void dependentsRightAfterDependsOnAreIgnored() {
+    void dependentsRightAfterDependsOnAreIgnored() {  // ---- 1
         String text = HEADER + "Status: ○ To Do\n\n"
                 + "Dependency Graph:\n--------------------------------------------------\n"
                 + "Depends on (1 direct, 1 total):\n"
@@ -51,7 +60,7 @@ class BacklogClientEdgeTest {
 
     @Test
     @DisplayName("AO-32#3 hasUnmergedTaskBranch: task/<ID>/하위 브랜치는 그 태스크 브랜치로 보지 않는다")
-    void nestedLocalBranchIsNotTheTaskBranch() {
+    void nestedLocalBranchIsNotTheTaskBranch() {  // ---- 2
         List<List<String>> calls = new ArrayList<>();
         var client = new BacklogClient(
                 BacklogClientTest.git(calls, "refs/heads/task/AO-9/spike\n", Map.of("refs/heads/task/AO-9/spike", "+ abc\n")));
@@ -73,7 +82,7 @@ class BacklogClientEdgeTest {
     void executorKeepsInterruptStatus(@TempDir Path dir) {
         var executor = BacklogClient.processExecutor(dir);
         // 출력 스트림을 닫고 잠깐 살아 있는 자식: 출력 읽기는 바로 끝나고 waitFor에서 인터럽트를 만난다.
-        List<String> command = List.of("sh", "-c", "exec >&- 2>&-; sleep 1");
+        List<String> command = List.of("sh", "-c", "exec >&- 2>&-; sleep 1");  // ---- 3
 
         Thread.currentThread().interrupt();
         try {
@@ -100,3 +109,14 @@ class BacklogClientEdgeTest {
 
     // == Coverage ==
 }
+
+// ======== 노트 ========
+// 1 Dependents 블록은 직접 의존이 아니다
+//   설명: Depends on 바로 뒤에 빈 줄 없이 Dependents(역방향)가 이어져도 그쪽 줄을 직접 의존으로 읽지 않는 경계를 본다.
+//   관련: backlog/BacklogClient.java
+// 2 task/<ID>/하위 브랜치는 착수가 아니다
+//   설명: refs/heads/task/AO-9/spike 같은 하위 이름은 task/AO-9 브랜치로 보지 않는다. 접미사 일치를 정확히 하는지 확인한다.
+//   관련: decision-14
+// 3 인터럽트를 waitFor에서 만나게 하는 자식
+//   설명: 출력 스트림을 닫고 잠깐 살아 있는 자식이라 출력 읽기는 바로 끝나고 waitFor에서 인터럽트를 만난다. 테스트가 끝나면 finally에서 인터럽트 상태를 지운다.
+//   개념: 인터럽트 상태

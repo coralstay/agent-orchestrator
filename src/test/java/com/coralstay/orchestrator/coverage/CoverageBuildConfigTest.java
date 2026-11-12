@@ -1,3 +1,12 @@
+// ---
+// title: CoverageBuildConfigTest
+// description: build.gradle.kts의 JaCoCo 커버리지 설정을 검사하는 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 // AO-32: JaCoCo 커버리지 빌드 설정(build.gradle.kts)과 프로젝트 설정의 coverageCommand를 검증한다.
 package com.coralstay.orchestrator.coverage;
 
@@ -17,7 +26,7 @@ import org.junit.jupiter.api.Test;
 /** Gradle은 프로젝트 디렉토리를 작업 디렉토리로 테스트를 돌린다. */
 class CoverageBuildConfigTest {
 
-    static final Path BUILD_FILE = Path.of("build.gradle.kts");
+    static final Path BUILD_FILE = Path.of("build.gradle.kts");  // ---- 1
 
     static String build() throws IOException {
         return Files.readString(BUILD_FILE);
@@ -101,7 +110,7 @@ class CoverageBuildConfigTest {
     }
 
     /** 주석을 지운 소스. 문자열 · 문자 리터럴은 그대로 둔다. */
-    static String withoutComments(String src) {
+    static String withoutComments(String src) {  // ---- 2
         StringBuilder out = new StringBuilder();
         int i = 0;
         while (i < src.length()) {
@@ -246,7 +255,7 @@ class CoverageBuildConfigTest {
 
     @Test
     @DisplayName("AO-32#B2 검증 규칙은 LINE과 BRANCH 각각 COVEREDRATIO minimum 1.0이다")
-    void lineAndBranchMustBeFullyCovered() throws IOException {
+    void lineAndBranchMustBeFullyCovered() throws IOException {  // ---- 3
         String rules = block(block(build(), "tasks.jacocoTestCoverageVerification"), "violationRules");
         List<String> limits = new ArrayList<>();
         Matcher m = Pattern.compile("limit\\s*\\{([^}]*)}").matcher(rules);
@@ -267,7 +276,7 @@ class CoverageBuildConfigTest {
 
     @Test
     @DisplayName("AO-32#2 제외 항목은 메서드가 전부 pending 스텁인 클래스 파일뿐이고 리포트 · 검증이 같은 필터를 쓴다")
-    void excludesOnlyAllStubClassFiles() throws IOException {
+    void excludesOnlyAllStubClassFiles() throws IOException {  // ---- 4
         List<Exclusion> exclusions = exclusions();
         assertTrue(!exclusions.isEmpty(), "제외 항목이 있어야 한다");
         for (Exclusion exclusion : exclusions) {
@@ -304,3 +313,18 @@ class CoverageBuildConfigTest {
 
     // == Coverage ==
 }
+
+// ======== 노트 ========
+// 1 빌드 설정 파일을 텍스트로 검사
+//   설명: Gradle은 프로젝트 디렉토리를 작업 디렉토리로 테스트를 돌리므로 상대 경로로 build.gradle.kts를 읽는다. 커버리지 게이트 설정이 몰래 느슨해지는 것을 막는다.
+//   관련: build.gradle.kts, AO-32
+// 2 주석을 지운 소스로 스텁을 판별
+//   설명: 문자열 · 문자 리터럴은 그대로 두고 주석만 지운 소스에서 메서드 본문을 본다. 주석이 늘어도(헤더, 노트 구역) 스텁 판정이 달라지면 안 된다.
+//   개념: 스텁 판별
+// 3 LINE과 BRANCH 각각 100%
+//   설명: 두 카운터 모두 COVEREDRATIO minimum 1.0이다. failOnViolation을 끄지 않아 미달이 경고가 아니라 빌드 실패가 된다.
+//   관련: AO-32#B2, build.gradle.kts
+//   개념: JaCoCo 게이트
+// 4 제외는 전부 pending 스텁인 클래스뿐
+//   설명: 커버리지 제외는 '아직 구현 없음'의 표시이지 면제가 아니다. 메서드가 전부 pending 스텁인 클래스 파일만 제외하고, 리포트와 검증이 같은 필터를 쓴다.
+//   관련: AO-32#2

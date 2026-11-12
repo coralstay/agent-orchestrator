@@ -1,3 +1,12 @@
+// ---
+// title: MainTest
+// description: Main.parse의 run <taskId> 파싱과 usage 오류 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,7 +28,7 @@ class MainTest {
     @Test
     @DisplayName("AO-1#1 run <taskId>를 파싱해 taskId를 꺼낸다")
     void parsesRunWithTaskId() {
-        var result = Main.parse(new String[] {"run", "AO-1"});
+        var result = Main.parse(new String[] {"run", "AO-1"});  // ---- 1
         assertEquals(new Command("run", "AO-1"), result);
     }
 
@@ -55,7 +64,7 @@ class MainTest {
 
     @ParameterizedTest(name = "{displayName} [{index}] args=\"{0}\"")
     @DisplayName("AO-1#2 잘못된 인자면 usage를 stderr에 출력하고 exit 2")
-    @ValueSource(strings = {"", "watch AO-1", "run"})
+    @ValueSource(strings = {"", "watch AO-1", "run"})  // ---- 2
     void badArgsPrintUsageToStderrAndExit2(String line) {
         String[] args = line.isEmpty() ? new String[0] : line.split(" ");
         var out = new ByteArrayOutputStream();
@@ -85,3 +94,11 @@ class MainTest {
         return new PrintStream(sink, true, StandardCharsets.UTF_8);
     }
 }
+
+// ======== 노트 ========
+// 1 AC #1: run <taskId> 파싱
+//   설명: 진입점의 기본 계약: run 뒤 taskId 하나를 Command로 읽는다.
+//   관련: AO-1#1
+// 2 AC #2: 잘못된 인자는 stderr + exit 2
+//   설명: usage 오류는 stdout에 아무것도 쓰지 않고 stderr에 usage를 쓰며 종료 코드 2다.
+//   관련: AO-1#2

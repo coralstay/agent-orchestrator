@@ -1,3 +1,12 @@
+// ---
+// title: SessionRegistryTest
+// description: SessionRegistry의 admit·attach·retire와 동시성 제한 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.registry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,7 +34,7 @@ import org.junit.jupiter.api.Test;
 class SessionRegistryTest {
 
     /** 블록돼야 하는 호출이 "아직 안 끝났다"고 판정하기까지 기다리는 시간. */
-    static final long BLOCK_MS = 300;
+    static final long BLOCK_MS = 300;  // ---- 1
 
     /** 끝나야 하는 호출을 기다리는 상한. */
     static final long DONE_S = 5;
@@ -92,7 +101,7 @@ class SessionRegistryTest {
 
     @Test
     @DisplayName("AO-5#1 용량이 차면 admit은 허가가 날 때까지 기다린다")
-    void admitBlocksWhenFull() throws Exception {
+    void admitBlocksWhenFull() throws Exception {  // ---- 2
         var registry = new SessionRegistry(1);
         registry.admit("AO-1", "implementer");
 
@@ -170,7 +179,7 @@ class SessionRegistryTest {
 
     @Test
     @DisplayName("AO-5 보조: retire를 두 번 해도 허가는 한 번만 반납한다")
-    void retireTwiceReleasesPermitOnlyOnce() throws Exception {
+    void retireTwiceReleasesPermitOnlyOnce() throws Exception {  // ---- 3
         var registry = new SessionRegistry(1);
         Session session = registry.admit("AO-1", "implementer");
 
@@ -211,7 +220,7 @@ class SessionRegistryTest {
 
     @Test
     @DisplayName("AO-5#2 retire는 실행 중인 프로세스와 남은 자식을 종료한다")
-    void retireKillsRunningProcessAndLingeringChild() throws Exception {
+    void retireKillsRunningProcessAndLingeringChild() throws Exception {  // ---- 4
         var registry = new SessionRegistry(1);
         Session session = registry.admit("AO-1", "implementer");
         Process p = sh("sleep 30 & echo $!; wait");
@@ -302,3 +311,18 @@ class SessionRegistryTest {
         assertTrue(registry.live().isEmpty());
     }
 }
+
+// ======== 노트 ========
+// 1 블록 판정 대기 시간
+//   설명: 막혀야 하는 호출이 '아직 안 끝났다'고 판정하기까지 기다리는 시간이다. 부정 단언(안 끝남)은 시간으로 확인할 수밖에 없다.
+//   개념: 부정 단언의 시간 의존
+// 2 용량이 차면 admit은 기다린다
+//   설명: 동시 실행 상한의 핵심 동작. 허가가 날 때까지 virtual thread에서 대기한다.
+//   관련: AO-5#1, registry/SessionRegistry.java
+// 3 retire는 멱등
+//   설명: 두 번 불러도 허가를 한 번만 반납해 Semaphore 용량이 늘지 않는다.
+//   관련: SessionRegistry.retire
+//   개념: 멱등
+// 4 자손까지 종료
+//   설명: retire가 실행 중인 프로세스와 남은 자식을 함께 끝낸다. sh가 띄운 백그라운드 자식의 PID를 스크립트 첫 줄에서 읽어 확인한다.
+//   관련: AO-5#2, AgentSpawner.terminate

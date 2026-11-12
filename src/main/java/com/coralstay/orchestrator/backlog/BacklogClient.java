@@ -1,3 +1,12 @@
+// ---
+// title: BacklogClient
+// description: backlog task view --plain 출력을 읽어 Task 값으로 파싱하는 클라이언트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.backlog;
 
 import java.io.IOException;
@@ -68,12 +77,12 @@ public final class BacklogClient {
     private final Function<List<String>, ProcessResult> executor;
 
     /** 명령 실행기를 주입받는다. 테스트는 가짜 실행기를, 운영은 {@link #processExecutor(Path)}를 넘긴다. */
-    public BacklogClient(Function<List<String>, ProcessResult> executor) {
+    public BacklogClient(Function<List<String>, ProcessResult> executor) {  // ---- 1
         this.executor = Objects.requireNonNull(executor);
     }
 
     /** {@code backlog task view <id> --plain}을 실행해 Task로 해석한다. 종료코드≠0이면 {@link BacklogException}. */
-    public Task view(String id) {
+    public Task view(String id) {  // ---- 2
         List<String> command = List.of("backlog", "task", "view", id, "--plain");
         ProcessResult result = executor.apply(command);
         if (result.exitCode() != 0) {
@@ -88,7 +97,7 @@ public final class BacklogClient {
             try {
                 Process process = new ProcessBuilder(command).directory(workingDir.toFile()).start();
                 process.getOutputStream().close();
-                try (var pool = Executors.newVirtualThreadPerTaskExecutor()) {
+                try (var pool = Executors.newVirtualThreadPerTaskExecutor()) {  // ---- 3
                     Future<String> stderr = pool.submit(() -> read(process.getErrorStream()));
                     String stdout = read(process.getInputStream());
                     int exitCode = process.waitFor();
@@ -135,7 +144,7 @@ public final class BacklogClient {
      * @param hasUnmergedTaskBranch 태스크 ID → 미병합 {@code task/<ID>} 브랜치 존재 여부(보통 {@code
      *     this::hasUnmergedTaskBranch})
      */
-    public static boolean isRunnable(
+    public static boolean isRunnable(  // ---- 4
             Task task, Function<String, Task> lookup, Predicate<String> hasUnmergedTaskBranch) {
         if (!TO_DO.equals(task.status())) {
             return false;
@@ -160,13 +169,13 @@ public final class BacklogClient {
     public boolean hasUnmergedTaskBranch(String id) {
         String local = "refs/heads/task/" + id;
         String remoteSuffix = "/task/" + id;
-        List<String> refs = git("for-each-ref", "--format=%(refname)", local, "refs/remotes")
+        List<String> refs = git("for-each-ref", "--format=%(refname)", local, "refs/remotes")  // ---- 5
                 .lines()
                 .map(String::strip)
                 .filter(ref -> ref.equals(local) || (ref.startsWith("refs/remotes/") && ref.endsWith(remoteSuffix)))
                 .toList();
         for (String ref : refs) {
-            if (git("cherry", MAIN_BRANCH, ref).lines().anyMatch(line -> line.startsWith("+"))) {
+            if (git("cherry", MAIN_BRANCH, ref).lines().anyMatch(line -> line.startsWith("+"))) {  // ---- 6
                 return true;
             }
         }
@@ -197,7 +206,7 @@ public final class BacklogClient {
     static final String SECTION_ACCEPTANCE = "Acceptance Criteria:";
 
     /** {@code --plain} 출력 전체를 Task로 해석한다. 부수효과 없는 순수 함수. */
-    public static Task parse(String plainText) {
+    public static Task parse(String plainText) {  // ---- 7
         List<String> lines = plainText.lines().toList();
         String id = null;
         String title = null;
@@ -224,7 +233,7 @@ public final class BacklogClient {
     }
 
     /** "헤더 줄 + 대시 밑줄"로 시작하는 섹션들을 헤더 → 본문 줄로 나눈다. */
-    static Map<String, List<String>> sections(List<String> lines) {
+    static Map<String, List<String>> sections(List<String> lines) {  // ---- 8
         Map<String, List<String>> sections = new LinkedHashMap<>();
         List<String> current = null;
         for (int i = 0; i < lines.size(); i++) {
@@ -257,7 +266,7 @@ public final class BacklogClient {
         List<String> result = new ArrayList<>();
         boolean inDependsOn = false;
         for (String line : body) {
-            if (line.startsWith("Depends on")) {
+            if (line.startsWith("Depends on")) {  // ---- 9
                 inDependsOn = true;
                 continue;
             }
@@ -274,3 +283,36 @@ public final class BacklogClient {
         return result;
     }
 }
+
+// ======== 노트 ========
+// 1 실행기를 주입받는다
+//   설명: 명령 실행기를 생성자로 받아 테스트는 가짜 실행기를, 운영은 processExecutor를 쓴다. 프로세스를 띄우지 않고 파싱과 판정을 검증하게 하는 이음매다.
+//   관련: BacklogClientTest
+//   개념: 의존성 주입
+// 2 view: 실행 → 종료코드 검사 → 파싱
+//   설명: backlog task view <id> --plain을 실행하고 종료코드가 0이 아니면 stderr를 담은 BacklogException을 던진다.
+//   개념: 외부 연동
+// 3 stdout · stderr를 동시에 읽는다
+//   설명: 한쪽 파이프만 읽으며 기다리면 다른 쪽 버퍼가 차서 교착한다. stderr는 가상 스레드에서 읽고 stdout은 현재 스레드에서 읽는다. stdin은 미리 닫는다.
+//   개념: 파이프 교착
+// 4 배정 조건 (ORC-005)
+//   설명: To Do ∧ 직접 의존이 전부 Done ∧ 미병합 task/<ID> 브랜치 없음일 때만 true. backlog의 isReady는 In Progress도 ready로 쳐서(1.51.0 실측) 쓰지 않고 직접 판정한다.
+//   관련: decision-14, 설계 문서 3.02
+//   개념: 착수 판정
+// 5 로컬과 원격 브랜치를 모두 본다
+//   설명: refs/heads/task/<id>와 refs/remotes/<remote>/task/<id>를 찾는다. 사람이 만든 브랜치든 에이전트가 만든 브랜치든 착수로 본다.
+//   관련: decision-14
+// 6 병합 여부는 git cherry로
+//   설명: main에 같은 패치가 없는 커밋(+)이 하나라도 있으면 미병합이다. squash 병합은 패치가 달라져 미병합으로 남으므로, 병합 뒤 브랜치를 지우는 것이 규칙이다.
+//   관련: decision-14
+//   개념: git cherry
+// 7 parse는 순수 함수
+//   설명: --plain 출력 전체를 Task로 읽는다. Task · Status 줄이 없으면 IllegalArgumentException. 부수효과가 없어 고정 출력 문자열로 테스트한다.
+//   관련: BacklogClientTest, BacklogClientEdgeTest
+//   개념: 순수 함수
+// 8 섹션은 제목 줄 + 대시 밑줄
+//   설명: 포맷 변화에 덜 깨지도록 '제목 줄 다음에 --- 밑줄'이 오는 곳을 섹션 시작으로 느슨하게 읽는다. backlog 1.51.0 출력 기준.
+//   개념: 느슨한 파싱
+// 9 직접 의존만 읽는다
+//   설명: Depends on 블록의 1단계 줄만 직접 의존으로 쓴다. 들여쓴 줄은 전이 의존이고, 역방향 Dependents 블록은 무시한다.
+//   개념: 직접 의존

@@ -1,3 +1,12 @@
+// ---
+// title: BacklogClientTest
+// description: BacklogClient.parse의 정상 출력 파싱과 실행 가능 판정 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.backlog;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,7 +42,7 @@ class BacklogClientTest {
 
     @DisplayName("AO-2#2 parse: 직접 의존 5개인 To Do 태스크를 파싱한다")
     @Test
-    void parsesTaskWithFiveDirectDependencies() {
+    void parsesTaskWithFiveDirectDependencies() {  // ---- 1
         Task task = BacklogClient.parse(fixture("ao-7-plain.txt"));
 
         assertEquals("AO-7", task.id());
@@ -102,7 +111,7 @@ class BacklogClientTest {
 
     @DisplayName("AO-2#1 view: 종료코드≠0이면 stderr를 담은 예외를 던진다")
     @Test
-    void viewThrowsWithStderrOnNonZeroExit() {
+    void viewThrowsWithStderrOnNonZeroExit() {  // ---- 2
         var client = new BacklogClient(command -> new ProcessResult(1, "", "Task AO-999 not found.\n"));
 
         var e = assertThrows(BacklogException.class, () -> client.view("AO-999"));
@@ -168,7 +177,7 @@ class BacklogClientTest {
 
     @DisplayName("AO-30#3 AO-30#B1 isRunnable: To Do · 의존 Done이어도 미병합 task/<ID> 브랜치가 있으면 false")
     @Test
-    void notRunnableWhenUnmergedTaskBranchExists() {
+    void notRunnableWhenUnmergedTaskBranchExists() {  // ---- 3
         Task task = task("AO-9", "To Do", List.of("AO-1"));
         Map<String, Task> board = Map.of("AO-1", task("AO-1", "Done", List.of()));
         List<String> asked = new ArrayList<>();
@@ -179,7 +188,7 @@ class BacklogClientTest {
     }
 
     /** {@code git for-each-ref} · {@code git cherry} 출력을 돌려주는 가짜 실행기. 호출을 기록한다. */
-    static Function<List<String>, ProcessResult> git(List<List<String>> calls, String refs, Map<String, String> cherry) {
+    static Function<List<String>, ProcessResult> git(List<List<String>> calls, String refs, Map<String, String> cherry) {  // ---- 4
         return command -> {
             calls.add(command);
             if (command.size() >= 2 && command.get(1).equals("for-each-ref")) {
@@ -254,7 +263,7 @@ class BacklogClientTest {
 
     @DisplayName("AO-30#3 AO-30#B1 hasUnmergedTaskBranch: 실제 git — 로컬 · 원격 미병합은 true, 병합 · cherry-pick 뒤는 false")
     @Test
-    void realGitDetectsUnmergedLocalAndRemoteBranches(@TempDir Path tmp) throws IOException {
+    void realGitDetectsUnmergedLocalAndRemoteBranches(@TempDir Path tmp) throws IOException {  // ---- 5
         Path root = tmp.toRealPath();
         Path hooks = Files.createDirectory(root.resolve("no-hooks"));
         Path origin = Files.createDirectory(root.resolve("origin"));
@@ -321,7 +330,7 @@ class BacklogClientTest {
 
     @DisplayName("AO-2#1 view: 실제 backlog CLI로 Done 태스크(AO-1)를 조회한다")
     @Test
-    void realCliViewsDoneTask() {
+    void realCliViewsDoneTask() {  // ---- 6
         var client = new BacklogClient(BacklogClient.processExecutor(Path.of("").toAbsolutePath()));
         assumeTrue(backlogOnPath(), "backlog CLI not on PATH");
 
@@ -368,3 +377,25 @@ class BacklogClientTest {
         }
     }
 }
+
+// ======== 노트 ========
+// 1 실제 backlog 1.51.0 출력 픽스처
+//   설명: 실제 task view --plain 출력을 파일 픽스처로 두고 파싱한다. 직접 의존만 읽고 트리의 전이 의존과 Dependents는 제외한다.
+//   관련: AO-2#2, backlog/BacklogClient.java
+// 2 실패 시 stderr를 담은 예외
+//   설명: backlog가 0이 아닌 종료코드로 끝나면 BacklogException이 종료코드와 stderr를 담는다.
+//   관련: AO-2#1
+// 3 미병합 브랜치가 있으면 배정하지 않는다
+//   설명: To Do이고 의존이 Done이어도 미병합 task/<ID> 브랜치가 있으면 false다. 착수한 카드의 중복 배정을 막는다.
+//   관련: decision-14, ORC-005, AO-30#B1
+//   개념: 착수 판정
+// 4 git 출력을 흉내 내는 가짜 실행기
+//   설명: for-each-ref와 cherry 출력을 돌려주고 호출을 기록한다. 진짜 git 없이 판정 로직을 검증한다.
+//   관련: BacklogClientEdgeTest
+// 5 실제 git으로 병합 판정을 확인
+//   설명: 로컬 · 원격 미병합은 true이고, 병합했거나 같은 패치를 cherry-pick한 뒤에는 false다. git cherry의 패치 동등성 판정을 가짜가 아닌 실제 git으로 검증한다.
+//   관련: decision-14
+//   개념: git cherry
+// 6 실제 backlog CLI 통합 테스트
+//   설명: PATH에 backlog가 없으면 건너뛴다. 이 저장소의 backlog/ 카드를 실제로 조회한다.
+//   관련: backlogOnPath

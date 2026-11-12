@@ -1,3 +1,12 @@
+// ---
+// title: ModelPolicy
+// description: 카드의 예상 토큰으로 Claude 모델을 고르는 정책
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.policy;
 
 import java.io.IOException;
@@ -28,7 +37,7 @@ public final class ModelPolicy {
      */
 
     /** 내장 기본값의 작은 구간 상한(토큰, 이하). */
-    public static final long BUILT_IN_SMALL_UP_TO = 200_000L;
+    public static final long BUILT_IN_SMALL_UP_TO = 200_000L;  // ---- 1
 
     /** 내장 기본값의 작은 구간 모델. */
     public static final String BUILT_IN_SMALL_MODEL = "claude-haiku-4-5";
@@ -86,7 +95,7 @@ public final class ModelPolicy {
      *
      * @throws IOException 파일은 있으나 읽을 수 없을 때
      */
-    public static ModelPolicy load(Path path) throws IOException {
+    public static ModelPolicy load(Path path) throws IOException {  // ---- 2
         throw new UnsupportedOperationException("pending: DRAFT-4");
     }
 
@@ -101,7 +110,7 @@ public final class ModelPolicy {
      * @param estimatedInOut session 단위 예상 in+out(캐시 포함 입력). 0 이상
      * @throws IllegalArgumentException 음수일 때
      */
-    public Choice choose(long estimatedInOut) {
+    public Choice choose(long estimatedInOut) {  // ---- 3
         throw new UnsupportedOperationException("pending: DRAFT-4");
     }
 
@@ -120,3 +129,16 @@ public final class ModelPolicy {
         throw new UnsupportedOperationException("pending: DRAFT-4");
     }
 }
+
+// ======== 노트 ========
+// 1 내장 기본값은 근거 없는 임시 값
+//   설명: 실측이 쌓이기 전의 임시 값이다. runs.jsonl 실측이 쌓이면 다시 정한다. 모델 이름은 git-trail의 AI-Model 기록과 같은 형식을 쓴다.
+//   관련: decision-10, 설계 문서 4.03 미결 사항
+// 2 설정 파일 형식과 거부 규칙
+//   설명: 허용 키는 model.upTo.<양의 정수>와 model.default뿐이다. 모르는 키 · 중복 키 · 0 이하 숫자 · default 누락은 줄 번호가 담긴 PolicyFormatException이다. 파일이 없으면 내장 기본값.
+//   관련: decision-10, ModelPolicyTest
+//   개념: key=value 설정
+// 3 구간 선택: 상한 이하인 가장 작은 구간
+//   설명: 예상치가 상한 이하인 가장 작은 구간의 모델을, 없으면 model.default를 고른다. 폴백은 없다. 이 스텁은 AllocationPolicy로 대체될 예정이다(AO-25).
+//   관련: decision-12, AO-25
+//   개념: 시그니처 스텁

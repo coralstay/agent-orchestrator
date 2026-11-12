@@ -1,3 +1,12 @@
+// ---
+// title: BacklogCardSourceTest
+// description: BacklogCardSource의 명령 인자·작업 디렉토리·환경 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.card;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,7 +39,7 @@ import org.junit.jupiter.api.Test;
  * --plain}에는 실제 출력 형식의 픽스처({@code src/test/resources/card/})를 돌려준다. 구현 전까지 전부 pending이다.
  */
 @Tag("pending")
-class BacklogCardSourceTest {
+class BacklogCardSourceTest {  // ---- 1
 
     static final Path REPO = Path.of("/repo/app");
     static final Path WORKTREE = Path.of("/repo/app-wt/AO-91");
@@ -60,7 +69,7 @@ class BacklogCardSourceTest {
      * 호출을 기록하는 가짜 실행기. {@code backlog task view <id> --plain}에는 픽스처를 돌려주되 {@code File:} 줄을 작업
      * 디렉토리 기준 경로로 바꾼다(실제 backlog는 실행한 작업 트리의 카드 파일 경로를 출력한다). 나머지는 성공·빈 출력.
      */
-    static final class FakeRunner implements BacklogCardSource.CommandRunner {
+    static final class FakeRunner implements BacklogCardSource.CommandRunner {  // ---- 2
 
         final List<Call> calls = new ArrayList<>();
         private final Map<String, String> fixtures; // id → 픽스처 파일명
@@ -185,7 +194,7 @@ class BacklogCardSourceTest {
 
     @Test
     @DisplayName("DRAFT-2#3 AO-30#4 AO-30#B3 recordAttempt는 Token Budget 소절만 session만 있는 줄로 바꿔 task edit -d로 쓴다")
-    void recordAttemptRewritesOnlyTokenBudgetSubsection() {
+    void recordAttemptRewritesOnlyTokenBudgetSubsection() {  // ---- 3
         var runner = runner();
         var second = new Attempt(new Tokens(95000, 2100), "claude-opus-4-1", "tests-failed");
 
@@ -219,7 +228,7 @@ class BacklogCardSourceTest {
 
     @Test
     @DisplayName("DRAFT-2#3 AO-30#2 AO-30#B2 recordAttempt는 워크트리에서 카드를 커밋하고 커밋 환경에 AI 도구 변수가 없다")
-    void recordAttemptRunsInWorktreeAndCommitsCard() {
+    void recordAttemptRunsInWorktreeAndCommitsCard() {  // ---- 4
         var runner = runner();
 
         source(runner).recordAttempt("AO-91", TIMEOUT);
@@ -302,3 +311,17 @@ class BacklogCardSourceTest {
         assertEquals(expectedSection.strip(), middle.strip());
     }
 }
+
+// ======== 노트 ========
+// 1 DRAFT-2 구현 전까지 전부 pending
+//   설명: 클래스 전체에 @Tag("pending")가 있어 기본 test에서 제외된다. BacklogCardSource가 구현되면 태그를 떼고 pendingStubClasses 항목을 지운다.
+//   관련: build.gradle.kts, decision-11, DRAFT-2
+// 2 호출을 기록하는 가짜 실행기
+//   설명: 명령 인자 · 작업 디렉토리 · 환경을 캡처하고, task view에는 픽스처를 돌려준다. File: 줄을 작업 디렉토리 기준 경로로 바꿔 실제 backlog 동작을 흉내 낸다.
+//   관련: src/test/resources/card/
+// 3 Token Budget 소절만 바꾼다
+//   설명: Description 전체를 읽어 ### Token Budget 소절만 교체하고 task edit -d로 다시 쓴다. 소절 앞뒤는 바이트 그대로여야 한다.
+//   관련: DRAFT-2#3, AO-30#B3
+// 4 워크트리에서 커밋하고 AI 변수를 뺀다
+//   설명: 기록은 태스크 워크트리에서 카드 파일만 커밋하고, 커밋 환경에는 AI_AGENT 등이 없어야 한다.
+//   관련: decision-5, AO-30#B2

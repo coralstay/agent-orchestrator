@@ -1,3 +1,12 @@
+// ---
+// title: AgentSpawner
+// description: claude -p 헤드리스 프로세스를 띄우고 기다리는 스포너
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.spawn;
 
 import java.io.ByteArrayOutputStream;
@@ -93,7 +102,7 @@ public final class AgentSpawner {
      * 통째로 끄지 않는다. {@code acceptEdits}는 파일 편집만 자동 승인하므로 Implementer가 돌려야 하는
      * {@code ./gradlew test}·{@code git commit}이 거부될 수 있다. 최종 선택은 실제 claude로 돌리는 E2E(AO-8)에서 확인한다.
      */
-    public static final String DEFAULT_PERMISSION_MODE = "auto";
+    public static final String DEFAULT_PERMISSION_MODE = "auto";  // ---- 1
 
     private final String executable;
     private final String permissionMode;
@@ -122,7 +131,7 @@ public final class AgentSpawner {
      *
      * @param role 에이전트 역할 (스켈레톤은 Implementer 단독이라 아직 argv에 반영하지 않는다)
      */
-    public List<String> command(String role, String prompt) {
+    public List<String> command(String role, String prompt) {  // ---- 2
         requireText(role, "role");
         Objects.requireNonNull(prompt, "prompt");
         return List.of(
@@ -140,7 +149,7 @@ public final class AgentSpawner {
      * <p>stdin은 즉시 닫는다 — {@code claude -p}는 파이프된 stdin을 프롬프트로 읽으려 기다릴 수 있다. stdout·stderr는
      * 각각 별도 virtual thread로 끝까지 읽어, 출력이 커도 파이프 버퍼가 차서 프로세스가 멈추지 않게 한다.
      */
-    public SpawnedAgent start(String role, Path cwd, String prompt, Duration timeout) {
+    public SpawnedAgent start(String role, Path cwd, String prompt, Duration timeout) {  // ---- 3
         Objects.requireNonNull(cwd, "cwd");
         if (timeout == null || timeout.isNegative() || timeout.isZero()) {
             throw new IllegalArgumentException("timeout은 양수여야 합니다: " + timeout);
@@ -150,20 +159,20 @@ public final class AgentSpawner {
         Instant startedAt = Instant.now();
         try {
             process = new ProcessBuilder(command).directory(cwd.toFile()).start();
-            process.getOutputStream().close();
+            process.getOutputStream().close();  // ---- 4
         } catch (IOException e) {
             throw new UncheckedIOException("에이전트 프로세스 시작 실패: " + command.getFirst(), e);
         }
         var stdout = new ByteArrayOutputStream();
         var stderr = new ByteArrayOutputStream();
-        Thread outDrain = Thread.ofVirtual().name("agent-stdout-" + process.pid())
+        Thread outDrain = Thread.ofVirtual().name("agent-stdout-" + process.pid())  // ---- 5
                 .start(() -> drain(process.getInputStream(), stdout));
         Thread errDrain = Thread.ofVirtual().name("agent-stderr-" + process.pid())
                 .start(() -> drain(process.getErrorStream(), stderr));
 
         var result = new CompletableFuture<AgentResult>();
         Thread.ofVirtual().name("agent-wait-" + process.pid()).start(() -> settle(result, process.toHandle(), () -> {
-            boolean exited = process.waitFor(timeout.toMillis(), TimeUnit.MILLISECONDS);
+            boolean exited = process.waitFor(timeout.toMillis(), TimeUnit.MILLISECONDS);  // ---- 6
             if (!exited) {
                 terminate(process.toHandle());
             }
@@ -180,7 +189,7 @@ public final class AgentSpawner {
      * 대기 작업 {@code wait}의 결과로 {@code result}를 완료한다. 대기 중 인터럽트되면 인터럽트 상태를 되살리고
      * {@code process}와 자손을 종료한 뒤 실패로, 그 밖의 예외는 그 예외로 실패 완료한다.
      */
-    static void settle(CompletableFuture<AgentResult> result, ProcessHandle process, Callable<AgentResult> wait) {
+    static void settle(CompletableFuture<AgentResult> result, ProcessHandle process, Callable<AgentResult> wait) {  // ---- 7
         try {
             result.complete(wait.call());
         } catch (InterruptedException e) {
@@ -204,7 +213,7 @@ public final class AgentSpawner {
     private static final Duration DRAIN_GRACE = Duration.ofSeconds(2);
 
     /** 정상 종료(SIGTERM) 후 강제 종료(SIGKILL)로 넘어가기 전 기다리는 시간. */
-    static final Duration TERMINATE_GRACE = Duration.ofMillis(500);
+    static final Duration TERMINATE_GRACE = Duration.ofMillis(500);  // ---- 8
 
     /**
      * 프로세스와 그 자손 전부를 종료한다: destroy → {@link #TERMINATE_GRACE} 대기 → 남은 것은 destroyForcibly → 다시
@@ -217,12 +226,12 @@ public final class AgentSpawner {
      * @return 대상(스냅샷한 자손 + root)이 모두 종료됐는가 — SIGKILL 후에도 유예 안에 안 끝난 것이 있으면 false
      */
     public static boolean terminate(ProcessHandle root) {
-        List<ProcessHandle> all = new ArrayList<>(root.descendants().toList());
+        List<ProcessHandle> all = new ArrayList<>(root.descendants().toList());  // ---- 9
         all.add(root);
         all.forEach(ProcessHandle::destroy);
         awaitExit(all, TERMINATE_GRACE);
         List<ProcessHandle> survivors = all.stream().filter(ProcessHandle::isAlive).toList();
-        survivors.forEach(ProcessHandle::destroyForcibly);
+        survivors.forEach(ProcessHandle::destroyForcibly);  // ---- 10
         return awaitExit(survivors, TERMINATE_GRACE);
     }
 
@@ -270,3 +279,40 @@ public final class AgentSpawner {
         return value;
     }
 }
+
+// ======== 노트 ========
+// 1 기본 권한 모드 auto
+//   설명: 헤드리스 세션은 승인 프롬프트에 답할 사람이 없다. auto는 분류기가 승인을 대신해 멈추지 않으면서 bypassPermissions처럼 검사를 통째로 끄지 않는다. acceptEdits는 gradlew test · git commit이 거부될 수 있다. 최종 선택은 E2E(AO-8)에서 확인한다.
+//   관련: AO-8
+//   개념: 권한 모드
+// 2 프롬프트는 argv 원소 하나
+//   설명: 셸을 거치지 않으므로 따옴표 · 개행 · $가 그대로 전달된다. --bare는 훅을 건너뛰어 git-logbook 트레일러와 claude-code-agile-hooks 게이트가 꺼지므로 절대 쓰지 않는다. --permission-prompts none은 묻지 않고 거부하게 한다.
+//   관련: decision-5, RFC 11절
+//   개념: argv
+// 3 start는 핸들을 바로 돌려준다
+//   설명: 돌아오는 시점에 프로세스가 이미 떠 있어 PID를 읽을 수 있다. 대기 · 타임아웃 처리는 virtual thread에서 진행한다. 세션 레지스트리가 process()로 추적하고 await()로 결과를 받는다.
+//   관련: registry/SessionRegistry.java, AO-5, AO-7
+//   개념: 핸들
+// 4 stdin을 즉시 닫는다
+//   설명: claude -p는 파이프된 stdin을 프롬프트로 읽으려 기다릴 수 있다. 띄우자마자 닫아 멈춤을 막는다.
+//   개념: stdin
+// 5 stdout · stderr를 각각 읽는다
+//   설명: 별도 virtual thread로 끝까지 읽어, 출력이 커도 파이프 버퍼가 차서 프로세스가 멈추지 않게 한다.
+//   개념: 파이프 교착
+// 6 타임아웃이면 자손까지 종료
+//   설명: 제한 시간 안에 안 끝나면 terminate로 프로세스와 자손을 죽이고 결과에 timedOut=true를 남긴다.
+//   개념: 타임아웃
+// 7 인터럽트되면 정리하고 실패 완료
+//   설명: 대기 중 인터럽트되면 인터럽트 상태를 되살리고 프로세스와 자손을 종료한 뒤 실패로 완료한다. 그 밖의 예외는 그 예외로 실패 완료한다.
+//   관련: AgentSpawnerEdgeTest
+// 8 SIGTERM 뒤 유예
+//   설명: 정상 종료(SIGTERM) 뒤 강제 종료(SIGKILL)로 넘어가기 전에 기다리는 시간이다. 최상위 Q-16(회수 유예 시간) 미결 사항과 연결된다.
+//   관련: 최상위 Q-16
+// 9 자손 목록은 부모를 죽이기 전에 뜬다
+//   설명: 부모가 먼저 죽으면 자손이 init으로 재부모화되어 descendants()로 찾을 수 없다. 같은 이유로 root가 이미 끝난 뒤에는 남은 자손을 못 죽이고, 스냅샷 이후 생긴 자손도 놓칠 수 있다(스켈레톤 범위 밖).
+//   관련: 최상위 Q-17, registry/SessionRegistry.java
+//   개념: 재부모화
+// 10 TERM → 유예 → KILL
+//   설명: destroy 뒤 유예 안에 안 끝난 것만 destroyForcibly로 넘어간다. 타임아웃 처리와 세션 레지스트리 회수(AO-5)가 함께 쓰는 단일 구현이다.
+//   관련: AO-5
+//   개념: SIGTERM/SIGKILL

@@ -1,3 +1,12 @@
+// ---
+// title: WorktreeManager
+// description: 태스크별 git worktree와 task/<id> 브랜치를 만들고 지우는 관리자
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.workspace;
 
 import com.coralstay.orchestrator.backlog.BacklogClient;
@@ -28,7 +37,7 @@ public final class WorktreeManager {
     }
 
     /** 경로 조작을 막으려고 태스크 ID는 영숫자·하이픈·밑줄만 허용한다. */
-    private static final Pattern TASK_ID = Pattern.compile("[A-Za-z0-9][A-Za-z0-9_-]*");
+    private static final Pattern TASK_ID = Pattern.compile("[A-Za-z0-9][A-Za-z0-9_-]*");  // ---- 1
 
     private final Path repoRoot;
     private final Function<List<String>, ProcessResult> executor;
@@ -50,13 +59,13 @@ public final class WorktreeManager {
     /** {@code <parent>/<repo>-wt/<taskId>}. */
     public Path worktreePath(String taskId) {
         requireValid(taskId);
-        return repoRoot.resolveSibling(repoRoot.getFileName() + "-wt").resolve(taskId);
+        return repoRoot.resolveSibling(repoRoot.getFileName() + "-wt").resolve(taskId);  // ---- 2
     }
 
     /** {@code task/<taskId>}. */
     public static String branchName(String taskId) {
         requireValid(taskId);
-        return "task/" + taskId;
+        return "task/" + taskId;  // ---- 3
     }
 
     /**
@@ -68,7 +77,7 @@ public final class WorktreeManager {
     public Path create(String taskId) {
         Path path = worktreePath(taskId);
         String branch = branchName(taskId);
-        if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
+        if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {  // ---- 4
             throw new WorktreeException("worktree 경로가 이미 있습니다: " + path);
         }
         if (executor.apply(List.of("git", "rev-parse", "--verify", "--quiet", "refs/heads/" + branch))
@@ -88,7 +97,7 @@ public final class WorktreeManager {
     public void remove(String taskId) {
         Path path = worktreePath(taskId);
         if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
-            git("worktree", "remove", path.toString());
+            git("worktree", "remove", path.toString());  // ---- 5
         }
         git("worktree", "prune");
     }
@@ -110,3 +119,22 @@ public final class WorktreeManager {
         }
     }
 }
+
+// ======== 노트 ========
+// 1 태스크 ID 허용 문자
+//   설명: 영숫자 · 하이픈 · 밑줄만 허용한다. ID가 경로와 브랜치 이름으로 쓰이므로 경로 조작(../ 등)을 여기서 막는다.
+//   관련: decision-3
+//   개념: 경로 조작 방어
+// 2 worktree는 저장소 옆 -wt 디렉토리
+//   설명: <parent>/<repo>-wt/<id>에 둔다. 저장소 안에 두지 않아 메인 작업 트리를 더럽히지 않는다.
+//   관련: decision-3
+// 3 브랜치 이름 task/<id>
+//   설명: git-logbook의 Task-Id 추출 규칙과 claude-code-agile-hooks의 브랜치 확인을 함께 만족하는 이름이다. 오케스트레이터의 착수 판정도 이 이름의 브랜치 존재를 본다.
+//   관련: BacklogClient.hasUnmergedTaskBranch, decision-14
+// 4 이미 있으면 아무것도 바꾸지 않고 실패
+//   설명: git은 빈 디렉토리에는 그대로 worktree를 만들어 버리므로 경로를 직접 확인한다. 브랜치도 확인해 둘 중 하나라도 있으면 WorktreeException이다.
+//   관련: WorktreeManagerTest
+// 5 --force를 쓰지 않는다
+//   설명: 미커밋 변경이 있으면 remove가 실패하고 worktree가 그대로 남는다. 부분 작업 상태는 사람이 판단한다. 브랜치도 남겨 둔다.
+//   관련: RFC 07절
+//   개념: 안전한 회수

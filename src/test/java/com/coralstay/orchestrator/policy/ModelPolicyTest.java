@@ -1,3 +1,12 @@
+// ---
+// title: ModelPolicyTest
+// description: ModelPolicy의 모델 선택과 설정 파일 파싱 테스트
+// authors: [coralstay]
+// license: AGPL-3.0-only
+// status: draft
+// created_date: '2026-11-06'
+// updated_date: '2026-11-06'
+// ---
 package com.coralstay.orchestrator.policy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -71,7 +80,7 @@ class ModelPolicyTest {
     @Test
     @Tag("pending")
     @DisplayName("DRAFT-4#1 default만 있어도 된다 — 모든 예상치가 default")
-    void loadAcceptsDefaultOnly() throws IOException {
+    void loadAcceptsDefaultOnly() throws IOException {  // ---- 1
         ModelPolicy policy = ModelPolicy.load(write("model.default=" + SONNET + "\n"));
 
         assertTrue(policy.buckets().isEmpty());
@@ -94,7 +103,7 @@ class ModelPolicyTest {
             model.upTo.200000=a\\nmodel.default=x\\nmodel.upTo.200000=b        | 3 | 중복 upTo 키
             model.default=x\\nmodel.default=y                                  | 2 | 중복 default
             """)
-    void loadRejectsMalformedLineWithLineNumber(String content, int line, String why) throws IOException {
+    void loadRejectsMalformedLineWithLineNumber(String content, int line, String why) throws IOException {  // ---- 2
         Path file = write(content.replace("\\n", "\n") + "\n");
 
         var e = assertThrows(PolicyFormatException.class, () -> ModelPolicy.load(file), why);
@@ -131,7 +140,7 @@ class ModelPolicyTest {
         "800001,  " + OPUS, // 어느 구간에도 안 들면 default
         "9223372036854775807, " + OPUS,
     })
-    void chooseSmallestBucketAtOrAbove(long estimated, String expected) throws IOException {
+    void chooseSmallestBucketAtOrAbove(long estimated, String expected) throws IOException {  // ---- 3
         Choice choice = valid().choose(estimated);
 
         assertEquals(expected, choice.model());
@@ -193,3 +202,14 @@ class ModelPolicyTest {
         assertEquals(Source.BUILT_IN, builtIn.source());
     }
 }
+
+// ======== 노트 ========
+// 1 default만 있어도 된다
+//   설명: 구간 없이 model.default만 있으면 모든 예상치가 default 모델로 간다. 설정 텍스트 블록(VALID)은 일부러 오름차순이 아니게 써서 파일 순서가 아니라 상한 순서로 고르는지 본다.
+//   관련: DRAFT-4#1, DRAFT-4#2
+// 2 형식 오류는 줄 번호와 함께
+//   설명: 모르는 키 · 중복 키 · 0 이하 숫자 등은 줄 번호가 담긴 PolicyFormatException이다. model.default 누락은 줄 번호 0이다.
+//   관련: DRAFT-4#1, policy/ModelPolicy.java
+// 3 경계값 포함 구간 선택
+//   설명: 예상치가 상한 이하인 가장 작은 구간을 고른다. 상한과 같은 값은 그 구간에 든다.
+//   관련: DRAFT-4#2
