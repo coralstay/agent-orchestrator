@@ -5,7 +5,7 @@
 // license: AGPL-3.0-only
 // status: draft
 // created_date: '2026-11-06'
-// updated_date: '2026-11-06'
+// updated_date: '2026-11-17'
 // ---
 package com.coralstay.orchestrator.spawn;
 
@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -26,6 +27,8 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
+import java.util.regex.Pattern;
 
 /**
  * {@code claude -p} 헤드리스 프로세스를 띄우고 기다리는 스포너 (RFC 06절 Agent Spawner).
@@ -104,12 +107,25 @@ public final class AgentSpawner {
      */
     public static final String DEFAULT_PERMISSION_MODE = "auto";  // ---- 1
 
+    /** 헤드리스 세션 하나의 기본 비용 상한(USD). {@code --max-budget-usd}로 넘긴다. */
+    public static final String DEFAULT_MAX_BUDGET_USD = "1.00";
+
+    /** 비용 상한을 바꾸는 환경 변수. */
+    public static final String MAX_BUDGET_ENV = "ORCHESTRATOR_MAX_BUDGET_USD";
+
+    /** 헤드리스 세션에서 늘 막는 도구. 오케스트레이터 실행분은 push하지 않는다. */
+    public static final String DISALLOWED_TOOLS = "Bash(git push:*)";
+
+    /** 양의 소수: {@code 1}, {@code 1.00}, {@code 0.5}. 지수 · 부호 · 쉼표는 받지 않는다. */
+    private static final Pattern BUDGET = Pattern.compile("[0-9]+(\\.[0-9]+)?");
+
     private final String executable;
     private final String permissionMode;
+    private final String maxBudgetUsd;
 
-    /** {@code claude}(PATH 탐색) + {@link #DEFAULT_PERMISSION_MODE}. */
+    /** {@code claude}(PATH 탐색) + {@link #DEFAULT_PERMISSION_MODE} + 환경 변수 {@link #MAX_BUDGET_ENV}의 비용 상한. */
     public AgentSpawner() {
-        this(DEFAULT_EXECUTABLE, DEFAULT_PERMISSION_MODE);
+        this(DEFAULT_EXECUTABLE, DEFAULT_PERMISSION_MODE, maxBudgetFrom(System::getenv));
     }
 
     /**
@@ -118,27 +134,61 @@ public final class AgentSpawner {
      *     manual, dontAsk, plan)
      */
     public AgentSpawner(String executable, String permissionMode) {
-        this.executable = requireText(executable, "executable");
-        this.permissionMode = requireText(permissionMode, "permissionMode");
+        this(executable, permissionMode, DEFAULT_MAX_BUDGET_USD);
     }
 
     /**
-     * {@code [executable, -p, <prompt>, --permission-mode, <mode>, --permission-prompts, none]}.
+     * @param maxBudgetUsd {@code --max-budget-usd} 값. 양의 소수가 아니면 {@link IllegalArgumentException}
+     */
+    public AgentSpawner(String executable, String permissionMode, String maxBudgetUsd) {
+        this.executable = requireText(executable, "executable");
+        this.permissionMode = requireText(permissionMode, "permissionMode");
+        this.maxBudgetUsd = requireBudget(maxBudgetUsd);
+    }
+
+    /**
+     * 환경 변수 {@link #MAX_BUDGET_ENV}의 비용 상한. 없거나 비어 있으면 {@link #DEFAULT_MAX_BUDGET_USD}, 양의 소수가 아니면
+     * {@link IllegalArgumentException} — 비용 상한의 오타를 기본값으로 조용히 덮지 않는다.
+     *
+     * @param env 환경 변수 조회(운영은 {@code System::getenv}, 테스트는 가짜)
+     */
+    public static String maxBudgetFrom(Function<String, String> env) {  // ---- 2
+        String value = env.apply(MAX_BUDGET_ENV);
+        if (value == null || value.isBlank()) {
+            return DEFAULT_MAX_BUDGET_USD;
+        }
+        return requireBudget(value.strip());
+    }
+
+    private static String requireBudget(String value) {
+        if (value == null || !BUDGET.matcher(value).matches() || new BigDecimal(value).signum() <= 0) {
+            throw new IllegalArgumentException(MAX_BUDGET_ENV + "(비용 상한, USD)는 양의 소수여야 합니다: " + value);
+        }
+        return value;
+    }
+
+    /**
+     * {@code [executable, -p, <prompt>, --permission-mode, <mode>, --permission-prompts, none, --output-format, json,
+     * --max-budget-usd, <amount>, --disallowedTools, Bash(git push:*)]}.
      *
      * <p>프롬프트는 셸을 거치지 않고 argv 원소 하나로 넘긴다 — 따옴표·개행·{@code $}가 그대로 전달된다.
      * {@code --permission-prompts none}은 권한 모드가 허용하지 않은 동작을 묻지 않고 거부하게 해, 헤드리스 세션이 답할 사람
-     * 없는 프롬프트에서 멈추지 않게 한다.
+     * 없는 프롬프트에서 멈추지 않게 한다. 비용 상한과 push 금지는 생성자와 상관없이 늘 넣는다(AO-33 B4).
+     * {@code --disallowedTools}는 가변 인자({@code <tools...>})라 뒤 인자를 삼키지 않도록 맨 끝에 둔다.
      *
      * @param role 에이전트 역할 (스켈레톤은 Implementer 단독이라 아직 argv에 반영하지 않는다)
      */
-    public List<String> command(String role, String prompt) {  // ---- 2
+    public List<String> command(String role, String prompt) {  // ---- 3
         requireText(role, "role");
         Objects.requireNonNull(prompt, "prompt");
         return List.of(
                 executable,
                 "-p", prompt,
                 "--permission-mode", permissionMode,
-                "--permission-prompts", "none");
+                "--permission-prompts", "none",
+                "--output-format", "json",
+                "--max-budget-usd", maxBudgetUsd,
+                "--disallowedTools", DISALLOWED_TOOLS);  // ---- 4
     }
 
     /**
@@ -149,7 +199,7 @@ public final class AgentSpawner {
      * <p>stdin은 즉시 닫는다 — {@code claude -p}는 파이프된 stdin을 프롬프트로 읽으려 기다릴 수 있다. stdout·stderr는
      * 각각 별도 virtual thread로 끝까지 읽어, 출력이 커도 파이프 버퍼가 차서 프로세스가 멈추지 않게 한다.
      */
-    public SpawnedAgent start(String role, Path cwd, String prompt, Duration timeout) {  // ---- 3
+    public SpawnedAgent start(String role, Path cwd, String prompt, Duration timeout) {  // ---- 5
         Objects.requireNonNull(cwd, "cwd");
         if (timeout == null || timeout.isNegative() || timeout.isZero()) {
             throw new IllegalArgumentException("timeout은 양수여야 합니다: " + timeout);
@@ -159,20 +209,20 @@ public final class AgentSpawner {
         Instant startedAt = Instant.now();
         try {
             process = new ProcessBuilder(command).directory(cwd.toFile()).start();
-            process.getOutputStream().close();  // ---- 4
+            process.getOutputStream().close();  // ---- 6
         } catch (IOException e) {
             throw new UncheckedIOException("에이전트 프로세스 시작 실패: " + command.getFirst(), e);
         }
         var stdout = new ByteArrayOutputStream();
         var stderr = new ByteArrayOutputStream();
-        Thread outDrain = Thread.ofVirtual().name("agent-stdout-" + process.pid())  // ---- 5
+        Thread outDrain = Thread.ofVirtual().name("agent-stdout-" + process.pid())  // ---- 7
                 .start(() -> drain(process.getInputStream(), stdout));
         Thread errDrain = Thread.ofVirtual().name("agent-stderr-" + process.pid())
                 .start(() -> drain(process.getErrorStream(), stderr));
 
         var result = new CompletableFuture<AgentResult>();
         Thread.ofVirtual().name("agent-wait-" + process.pid()).start(() -> settle(result, process.toHandle(), () -> {
-            boolean exited = process.waitFor(timeout.toMillis(), TimeUnit.MILLISECONDS);  // ---- 6
+            boolean exited = process.waitFor(timeout.toMillis(), TimeUnit.MILLISECONDS);  // ---- 8
             if (!exited) {
                 terminate(process.toHandle());
             }
@@ -189,7 +239,7 @@ public final class AgentSpawner {
      * 대기 작업 {@code wait}의 결과로 {@code result}를 완료한다. 대기 중 인터럽트되면 인터럽트 상태를 되살리고
      * {@code process}와 자손을 종료한 뒤 실패로, 그 밖의 예외는 그 예외로 실패 완료한다.
      */
-    static void settle(CompletableFuture<AgentResult> result, ProcessHandle process, Callable<AgentResult> wait) {  // ---- 7
+    static void settle(CompletableFuture<AgentResult> result, ProcessHandle process, Callable<AgentResult> wait) {  // ---- 9
         try {
             result.complete(wait.call());
         } catch (InterruptedException e) {
@@ -213,7 +263,7 @@ public final class AgentSpawner {
     private static final Duration DRAIN_GRACE = Duration.ofSeconds(2);
 
     /** 정상 종료(SIGTERM) 후 강제 종료(SIGKILL)로 넘어가기 전 기다리는 시간. */
-    static final Duration TERMINATE_GRACE = Duration.ofMillis(500);  // ---- 8
+    static final Duration TERMINATE_GRACE = Duration.ofMillis(500);  // ---- 10
 
     /**
      * 프로세스와 그 자손 전부를 종료한다: destroy → {@link #TERMINATE_GRACE} 대기 → 남은 것은 destroyForcibly → 다시
@@ -226,12 +276,12 @@ public final class AgentSpawner {
      * @return 대상(스냅샷한 자손 + root)이 모두 종료됐는가 — SIGKILL 후에도 유예 안에 안 끝난 것이 있으면 false
      */
     public static boolean terminate(ProcessHandle root) {
-        List<ProcessHandle> all = new ArrayList<>(root.descendants().toList());  // ---- 9
+        List<ProcessHandle> all = new ArrayList<>(root.descendants().toList());  // ---- 11
         all.add(root);
         all.forEach(ProcessHandle::destroy);
         awaitExit(all, TERMINATE_GRACE);
         List<ProcessHandle> survivors = all.stream().filter(ProcessHandle::isAlive).toList();
-        survivors.forEach(ProcessHandle::destroyForcibly);  // ---- 10
+        survivors.forEach(ProcessHandle::destroyForcibly);  // ---- 12
         return awaitExit(survivors, TERMINATE_GRACE);
     }
 
@@ -285,34 +335,41 @@ public final class AgentSpawner {
 //   설명: 헤드리스 세션은 승인 프롬프트에 답할 사람이 없다. auto는 분류기가 승인을 대신해 멈추지 않으면서 bypassPermissions처럼 검사를 통째로 끄지 않는다. acceptEdits는 gradlew test · git commit이 거부될 수 있다. 최종 선택은 E2E(AO-8)에서 확인한다.
 //   관련: AO-8
 //   개념: 권한 모드
-// 2 프롬프트는 argv 원소 하나
+// 2 비용 상한은 환경 변수로, 잘못되면 실패
+//   설명: ORCHESTRATOR_MAX_BUDGET_USD가 없거나 비면 1.00이다. 양의 소수가 아니면 IllegalArgumentException — 비용 상한의 오타를 기본값으로 조용히 덮지 않는다. 테스트는 환경 조회 함수를 가짜로 넘긴다.
+//   관련: AO-33
+//   개념: 비용 상한
+// 3 프롬프트는 argv 원소 하나
 //   설명: 셸을 거치지 않으므로 따옴표 · 개행 · $가 그대로 전달된다. --bare는 훅을 건너뛰어 git-logbook 트레일러와 claude-code-agile-hooks 게이트가 꺼지므로 절대 쓰지 않는다. --permission-prompts none은 묻지 않고 거부하게 한다.
 //   관련: decision-5, RFC 11절
 //   개념: argv
-// 3 start는 핸들을 바로 돌려준다
+// 4 push 금지 · 비용 상한 · JSON 출력은 늘 넣는다 (B4)
+//   설명: 생성자와 상관없이 --output-format json, --max-budget-usd, --disallowedTools Bash(git push:*)를 넣는다. --disallowedTools는 가변 인자라 뒤 인자를 삼키지 않도록 맨 끝에 둔다. --model은 아직 넣지 않는다(ModelPolicy는 AO-7).
+//   관련: AO-33, RunCommand.PROMPT
+// 5 start는 핸들을 바로 돌려준다
 //   설명: 돌아오는 시점에 프로세스가 이미 떠 있어 PID를 읽을 수 있다. 대기 · 타임아웃 처리는 virtual thread에서 진행한다. 세션 레지스트리가 process()로 추적하고 await()로 결과를 받는다.
 //   관련: registry/SessionRegistry.java, AO-5, AO-7
 //   개념: 핸들
-// 4 stdin을 즉시 닫는다
+// 6 stdin을 즉시 닫는다
 //   설명: claude -p는 파이프된 stdin을 프롬프트로 읽으려 기다릴 수 있다. 띄우자마자 닫아 멈춤을 막는다.
 //   개념: stdin
-// 5 stdout · stderr를 각각 읽는다
+// 7 stdout · stderr를 각각 읽는다
 //   설명: 별도 virtual thread로 끝까지 읽어, 출력이 커도 파이프 버퍼가 차서 프로세스가 멈추지 않게 한다.
 //   개념: 파이프 교착
-// 6 타임아웃이면 자손까지 종료
+// 8 타임아웃이면 자손까지 종료
 //   설명: 제한 시간 안에 안 끝나면 terminate로 프로세스와 자손을 죽이고 결과에 timedOut=true를 남긴다.
 //   개념: 타임아웃
-// 7 인터럽트되면 정리하고 실패 완료
+// 9 인터럽트되면 정리하고 실패 완료
 //   설명: 대기 중 인터럽트되면 인터럽트 상태를 되살리고 프로세스와 자손을 종료한 뒤 실패로 완료한다. 그 밖의 예외는 그 예외로 실패 완료한다.
 //   관련: AgentSpawnerEdgeTest
-// 8 SIGTERM 뒤 유예
+// 10 SIGTERM 뒤 유예
 //   설명: 정상 종료(SIGTERM) 뒤 강제 종료(SIGKILL)로 넘어가기 전에 기다리는 시간이다. 최상위 Q-16(회수 유예 시간) 미결 사항과 연결된다.
 //   관련: 최상위 Q-16
-// 9 자손 목록은 부모를 죽이기 전에 뜬다
+// 11 자손 목록은 부모를 죽이기 전에 뜬다
 //   설명: 부모가 먼저 죽으면 자손이 init으로 재부모화되어 descendants()로 찾을 수 없다. 같은 이유로 root가 이미 끝난 뒤에는 남은 자손을 못 죽이고, 스냅샷 이후 생긴 자손도 놓칠 수 있다(스켈레톤 범위 밖).
 //   관련: 최상위 Q-17, registry/SessionRegistry.java
 //   개념: 재부모화
-// 10 TERM → 유예 → KILL
+// 12 TERM → 유예 → KILL
 //   설명: destroy 뒤 유예 안에 안 끝난 것만 destroyForcibly로 넘어간다. 타임아웃 처리와 세션 레지스트리 회수(AO-5)가 함께 쓰는 단일 구현이다.
 //   관련: AO-5
 //   개념: SIGTERM/SIGKILL
