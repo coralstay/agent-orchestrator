@@ -5,7 +5,7 @@
 // license: AGPL-3.0-only
 // status: draft
 // created_date: '2026-11-06'
-// updated_date: '2026-11-06'
+// updated_date: '2026-11-17'
 // ---
 package com.coralstay.orchestrator.spawn;
 
@@ -26,10 +26,13 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /** spawn 테스트는 claude 대신 @TempDir에 쓴 셸 스크립트를 실행 파일로 주입한다 — 실제 claude는 띄우지 않는다. */
 class AgentSpawnerTest {
@@ -72,7 +75,8 @@ class AgentSpawnerTest {
 
         assertEquals(
                 List.of("/opt/claude", "-p", "do it", "--permission-mode", "acceptEdits",
-                        "--permission-prompts", "none"),
+                        "--permission-prompts", "none", "--output-format", "json", "--max-budget-usd", "1.00",
+                        "--disallowedTools", "Bash(git push:*)"),
                 spawner.command("implementer", "do it"));
     }
 
@@ -95,7 +99,49 @@ class AgentSpawnerTest {
         List<String> command = new AgentSpawner().command("implementer", prompt);
 
         assertEquals(prompt, command.get(command.indexOf("-p") + 1));
-        assertEquals(7, command.size());
+        assertEquals(13, command.size());
+    }
+
+    @Test
+    @DisplayName("AO-33#4 AO-33#B4 command는 JSON 출력 · 비용 상한(기본 1.00) · push 금지를 늘 넣고, push 금지는 맨 끝이다")
+    void commandAlwaysCapsBudgetAndDeniesPush() {  // ---- 3
+        for (AgentSpawner spawner : List.of(
+                new AgentSpawner(), new AgentSpawner("/opt/claude", "auto"),
+                new AgentSpawner("/opt/claude", "auto", "2.5"))) {
+            List<String> command = spawner.command("implementer", "x");
+
+            assertEquals("json", command.get(command.indexOf("--output-format") + 1));
+            assertTrue(command.indexOf("--max-budget-usd") > 0, command.toString());
+            // --disallowedTools는 가변 인자(<tools...>)라 뒤 인자를 삼키지 않도록 맨 끝에 둔다
+            assertEquals(List.of("--disallowedTools", "Bash(git push:*)"),
+                    command.subList(command.size() - 2, command.size()));
+            assertFalse(command.contains("--model"), "모델은 아직 고르지 않는다");
+        }
+        assertEquals("1.00", budget(new AgentSpawner("/opt/claude", "auto")));
+        assertEquals("2.5", budget(new AgentSpawner("/opt/claude", "auto", "2.5")));
+    }
+
+    static String budget(AgentSpawner spawner) {
+        List<String> command = spawner.command("implementer", "x");
+        return command.get(command.indexOf("--max-budget-usd") + 1);
+    }
+
+    @Test
+    @DisplayName("AO-33#4 AO-33#B4 비용 상한은 ORCHESTRATOR_MAX_BUDGET_USD로 바꾸고, 없거나 비면 1.00이다")
+    void budgetComesFromEnvironmentWithDefault() {
+        assertEquals("3.25", AgentSpawner.maxBudgetFrom(Map.of(AgentSpawner.MAX_BUDGET_ENV, "3.25")::get));
+        assertEquals("1.00", AgentSpawner.maxBudgetFrom(name -> null));
+        assertEquals("1.00", AgentSpawner.maxBudgetFrom(name -> " "));
+        assertEquals(AgentSpawner.DEFAULT_MAX_BUDGET_USD, "1.00");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"abc", "0", "0.00", "-1", "1e3", "1.", ".5", "1,5"})
+    @DisplayName("AO-33#4 AO-33#B4 비용 상한이 양의 소수가 아니면 조용히 넘어가지 않고 IllegalArgumentException")
+    void invalidBudgetIsRejected(String value) {
+        assertThrows(IllegalArgumentException.class,
+                () -> AgentSpawner.maxBudgetFrom(Map.of(AgentSpawner.MAX_BUDGET_ENV, value)::get));
+        assertThrows(IllegalArgumentException.class, () -> new AgentSpawner("/opt/claude", "auto", value));
     }
 
     @Test
@@ -103,6 +149,7 @@ class AgentSpawnerTest {
     void constructorRejectsBlankValues() {
         assertThrows(IllegalArgumentException.class, () -> new AgentSpawner(" ", "auto"));
         assertThrows(IllegalArgumentException.class, () -> new AgentSpawner("claude", ""));
+        assertThrows(IllegalArgumentException.class, () -> new AgentSpawner("claude", "auto", null));
     }
 
     // --- spawn ---
@@ -121,7 +168,9 @@ class AgentSpawnerTest {
 
         assertEquals(7, result.exitCode());
         assertEquals(
-                "-p\nhello world\n--permission-mode\nacceptEdits\n--permission-prompts\nnone\n" + cwd + "\n",
+                "-p\nhello world\n--permission-mode\nacceptEdits\n--permission-prompts\nnone\n"
+                        + "--output-format\njson\n--max-budget-usd\n1.00\n--disallowedTools\nBash(git push:*)\n"
+                        + cwd + "\n",
                 result.stdout());
         assertEquals("oops\n", result.stderr());
         assertFalse(result.timedOut());
@@ -182,7 +231,7 @@ class AgentSpawnerTest {
 
     @Test
     @DisplayName("AO-4 보조: 큰 출력도 막히지 않고 양쪽 스트림을 비운다")
-    void spawnDrainsLargeOutputOnBothStreamsWithoutBlocking() throws IOException {  // ---- 3
+    void spawnDrainsLargeOutputOnBothStreamsWithoutBlocking() throws IOException {  // ---- 4
         // 파이프 버퍼(64KiB 안팎)를 훨씬 넘는 양을 stdout·stderr 양쪽에 쓴다
         Path exe = fake("head -c 1048576 /dev/zero | tr '\\0' a; head -c 1048576 /dev/zero | tr '\\0' b >&2");
 
@@ -207,7 +256,7 @@ class AgentSpawnerTest {
 
     @Test
     @DisplayName("AO-4#3 타임아웃이면 프로세스와 자손을 모두 종료한다")
-    void spawnTimeoutKillsProcessAndAllDescendants() throws IOException {  // ---- 4
+    void spawnTimeoutKillsProcessAndAllDescendants() throws IOException {  // ---- 5
         // 백그라운드 자식과 전경 자식을 하나씩 두고, 둘 다 30초 동안 버티게 한다
         Path pids = tmp.resolve("pids");
         Path exe = fake("""
@@ -230,7 +279,7 @@ class AgentSpawnerTest {
 
     @Test
     @DisplayName("AO-4#3 SIGTERM을 무시하면 SIGKILL로 강제 종료한다")
-    void terminateForcesProcessThatIgnoresSigterm() throws IOException {  // ---- 5
+    void terminateForcesProcessThatIgnoresSigterm() throws IOException {  // ---- 6
         Path exe = fake("""
                 trap '' TERM
                 echo ready
@@ -251,13 +300,16 @@ class AgentSpawnerTest {
 // 2 프롬프트는 argv 원소 하나
 //   설명: 따옴표 · 개행 · $가 있어도 셸을 거치지 않고 그대로 전달된다.
 //   관련: AO-4#1
-// 3 큰 출력도 막히지 않는다
+// 3 B4: 비용 상한 · push 금지는 늘 들어간다
+//   설명: 어떤 생성자로 만들어도 --output-format json, --max-budget-usd, --disallowedTools Bash(git push:*)가 argv에 있다. --disallowedTools는 가변 인자라 맨 끝에 둔다.
+//   관련: AO-33
+// 4 큰 출력도 막히지 않는다
 //   설명: 파이프 버퍼(64KiB 안팎)를 훨씬 넘는 양을 stdout · stderr 양쪽에 써도 프로세스가 멈추지 않아야 한다.
 //   관련: AO-4
 //   개념: 파이프 교착
-// 4 타임아웃은 자손까지 종료
+// 5 타임아웃은 자손까지 종료
 //   설명: 백그라운드 자식과 전경 자식을 하나씩 두고 둘 다 죽는지 본다.
 //   관련: AO-4#3, AgentSpawner.terminate
-// 5 SIGTERM을 무시하면 SIGKILL
+// 6 SIGTERM을 무시하면 SIGKILL
 //   설명: 유예 뒤에도 살아 있는 프로세스는 destroyForcibly로 강제 종료된다.
 //   관련: AO-4#3
