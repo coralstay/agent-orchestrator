@@ -5,7 +5,7 @@
 // license: AGPL-3.0-only
 // status: draft
 // created_date: '2026-11-06'
-// updated_date: '2026-11-06'
+// updated_date: '2026-11-17'
 // ---
 package com.coralstay.orchestrator;
 
@@ -18,6 +18,8 @@ import com.coralstay.orchestrator.Main.UsageError;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -77,17 +79,38 @@ class MainTest {
         assertTrue(err.toString(StandardCharsets.UTF_8).contains(Main.USAGE));
     }
 
-    @Test
-    @DisplayName("AO-1 보조: run은 taskId를 stdout에 출력하고 exit 0")
-    void runPrintsTaskIdAndExits0() {
+    @ParameterizedTest(name = "{displayName} [{index}] exit={0}")
+    @DisplayName("AO-33#5 run <taskId>는 RunCommand 실행기에 taskId를 넘기고 그 종료 코드를 그대로 돌려준다")
+    @ValueSource(ints = {0, 1, 3})
+    void runDelegatesToTaskRunner(int exit) {  // ---- 3
         var out = new ByteArrayOutputStream();
         var err = new ByteArrayOutputStream();
+        List<String> seen = new ArrayList<>();
 
-        int code = Main.run(new String[] {"run", "AO-1"}, print(out), print(err));
+        int code = Main.run(new String[] {"run", " AO-1 "}, print(out), print(err), (taskId, o, e) -> {
+            seen.add(taskId);
+            o.println("ran " + taskId);
+            return exit;
+        });
 
-        assertEquals(0, code);
-        assertEquals("AO-1", out.toString(StandardCharsets.UTF_8).strip());
-        assertEquals("", err.toString(StandardCharsets.UTF_8));
+        assertEquals(exit, code);
+        assertEquals(List.of("AO-1"), seen);
+        assertEquals("ran AO-1", out.toString(StandardCharsets.UTF_8).strip());
+    }
+
+    @ParameterizedTest(name = "{displayName} [{index}] args=\"{0}\"")
+    @DisplayName("AO-33#5 usage 오류는 실행기를 부르지 않고 그대로 exit 2")
+    @ValueSource(strings = {"", "watch AO-1", "run", "run AO-1 AO-2"})
+    void usageErrorNeverRunsTask(String line) {
+        String[] args = line.isEmpty() ? new String[0] : line.split(" ");
+        var err = new ByteArrayOutputStream();
+
+        int code = Main.run(args, print(new ByteArrayOutputStream()), print(err), (taskId, o, e) -> {
+            throw new AssertionError("실행기를 부르면 안 된다: " + taskId);
+        });
+
+        assertEquals(Main.EXIT_USAGE, code);
+        assertTrue(err.toString(StandardCharsets.UTF_8).contains(Main.USAGE));
     }
 
     private static PrintStream print(ByteArrayOutputStream sink) {
@@ -102,3 +125,6 @@ class MainTest {
 // 2 AC #2: 잘못된 인자는 stderr + exit 2
 //   설명: usage 오류는 stdout에 아무것도 쓰지 않고 stderr에 usage를 쓰며 종료 코드 2다.
 //   관련: AO-1#2
+// 3 run은 RunCommand로 연결된다
+//   설명: 테스트는 실행기를 가짜로 넘겨 taskId 전달과 종료 코드(0 · 1 · 3) 전파만 본다. 실제 RunCommand 연결은 MainCoverageTest가 별도 JVM으로 확인한다.
+//   관련: AO-33, RunCommand
