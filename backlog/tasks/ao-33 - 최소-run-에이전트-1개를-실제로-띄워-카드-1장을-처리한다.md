@@ -1,7 +1,7 @@
 ---
-id: DRAFT-9
+id: AO-33
 title: '최소 run: 에이전트 1개를 실제로 띄워 카드 1장을 처리한다'
-status: Draft
+status: To Do
 assignee: []
 created_date: '2026-11-17T13:58:00Z'
 updated_date: '2026-11-17T13:58:00Z'
