@@ -4,11 +4,19 @@ title: '최소 run: 에이전트 1개를 실제로 띄워 카드 1장을 처리�
 status: To Do
 assignee: []
 created_date: '2026-11-17T13:58:00Z'
-updated_date: '2026-11-17T13:58:00Z'
+updated_date: '2026-11-17T14:01:00Z'
 labels:
   - run
   - e2e
 dependencies: []
+references:
+  - AO-7
+  - decision-2
+  - decision-3
+  - decision-7
+  - decision-14
+documentation:
+  - /Users/flynn_macpro/.claude/plans/agent-orchestrator-min-run.md
 ---
 
 ## Description
