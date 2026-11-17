@@ -4,6 +4,7 @@ title: '최소 run: 에이전트 1개를 실제로 띄워 카드 1장을 처리�
 status: Draft
 assignee: []
 created_date: '2026-11-17T13:58:00Z'
+updated_date: '2026-11-17T13:58:00Z'
 labels:
   - run
   - e2e
@@ -40,3 +41,44 @@ scripts/make-sandbox.sh 로 ~/githubs-work/ao-sandbox(git·backlog init, 카드 
 ## 하지 않는 것
 Token Budget 검증·기록, ModelPolicy, runs.jsonl, CommitLedger, ClaudeCodeRunner 포트 전환, 헤드리스 JSON 파싱(AO-7·AO-8·DRAFT-1~4)
 <!-- SECTION:DESCRIPTION:END -->
+
+## Acceptance Criteria
+<!-- AC:BEGIN -->
+- [ ] #1 실행 불가 사유(HEAD≠main, 상태, 의존, 미병합 task/<id>)마다 워크트리·프로세스 없이 사유와 exit 3 으로 끝난다(B1)
+- [ ] #2 순서가 create → admit → start/await → retire(finally)이고, 스폰 예외·타임아웃에도 retire 가 실행된다(B2)
+- [ ] #3 판정: 워크트리 카드 Done + AC 전부 체크 + 커밋 수 ≥ AC 수면 성공(exit 0)·워크트리 제거, 아니면 실패(exit 1)·보존, To Do 그대로면 '착수 안 됨'. main 카드는 고치지 않는다(B3·B5)
+- [ ] #4 AgentSpawner.command 에 --disallowedTools Bash(git push:*), --max-budget-usd(기본 1.00, ORCHESTRATOR_MAX_BUDGET_USD), --output-format json 이 들어간다(B4)
+- [ ] #5 Main 이 run <taskId> 를 RunCommand 로 연결한다(usage 오류 exit 2 는 그대로)
+- [ ] #6 실제 1회 실행: scripts/make-sandbox.sh 로 만든 샌드박스의 카드 SB-1(AC 1개)을 agent-orchestrator run 으로 처리해 성공 판정(exit 0)을 받고 출력·브랜치 로그·비용(total_cost_usd)을 Notes 에 첨부한다
+<!-- AC:END -->
+
+## Definition of Done
+<!-- DOD:BEGIN -->
+- [ ] #1 ./gradlew test check 통과(JaCoCo line+branch 100%) 로그를 확인했다
+- [ ] #2 테스트 @DisplayName 에 <ID>#n·<ID>#Bk 표식이 있다
+- [ ] #3 installDist 로 ~/githubs/bin/agent-orchestrator 를 갱신했다
+- [ ] #4 AC 마다 커밋 1개 이상이다
+<!-- DOD:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+### Subjective
+유저(2026-11-17)가 오케스트레이터 run 을 작게, 에이전트 하나만 띄워 실제로 실행해 보자고 했고 앞으로 계속 발전시킨다고 했다. 계획: ~/.claude/plans/agent-orchestrator-min-run.md
+
+### Objective
+- Main.run 은 taskId 만 출력한다(Main.java:57-63).
+- 구현됨: BacklogClient(view·isRunnable·hasUnmergedTaskBranch), WorktreeManager(create·remove, <repo>-wt/<id>, task/<id>), AgentSpawner(start·await·terminate, 가짜 claude 스크립트 테스트 패턴), SessionRegistry(admit·attach·retire).
+- pending 스텁: ClaudeCodeRunner, BacklogCardSource, ModelPolicy, Token Budget 파싱.
+- AgentSpawner.command 의 argv 는 [exe, -p, prompt, --permission-mode, mode, --permission-prompts, none] 뿐이라 push 금지·비용 상한이 없다. claude 2.1.285 에 --disallowedTools·--max-budget-usd·--output-format 이 있다.
+- check 는 pendingStubClasses 밖 모든 클래스에 line+branch 100% 를 요구한다. testFirst 훅이 있다.
+
+### Assessment
+RunCommand 를 새로 만들어 구현된 부품만 잇는다(AO-7 의 일부를 먼저 채움). 토큰·정책·기록은 AO-7 로 남긴다. 실제 실행은 원격 없는 샌드박스 저장소에서 하고, 사람 서명이 필요한 In Progress 는 유저가 샌드박스에서 미리 서명한다.
+
+### Plan
+1. 테스트 먼저: RunCommandTest(포트 가짜 주입), AgentSpawnerTest argv, MainTest/MainCoverageTest 기대값 — 실패 확인.
+2. AgentSpawner.command 보강 → RunCommand 구현 → Main 연결.
+3. gradlew test check 100%, installDist.
+4. scripts/make-sandbox.sh 로 샌드박스 생성 → 유저 서명 → 비용 상한 확인 → 실제 run 1회 → Notes 첨부.
+<!-- SECTION:PLAN:END -->
